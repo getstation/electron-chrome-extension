@@ -1,8 +1,8 @@
 ### Revive basic support
 -[x] implement API to load extension
 -[x] rename all IPC call
--[ ] reimplement the proptocol buffer handler
 -[x] Replace preference manager
+-[x] reimplement the proptocol buffer handler
 
 ### Add corrections
 -[ ] remove peristence
