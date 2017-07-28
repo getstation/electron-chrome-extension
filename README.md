@@ -5,7 +5,7 @@
 -[x] reimplement the proptocol buffer handler
 
 ### Add corrections
--[ ] remove peristence
+-[x] remove peristence
 -[ ] content_scrips support: support CSS
 -[ ] content_scrips support: fix matches rules implementation	
 -[ ] content_scrips support: run JS scripts in same context
