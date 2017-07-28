@@ -10,6 +10,6 @@
 -[ ] content_scrips support: fix matches rules implementation	
 -[ ] content_scrips support: run JS scripts in same context
 -[ ] Fix insecure content error for resources load via chrome-extension:
--[ ] content_scrips support: fix chrome.storage to access extension data independently of host page's doamain
+-[x] content_scrips support: fix chrome.storage to access extension data independently of host page's doamain
 -[ ] Fix page's URL used to test against content_scripts[].matches
 -[ ] Add support for chrome.runtime.getManifest()
