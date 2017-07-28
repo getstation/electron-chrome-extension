@@ -13,3 +13,8 @@
 -[x] content_scrips support: fix chrome.storage to access extension data independently of host page's doamain
 -[x] Fix page's URL used to test against content_scripts[].matches
 -[ ] Add support for chrome.runtime.getManifest()
+
+### Test extensions
+-[ ] MixMax
+-[ ] mailtracker
+-[ ] grammarly 
