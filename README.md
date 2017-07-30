@@ -12,7 +12,7 @@
 -[x] Fix insecure content error for resources load via chrome-extension: (not needed if https://github.com/electron/electron/pull/9950/ gets merged)
 -[x] content_scrips support: fix chrome.storage to access extension data independently of host page's doamain
 -[x] Fix page's URL used to test against content_scripts[].matches
--[ ] Add support for chrome.runtime.getManifest()
+-[x] Add support for chrome.runtime.getManifest()
 
 ### Test extensions
 -[ ] MixMax
