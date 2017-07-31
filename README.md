@@ -16,5 +16,5 @@
 
 ### Test extensions
 -[ ] MixMax
--[ ] mailtracker
+-[x] mailtracker
 -[ ] grammarly 
