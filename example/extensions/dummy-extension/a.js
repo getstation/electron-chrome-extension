@@ -8,3 +8,5 @@ var body = document.querySelector('body')
 var img = new Image();
 img.src = imgURL;
 body.appendChild(img);
+
+console.log(chrome.runtime.getManifest())
