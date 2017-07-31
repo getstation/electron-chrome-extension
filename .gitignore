@@ -57,3 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
+#
+example/extensions
+!example/extensions/dummy-extension
