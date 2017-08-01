@@ -63,5 +63,12 @@ app.on('activate', function () {
   }
 })
 
+// some webapps (mixmax) have a special behavior when we see we are on Electron
+// we don't want that so we remove the Electron mention
+app.on('session-created', session => {
+  const userAgent = session.getUserAgent();
+  session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''));
+});
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
