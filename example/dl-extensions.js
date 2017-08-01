@@ -7,6 +7,14 @@ const EXTENSIONS = [
   {
     id: 'pgbdljpkijehgoacbjpolaomhkoffhnl',
     slug: 'mailtracker'
+  },
+  {
+    id: 'kbfnbcaeplbcioakkpcpgfkobkghlhen',
+    slug: 'gramarly'
+  },
+  {
+    id: 'ocpljaamllnldhepankaeljmeeeghnid',
+    slug: 'mixmax'
   }
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
