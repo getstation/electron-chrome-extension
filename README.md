@@ -106,3 +106,7 @@ Extension Id: null
 InboxSDK Loader Version: 0.7.24-1484787998857-c248fbb55be579d3 
 InboxSDK Implementation Version: 0.7.24-1501629418090-9523e7c700f126e2
 ```
+
+#### Yesware
+Nothing happens when loaded.
+This does not like using content_scripts => how does htis event work??
