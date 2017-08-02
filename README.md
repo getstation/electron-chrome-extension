@@ -24,6 +24,7 @@
 - [x] Rapportive 
 - [ ] Streak 
 - [x] Clearbit
+- [x] Gmelius
 
 ### Extensions integration notes
 
@@ -114,4 +115,7 @@ This does not like using content_scripts => how does htis event work??
 
 
 #### Clearbit
+Requires `allowPopups`
+
+#### Gmelius
 Requires `allowPopups`

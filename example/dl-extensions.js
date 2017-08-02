@@ -32,6 +32,10 @@ const EXTENSIONS = [
     id: 'pmnhcgfcafcnkbengdcanjablaabjplo',
     slug: 'clearbit-connect'
   },
+  {
+    id: 'dheionainndbbpoacpnopgmnihkcmnkl',
+    slug: 'gmelius'
+  },
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
 
