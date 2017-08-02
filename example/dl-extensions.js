@@ -15,6 +15,10 @@ const EXTENSIONS = [
   {
     id: 'ocpljaamllnldhepankaeljmeeeghnid',
     slug: 'mixmax'
+  },
+  {
+    id: 'hihakjfhbmlmjdnnhegiciffjplmdhin',
+    slug: 'rapportive'
   }
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
