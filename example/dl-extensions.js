@@ -24,6 +24,10 @@ const EXTENSIONS = [
     id: 'pnnfemgpilpdaojpnkjdgfgbnnjojfik',
     slug: 'streak'
   },
+  {
+    id: 'gkjnkapjmjfpipfcccnjbjcbgdnahpjp',
+    slug: 'yesware'
+  },
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
 

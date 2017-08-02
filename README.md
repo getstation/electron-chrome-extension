@@ -44,6 +44,7 @@ The dangerous trick is to disable `webSecurity`.
 see https://github.com/electron/electron/issues/10180
 
 #### Streak
+Use `document_end` instead of `document_start`
 
 Several erros: 
 
