@@ -19,7 +19,11 @@ const EXTENSIONS = [
   {
     id: 'hihakjfhbmlmjdnnhegiciffjplmdhin',
     slug: 'rapportive'
-  }
+  },
+  {
+    id: 'pnnfemgpilpdaojpnkjdgfgbnnjojfik',
+    slug: 'streak'
+  },
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
 

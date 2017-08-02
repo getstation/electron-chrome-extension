@@ -22,6 +22,7 @@
 - [ ] MixMax
 - [ ] grammarly 
 - [x] Rapportive 
+- [ ] Streak 
 
 ### Extensions integration notes
 
@@ -42,3 +43,65 @@ The dangerous trick is to disable `webSecurity`.
 
 see https://github.com/electron/electron/issues/10180
 
+#### Streak
+
+Several erros: 
+
+`app.js:1 Uncaught TypeError: Cannot read property 'getAllCookies' of undefined` => no idea
+
+
+```
+Error logged: Error: failure to send updateUninstallPage messaage
+    at t.e (app.js:197)
+    at new t (app.js:197)
+    at e (app.js:197)
+    at e (app.js:74)
+    at e (app.js:74)
+    at e (app.js:74)
+    at e (app.js:74)
+    at e (app.js:74)
+    at e (app.js:74)
+    at e (app.js:74)
+    at e (app.js:74)
+    at app.js:74
+    at <anonymous> 
+
+Original error stack:
+Error: failure to send updateUninstallPage messaage
+    at t.e (https://mailfoogae.appspot.com/build/app.js:197:26356)
+    at new t (https://mailfoogae.appspot.com/build/app.js:197:25862)
+    at e (https://mailfoogae.appspot.com/build/app.js:197:26736)
+    at e (https://mailfoogae.appspot.com/build/app.js:74:18610)
+    at e (https://mailfoogae.appspot.com/build/app.js:74:18203)
+    at e (https://mailfoogae.appspot.com/build/app.js:74:20611)
+    at e (https://mailfoogae.appspot.com/build/app.js:74:17050)
+    at e (https://mailfoogae.appspot.com/build/app.js:74:18858)
+    at e (https://mailfoogae.appspot.com/build/app.js:74:18203)
+    at e (https://mailfoogae.appspot.com/build/app.js:74:20611)
+    at e (https://mailfoogae.appspot.com/build/app.js:74:17050)
+    at https://mailfoogae.appspot.com/build/app.js:74:19370
+    at <anonymous> 
+
+Error logged from:
+    at i (https://www.inboxsdk.com/build/platform-implementation.js:80:26920)
+    at u (https://www.inboxsdk.com/build/platform-implementation.js:101:7631)
+    at e.value (https://www.inboxsdk.com/build/platform-implementation.js:101:11575)
+    at Object.error (https://www.inboxsdk.com/build/platform-implementation.js:101:12261)
+    at https://mailfoogae.appspot.com/build/app.js:94:15782
+    at <anonymous> 
+
+Error details: Object {message: undefined, email: "alexandre@getstation.com", href: "https://mail.google.com/mail/u/0/#inbox", details: Object}details: Objectemail: "alexandre@getstation.com"href: "https://mail.google.com/mail/u/0/#inbox"message: undefined__proto__: Object 
+
+Extension App Ids: [
+  {
+    "appId": "sdk_streak_21e9788951",
+    "version": "6.3112",
+    "causedBy": true
+  }
+] 
+Sent by App: true 
+Session Id: 1501692922605-0.5971194064432392 
+Extension Id: null 
+InboxSDK Loader Version: 0.7.24-1484787998857-c248fbb55be579d3 
+InboxSDK Implementation Version: 0.7.24-1501629418090-9523e7c700f126e2
+```
