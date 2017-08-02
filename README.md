@@ -15,7 +15,7 @@
 - [x] Add support for chrome.runtime.getManifest()
 - [x] content_scripts: support `exclude_matches`
 - [ ] implement `chrome.storage.onChanged.addListener`
-- [ ] support manifest `permissions` hosts
+- [ ] support manifest `permissions` hosts (requires https://github.com/electron/electron/issues/10180)
 
 ### Test extensions
 - [x] mailtracker
@@ -39,4 +39,6 @@ No error in console. After few secsonds, a greyed Grammarly logo appears in the 
 Rapportive is loading external content from `https://rapportive.com/load/launchpad` that are whiltlisted in manifest's `permissions`.
 However, we don't support `permssions`.
 The dangerous trick is to disable `webSecurity`.
+
+see https://github.com/electron/electron/issues/10180
 
