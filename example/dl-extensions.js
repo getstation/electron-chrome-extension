@@ -28,6 +28,10 @@ const EXTENSIONS = [
     id: 'gkjnkapjmjfpipfcccnjbjcbgdnahpjp',
     slug: 'yesware'
   },
+  {
+    id: 'pmnhcgfcafcnkbengdcanjablaabjplo',
+    slug: 'clearbit-connect'
+  },
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
 
