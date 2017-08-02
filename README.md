@@ -15,8 +15,28 @@
 -[x] Add support for chrome.runtime.getManifest()
 -[x] content_scripts: support `exclude_matches`
 -[ ] implement `chrome.storage.onChanged.addListener`
+-[ ] support manifest `permissions` hosts
 
 ### Test extensions
--[ ] MixMax
 -[x] mailtracker
+-[ ] MixMax
 -[ ] grammarly 
+-[x] Rapportive 
+
+### Extensions integration notes
+
+#### MixMax
+Mixmax is using `chrome.storage.onChanged.addListener`, but looks like using a shim is enough.
+
+Overide user-agent ti remove any mention of Electron: `session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''))`
+
+When loading Mixmax, I have the Mixmax login screen when loading gmail. I can load log on, but then Gmail keeps infinitely looping: load gmail, "Setting Up Mixmax", "Finishing up", reload and so on.. (see screencast).
+
+#### Grammarly
+No error in console. After few secsonds, a greyed Grammarly logo appears in the inputs.
+
+#### Rapportive
+Rapportive is loading external content from `https://rapportive.com/load/launchpad` that are whiltlisted in manifest's `permissions`.
+However, we don't support `permssions`.
+The dangerous trick is to disable `webSecurity`.
+
