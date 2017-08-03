@@ -16,6 +16,17 @@
 - [x] content_scripts: support `exclude_matches`
 - [ ] implement `chrome.storage.onChanged.addListener`
 - [ ] support manifest `permissions` hosts (requires https://github.com/electron/electron/issues/10180)
+- [ ] implement `chrome.tabs.query`
+- [ ] implement `chrome.notifications`
+- [ ] implement `chrome.webRequest`
+
+### Faked API
+- [x] `chrome.storage.onChanged.addListener`
+- [x] `chrome.tabs.query`
+- [x] `chrome.browserAction` (no real sense in context of electron)
+- [x] `chrome.notifications`
+- [x] `chrome.webRequest`
+- [ ] `chrome.windows`
 
 ### Test extensions
 - [x] mailtracker
