@@ -20,7 +20,7 @@
 - [ ] implement `chrome.notifications`
 - [ ] implement `chrome.webRequest`
 
-### Faked API
+### Dummy-implemented API
 - [x] `chrome.storage.onChanged.addListener`
 - [x] `chrome.tabs.query`
 - [x] `chrome.browserAction` (no real sense in context of electron)
@@ -30,7 +30,7 @@
 
 ### Test extensions
 - [x] mailtracker
-- [ ] MixMax
+- [x] MixMax
 - [ ] grammarly 
 - [x] Rapportive 
 - [ ] Streak 
@@ -42,9 +42,16 @@
 #### MixMax
 Mixmax is using `chrome.storage.onChanged.addListener`, but looks like using a shim is enough.
 
-Overide user-agent ti remove any mention of Electron: `session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''))`
+Overide user-agent to remove any mention of Electron: `session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''))`
 
-When loading Mixmax, I have the Mixmax login screen when loading gmail. I can load log on, but then Gmail keeps infinitely looping: load gmail, "Setting Up Mixmax", "Finishing up", reload and so on.. (see screencast).
+I had to dummy-implement various APIs:
+- `chrome.storage.onChanged.addListener`
+- `chrome.tabs.query`
+- `chrome.browserAction` (no real sense in context of electron)
+- `chrome.notifications`
+- `chrome.webRequest`
+=> not sure how it impactcs the execution of the app but seems to work
+
 
 #### Grammarly
 No error in console. After few secsonds, a greyed Grammarly logo appears in the inputs.
