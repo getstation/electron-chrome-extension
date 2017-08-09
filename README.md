@@ -14,14 +14,13 @@
 - [x] Fix page's URL used to test against content_scripts[].matches
 - [x] Add support for chrome.runtime.getManifest()
 - [x] content_scripts: support `exclude_matches`
-- [ ] implement `chrome.storage.onChanged.addListener`
+- [x] implement `chrome.storage.onChanged.addListener`
 - [ ] support manifest `permissions` hosts (requires https://github.com/electron/electron/issues/10180)
 - [ ] implement `chrome.tabs.query`
 - [ ] implement `chrome.notifications`
 - [ ] implement `chrome.webRequest`
 
 ### Dummy-implemented API
-- [x] `chrome.storage.onChanged.addListener`
 - [x] `chrome.tabs.query`
 - [x] `chrome.browserAction` (no real sense in context of electron)
 - [x] `chrome.notifications`
