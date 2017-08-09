@@ -14,7 +14,7 @@
 -[x] Fix page's URL used to test against content_scripts[].matches
 -[x] Add support for chrome.runtime.getManifest()
 -[x] content_scripts: support `exclude_matches`
--[ ] implement `chrome.storage.onChanged.addListener`
+-[x] implement `chrome.storage.onChanged.addListener`
 -[ ] support manifest `permissions` hosts
 
 ### Test extensions
