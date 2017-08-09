@@ -137,3 +137,8 @@ Requires `allowPopups`
 
 #### Gmelius
 Requires `allowPopups`
+
+### Notets
+#### Use isoalated script injction
+- check `ScriptInjection::InjectJs` in `extensions/renderer/script_injection.cc`
+- use `inIsolatedWorld` related method from [`blink::webFrame`](https://chromium.googlesource.com/chromium/blink-public/+/master/web/WebLocalFrame.h)
