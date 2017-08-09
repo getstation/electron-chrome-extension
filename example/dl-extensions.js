@@ -19,7 +19,23 @@ const EXTENSIONS = [
   {
     id: 'hihakjfhbmlmjdnnhegiciffjplmdhin',
     slug: 'rapportive'
-  }
+  },
+  {
+    id: 'pnnfemgpilpdaojpnkjdgfgbnnjojfik',
+    slug: 'streak'
+  },
+  {
+    id: 'gkjnkapjmjfpipfcccnjbjcbgdnahpjp',
+    slug: 'yesware'
+  },
+  {
+    id: 'pmnhcgfcafcnkbengdcanjablaabjplo',
+    slug: 'clearbit-connect'
+  },
+  {
+    id: 'dheionainndbbpoacpnopgmnihkcmnkl',
+    slug: 'gmelius'
+  },
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
 
