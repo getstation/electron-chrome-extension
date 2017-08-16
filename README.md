@@ -137,7 +137,13 @@ Requires `allowPopups`
 #### Gmelius
 Requires `allowPopups`
 
+### Gooogle Drive Offline
+
+Use `web_accessible_resources` to load a file in `docs.google.com/*` and `drive.google.com/*`.
+
+It also relies on `content_capabilities` to let app comunicate with a background script.
+
 ### Notets
-#### Use isoalated script injction
+#### Use isoalated script injection
 - check `ScriptInjection::InjectJs` in `extensions/renderer/script_injection.cc`
 - use `inIsolatedWorld` related method from [`blink::webFrame`](https://chromium.googlesource.com/chromium/blink-public/+/master/web/WebLocalFrame.h)

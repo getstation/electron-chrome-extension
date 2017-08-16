@@ -36,6 +36,10 @@ const EXTENSIONS = [
     id: 'dheionainndbbpoacpnopgmnihkcmnkl',
     slug: 'gmelius'
   },
+  {
+    id: 'ghbmnnjooekpmoecnnnilnnbdlolhkhi',
+    slug: 'google-drive-offline'
+  },
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
 
