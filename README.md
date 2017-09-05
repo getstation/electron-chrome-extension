@@ -29,9 +29,9 @@
 
 ### Test extensions
 - [x] mailtracker
-- [x] MixMax
+- [ ] MixMax => unless you use nativeWindowOpen
 - [ ] grammarly 
-- [x] Rapportive 
+- [ ] Rapportive => unless you disable `webSecurity`
 - [ ] Streak 
 - [x] Clearbit
 - [x] Gmelius
