@@ -1,6 +1,6 @@
 {
   "name": "electron-chrome-extension",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "- re-implement preference manager",
   "main": "index.js",
   "directories": {
