@@ -13,7 +13,8 @@
   </style>
 
   <div class="container">
-    <webview allowPopups webpreferences="webSecurity=no" preload='../preload.js' src="https://mail.google.com/"></webview>
+    <!--<webview allowPopups webpreferences="webSecurity=no" preload='../preload.js' src="https://mail.google.com/"></webview>-->
+    <webview allowPopups preload='../preload.js' src="https://inbox.google.com/?pli=1"></webview>
   </div>
   <script>
     setTimeout(() => Array.from(document.getElementsByTagName('webview')).forEach(w => w.openDevTools()), 1000)
