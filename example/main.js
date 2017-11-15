@@ -13,6 +13,8 @@ const extensions = require('../index');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
+require('electron-local-crash-reporter').start();
+
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600})
@@ -42,9 +44,9 @@ function createWindow () {
 app.on('ready', createWindow)
 
 app.on('ready', () => {
-  //extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
-  extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
-  //extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
+  // extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
+  // extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
+  extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
 })
 
 // Quit when all windows are closed.

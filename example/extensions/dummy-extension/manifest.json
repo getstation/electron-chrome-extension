@@ -10,5 +10,6 @@
    "manifest_version": 2,
    "name": "Dummy Extension",
    "short_name": "Dummy Extension",
-   "version": "1.1.4"
+   "version": "1.1.4",
+   "content_security_policy": "script-src 'self' https://gmelius.io https://inboxsdk.com https://cdn.firebase.com  https://*.firebaseio.com; object-src 'self'; worker-src 'self' https://gmelius.io"
 }
