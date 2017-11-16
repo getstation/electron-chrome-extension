@@ -44,10 +44,10 @@ function createWindow () {
 app.on('ready', createWindow)
 
 app.on('ready', () => {
-  // api.addExtension(path.join(__dirname, './extensions/mixmax'))
+  // extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
   extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
-  // api.addExtension(path.join(__dirname, './extensions/1password'))
-  // api.addExtension(path.join(__dirname, './extensions/dummy-extension'))
+  // extensions.addExtension(path.join(__dirname, './extensions/1password'))
+  // extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
 })
 
 // Quit when all windows are closed.
