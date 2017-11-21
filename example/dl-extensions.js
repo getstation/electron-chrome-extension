@@ -40,9 +40,17 @@ const EXTENSIONS = [
   //   id: 'ghbmnnjooekpmoecnnnilnnbdlolhkhi',
   //   slug: 'google-drive-offline'
   // },
+  // {
+  //   id: 'aomjjhallfgjeglblehebfpbcfeobpgk',
+  //   slug: '1password'
+  // },
+  // {
+  //   id: 'hdokiejnpimakedhajhdlcegeplioahd',
+  //   slug: 'lastpass'
+  // },
   {
-    id: 'aomjjhallfgjeglblehebfpbcfeobpgk',
-    slug: '1password'
+    id: 'fdjamakpfbbddfjaooikfcpapjohcfmg',
+    slug: 'dashlane'
   }
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
