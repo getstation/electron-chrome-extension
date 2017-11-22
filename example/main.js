@@ -47,6 +47,7 @@ app.on('ready', () => {
   // extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
   extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
   // extensions.addExtension(path.join(__dirname, './extensions/1password'))
+  // extensions.addExtension(path.join(__dirname, './extensions/dashlane'))
   // extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
 })
 
