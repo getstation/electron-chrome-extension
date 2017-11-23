@@ -42,8 +42,8 @@ function createWindow () {
 app.on('ready', createWindow)
 
 app.on('ready', () => {
-  //extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
-  extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
+  extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
+  // extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
   //extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
 })
 
