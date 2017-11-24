@@ -12,15 +12,16 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
 });
 
 chrome.webRequest.onHeadersReceived.addListener(function(details) {
+  console.log('chrome.webRequest.onHeadersReceived')
+  console.log(details)
   details.responseHeaders.push({
     name: 'X-Test',
-    value: ['ok']
+    value: 'ok'
   })
 
   return {
     cancel: false,
     responseHeaders: details.responseHeaders,
-    statusLine: 'HTTP/1.1 200 OK'
   };
 }, {
   urls: ['<all_urls>'],
