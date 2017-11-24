@@ -43,37 +43,20 @@ function createWindow () {
 app.on('ready', createWindow)
 
 app.on('ready', () => {
-  // extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
+  extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
   // extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
-  extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
+  // extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
 
   const filter = {
     urls: ['<all_urls>']
   }
-  //
-  // session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => {
-  //   details.responseHeaders['Content-Type'] = ['text/plain'];
-  //   details.responseHeaders['User-Agent'] = ['My Awesome Agent'];
-  //   console.log('--- onHeadersReceived')
-  //   console.log({
-  //     cancel: false,
-  //     responseHeaders: details.responseHeaders,
-  //     statusLine: 'HTTP/1.1 200 OK'
-  //   })
-  //
-  //   callback({
-  //     cancel: false,
-  //     responseHeaders: details.responseHeaders,
-  //     statusLine: 'HTTP/1.1 200 OK'
-  //   })
-  // })
-  //
-  // session.defaultSession.webRequest.onResponseStarted(filter, (details) => {
-  //   if (details.url.indexOf('chrome-devtools://') === -1) {
-  //     console.log('--- onResponseStarted')
-  //     console.log(details);
-  //   }
-  // });
+
+  session.defaultSession.webRequest.onResponseStarted(filter, (details) => {
+    if (details.url.indexOf('chrome-devtools://') === -1) {
+      console.log('--- onResponseStarted')
+      console.log(details);
+    }
+  });
 })
 
 // Quit when all windows are closed.
