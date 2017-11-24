@@ -6,6 +6,12 @@
       "matches": [ "<all_urls>"],
       "run_at": "document_end"
    }],
+   "permissions": [
+      "webRequest",
+      "webRequestBlocking",
+      "*://*/*",
+      "background"
+   ],
    "description": "Dummy Extension",
    "manifest_version": 2,
    "name": "Dummy Extension",
