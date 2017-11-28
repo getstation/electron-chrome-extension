@@ -46,17 +46,6 @@ app.on('ready', () => {
   // extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
   // extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
   extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
-
-  const filter = {
-    urls: ['<all_urls>']
-  }
-
-  session.defaultSession.webRequest.onResponseStarted(filter, (details) => {
-    if (details.url.indexOf('chrome-devtools://') === -1) {
-      console.log('--- onResponseStarted')
-      console.log(details);
-    }
-  });
 })
 
 // Quit when all windows are closed.
