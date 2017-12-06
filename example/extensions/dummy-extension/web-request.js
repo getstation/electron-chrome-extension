@@ -114,3 +114,8 @@ sampleRequest.addEventListener('load', function () {
 });
 sampleRequest.open('GET', `http://motherfuckingwebsite.com/?foo=${Date.now()}`);
 sampleRequest.send();
+
+chrome.webRequest.handlerBehaviorChanged()
+  .then((onFlushed, onError) =>(
+    console.log('onFlushed')
+  ));
