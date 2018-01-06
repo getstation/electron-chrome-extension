@@ -57,5 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+# IDEs
+.idea
+
 example/extensions
 !example/extensions/dummy-extension
