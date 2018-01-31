@@ -20,6 +20,8 @@
   "devDependencies": {
     "download-crx": "^1.0.4",
     "electron-local-crash-reporter": "^1.0.2",
+    "electron": "^1.7.4",
+    "electron-process-manager": "^0.5.1",
     "tmp": "0.0.31",
     "unzip-crx": "^0.2.0"
   },

@@ -45,10 +45,17 @@ app.on('ready', createWindow)
 
 app.on('ready', () => {
   // extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
-  extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
+  extensions.addExtension(path.join(__dirname, './extensions/gmelius')),
   // extensions.addExtension(path.join(__dirname, './extensions/1password'))
   // extensions.addExtension(path.join(__dirname, './extensions/dashlane'))
   // extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
+  // extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
+  extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
+})
+
+app.on('ready', () => {
+  const { openProcessManager } = require('electron-process-manager');
+  openProcessManager();
 })
 
 // Quit when all windows are closed.
