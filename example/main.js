@@ -51,7 +51,7 @@ app.on('ready', () => {
   // extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
   // extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
   extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
-})
+});
 
 app.on('ready', () => {
   const { openProcessManager } = require('electron-process-manager');
