@@ -62,3 +62,5 @@ typings/
 
 example/extensions
 !example/extensions/dummy-extension
+
+/.idea
