@@ -2,6 +2,7 @@ const downloadCrx = require('download-crx');
 const unzip = require('unzip-crx');
 const tmp = require('tmp');
 const path = require('path');
+const fs = require('fs');
 
 const EXTENSIONS = [
   {
@@ -40,6 +41,18 @@ const EXTENSIONS = [
     id: 'ghbmnnjooekpmoecnnnilnnbdlolhkhi',
     slug: 'google-drive-offline'
   },
+  {
+    id: 'aomjjhallfgjeglblehebfpbcfeobpgk',
+    slug: '1password'
+  },
+  {
+    id: 'hdokiejnpimakedhajhdlcegeplioahd',
+    slug: 'lastpass'
+  },
+  {
+    id: 'fdjamakpfbbddfjaooikfcpapjohcfmg',
+    slug: 'dashlane'
+  }
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
 
@@ -48,5 +61,6 @@ EXTENSIONS.forEach(extension => {
   downloadCrx
     .downloadById(extension.id, tempDir, extension.slug)
     .then(filePath => unzip(filePath, path.resolve(destinationFolder, extension.slug)))
+    .then(() => fs.writeFile(path.resolve(destinationFolder, extension.slug, 'chromeStoreExtensionId'), extension.id))
     .then(() => console.log(`DLed ${extension.slug}`))
 })
