@@ -1,27 +1,36 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="utf-8">
-  <title>Electron Boilerplate</title>
+  <title>Electron Chrome Extensions Playground</title>
 </head>
+
 <body>
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
     webview {
-      height: 1000px;
-      width: 1000px;
+      height: 100vh;
+      width: 100vw;
     }
   </style>
 
   <div class="container">
-    <!--<webview allowPopups webpreferences="webSecurity=no" preload='../preload.js' src="https://mail.google.com/"></webview>-->
-    <webview allowPopups preload='../preload.js' webpreferences="nativeWindowOpen=yes" src="https://inbox.google.com/"></webview>
-    <!--<webview allowPopups preload='../preload.js' src="https://inbox.google.com/"></webview>-->
-     <!--<webview allowPopups preload='../preload.js' src="https://github.com"></webview>-->
-    <!--<webview allowPopups webpreferences="webSecurity=no" preload='../preload.js' src="https://mail.google.com/"></webview>-->
+    <webview allowPopups webpreferences="webSecurity=no" preload='../preload.js' src="https://mail.google.com/">
+    </webview>
+    <!-- <webview allowPopups preload='../preload.js' webpreferences="nativeWindowOpen=yes" src="https://inbox.google.com/"></webview> -->
     <!--<webview allowPopups preload='../preload.js' src="http://motherfuckingwebsite.com/"></webview>-->
   </div>
   <script>
-    setTimeout(() => Array.from(document.getElementsByTagName('webview')).forEach(w => w.openDevTools()), 1000)
+    setTimeout(
+      () => Array.from(document.getElementsByTagName('webview'))
+        .forEach(w => w.openDevTools()),
+      1000);
   </script>
 </body>
+
 </html>

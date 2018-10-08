@@ -15,9 +15,9 @@ let mainWindow
 
 require('electron-local-crash-reporter').start();
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  mainWindow = new BrowserWindow({ width: 800, height: 600 })
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
@@ -45,12 +45,11 @@ app.on('ready', createWindow)
 
 app.on('ready', () => {
   // extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
-  extensions.addExtension(path.join(__dirname, './extensions/gmelius')),
-  // extensions.addExtension(path.join(__dirname, './extensions/1password'))
-  // extensions.addExtension(path.join(__dirname, './extensions/dashlane'))
-  // extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
+  extensions.addExtension(path.join(__dirname, './extensions/boomerang'))
   // extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
-  extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
+  // extensions.addExtension(path.join(__dirname, './extensions/mailtracker'))
+  // extensions.addExtension(path.join(__dirname, './extensions/clearbit-connect'))
+  // extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
 });
 
 app.on('ready', () => {

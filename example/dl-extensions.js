@@ -10,24 +10,12 @@ const EXTENSIONS = [
     slug: 'mailtracker'
   },
   {
-    id: 'kbfnbcaeplbcioakkpcpgfkobkghlhen',
-    slug: 'gramarly'
-  },
-  {
     id: 'ocpljaamllnldhepankaeljmeeeghnid',
     slug: 'mixmax'
   },
   {
-    id: 'hihakjfhbmlmjdnnhegiciffjplmdhin',
-    slug: 'rapportive'
-  },
-  {
-    id: 'pnnfemgpilpdaojpnkjdgfgbnnjojfik',
-    slug: 'streak'
-  },
-  {
-    id: 'gkjnkapjmjfpipfcccnjbjcbgdnahpjp',
-    slug: 'yesware'
+    id: 'mdanidgdpmkimeiiojknlnekblgmpdll',
+    slug: 'boomerang',
   },
   {
     id: 'pmnhcgfcafcnkbengdcanjablaabjplo',
@@ -37,22 +25,38 @@ const EXTENSIONS = [
     id: 'dheionainndbbpoacpnopgmnihkcmnkl',
     slug: 'gmelius'
   },
-  {
-    id: 'ghbmnnjooekpmoecnnnilnnbdlolhkhi',
-    slug: 'google-drive-offline'
-  },
-  {
-    id: 'aomjjhallfgjeglblehebfpbcfeobpgk',
-    slug: '1password'
-  },
-  {
-    id: 'hdokiejnpimakedhajhdlcegeplioahd',
-    slug: 'lastpass'
-  },
-  {
-    id: 'fdjamakpfbbddfjaooikfcpapjohcfmg',
-    slug: 'dashlane'
-  }
+  // {
+  //   id: 'kbfnbcaeplbcioakkpcpgfkobkghlhen',
+  //   slug: 'gramarly'
+  // },
+  // {
+  //   id: 'hihakjfhbmlmjdnnhegiciffjplmdhin',
+  //   slug: 'rapportive'
+  // },
+  // {
+  //   id: 'pnnfemgpilpdaojpnkjdgfgbnnjojfik',
+  //   slug: 'streak'
+  // },
+  // {
+  //   id: 'gkjnkapjmjfpipfcccnjbjcbgdnahpjp',
+  //   slug: 'yesware'
+  // },
+  // {
+  //   id: 'ghbmnnjooekpmoecnnnilnnbdlolhkhi',
+  //   slug: 'google-drive-offline'
+  // },
+  // {
+  //   id: 'aomjjhallfgjeglblehebfpbcfeobpgk',
+  //   slug: '1password'
+  // },
+  // {
+  //   id: 'hdokiejnpimakedhajhdlcegeplioahd',
+  //   slug: 'lastpass'
+  // },
+  // {
+  //   id: 'fdjamakpfbbddfjaooikfcpapjohcfmg',
+  //   slug: 'dashlane'
+  // }
 ];
 const destinationFolder = path.resolve(__dirname, 'extensions');
 
