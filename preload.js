@@ -1,3 +1,1 @@
-setTimeout(() => {
-  require('./lib/renderer/init');
-}, 5000);
+require('./lib/renderer/init');

@@ -22,13 +22,13 @@ const EXTENSIONS = [
     slug: 'clearbit-connect'
   },
   {
-    id: 'dheionainndbbpoacpnopgmnihkcmnkl',
-    slug: 'gmelius'
-  },
-  {
     id: 'kbfnbcaeplbcioakkpcpgfkobkghlhen',
     slug: 'grammarly'
   },
+  // {
+  //   id: 'dheionainndbbpoacpnopgmnihkcmnkl',
+  //   slug: 'gmelius'
+  // },
   // {
   //   id: 'hihakjfhbmlmjdnnhegiciffjplmdhin',
   //   slug: 'rapportive'
@@ -58,6 +58,7 @@ const EXTENSIONS = [
   //   slug: 'dashlane'
   // }
 ];
+
 const destinationFolder = path.resolve(__dirname, 'extensions');
 
 const tempDir = tmp.dirSync().name;

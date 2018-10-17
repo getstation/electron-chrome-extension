@@ -22,14 +22,12 @@
   <div class="container">
     <webview allowPopups webpreferences="webSecurity=no, nativeWindowOpen=yes" preload='../preload.js' src="https://mail.google.com/">
     </webview>
-    <!-- <webview allowPopups preload='../preload.js' webpreferences="nativeWindowOpen=yes" src="https://inbox.google.com/"></webview> -->
-    <!--<webview allowPopups preload='../preload.js' src="http://motherfuckingwebsite.com/"></webview>-->
   </div>
   <script>
     setTimeout(
       () => Array.from(document.getElementsByTagName('webview'))
         .forEach(w => w.openDevTools()),
-      1000);
+      1000)
   </script>
 </body>
 
