@@ -25,10 +25,10 @@ const EXTENSIONS = [
     id: 'dheionainndbbpoacpnopgmnihkcmnkl',
     slug: 'gmelius'
   },
-  // {
-  //   id: 'kbfnbcaeplbcioakkpcpgfkobkghlhen',
-  //   slug: 'gramarly'
-  // },
+  {
+    id: 'kbfnbcaeplbcioakkpcpgfkobkghlhen',
+    slug: 'grammarly'
+  },
   // {
   //   id: 'hihakjfhbmlmjdnnhegiciffjplmdhin',
   //   slug: 'rapportive'

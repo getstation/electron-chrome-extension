@@ -13,7 +13,7 @@ const extensions = require('../index');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-require('electron-local-crash-reporter').start();
+// require('electron-local-crash-reporter').start();
 
 function createWindow() {
   // Create the browser window.
@@ -44,9 +44,10 @@ function createWindow() {
 app.on('ready', createWindow)
 
 app.on('ready', () => {
+  // extensions.addExtension(path.join(__dirname, './extensions/grammarly'))
   // extensions.addExtension(path.join(__dirname, './extensions/mixmax'))
-  extensions.addExtension(path.join(__dirname, './extensions/boomerang'))
-  // extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
+  // extensions.addExtension(path.join(__dirname, './extensions/boomerang'))
+  extensions.addExtension(path.join(__dirname, './extensions/gmelius'))
   // extensions.addExtension(path.join(__dirname, './extensions/mailtracker'))
   // extensions.addExtension(path.join(__dirname, './extensions/clearbit-connect'))
   // extensions.addExtension(path.join(__dirname, './extensions/dummy-extension'))
