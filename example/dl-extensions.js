@@ -68,4 +68,4 @@ EXTENSIONS.forEach(extension => {
     .then(filePath => unzip(filePath, path.resolve(destinationFolder, extension.slug)))
     .then(() => fs.writeFile(path.resolve(destinationFolder, extension.slug, 'chromeStoreExtensionId'), extension.id))
     .then(() => console.log(`DLed ${extension.slug}`))
-})
+});
