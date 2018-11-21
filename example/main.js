@@ -25,9 +25,9 @@ function createWindow() {
 app.on('ready', () => {
   createWindow();
 
-  // require('electron-process-manager').openProcessManager();
+  require('electron-process-manager').openProcessManager();
 
-  addExtension(join(__dirname, './extensions/gmelius'))
+  addExtension(join(__dirname, './extensions/mixmax'))
 });
 
 app.on('window-all-closed', () => {
