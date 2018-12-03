@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow } = require('electron'); term
 const { join } = require('path');
 const { format } = require('url');
 

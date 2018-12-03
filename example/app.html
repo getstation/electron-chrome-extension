@@ -26,13 +26,15 @@
   <script>
     setTimeout(
       () => Array.from(document.getElementsByTagName('webview'))
-        .forEach(w => {
-          w.openDevTools();
-          w.addEventListener('new-window', (e) => {
-            // e.preventDefault();
-            // w.loadURL(e.url);
-          })
-        }),
+        .forEach(
+          w => {
+            w.openDevTools();
+            w.addEventListener('new-window', (e) => {
+              // e.preventDefault();
+              // w.loadURL(e.url);
+            })
+          }
+        ),
       1000)
   </script>
 </body>
