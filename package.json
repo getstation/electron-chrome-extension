@@ -29,6 +29,7 @@
     "unzip-crx": "^0.2.0"
   },
   "dependencies": {
+    "@types/glob": "^7.1.1",
     "@types/mime-types": "^2.1.0",
     "capitalize": "^2.0.0",
     "electron-ipc-plus": "^1.3.4",

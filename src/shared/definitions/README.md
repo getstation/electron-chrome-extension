@@ -1,0 +1,1 @@
+Strip comments regex: [^:]\/\/.*
