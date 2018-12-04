@@ -1,8 +1,8 @@
-const { app, BrowserWindow } = require('electron'); term
+const { app, BrowserWindow } = require('electron');
 const { join } = require('path');
 const { format } = require('url');
 
-const { addExtension } = require('../index');
+const { loadExtension } = require('../index').default;
 
 let mainWindow;
 
@@ -22,11 +22,11 @@ function createWindow() {
   mainWindow.on('closed', () => mainWindow = null)
 }
 
-app.on('ready', () => {
+app.on('ready', async () => {
   createWindow();
 
   require('electron-process-manager').openProcessManager();
-  addExtension(join(__dirname, './extensions/mixmax'))
+  await loadExtension(join(__dirname, './extensions/'), 'ocpljaamllnldhepankaeljmeeeghnid')
 });
 
 app.on('window-all-closed', () => {

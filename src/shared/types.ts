@@ -9,11 +9,12 @@ export type Extension = ExtensionFS & {
   backgroundPage?: BackgroundPage,
 }
 
+// https://cs.chromium.org/chromium/src/extensions/common/api/_manifest_features.json
 export type Manifest = {
   name: string,
   background: {
     page: string,
-    scripts: string[],
+    scripts: Script<string>[],
   },
   content_security_policy: string,
 } & any // todo
@@ -44,25 +45,37 @@ export enum ScriptRuntimeProcess {
   DocumentIdle = 'DOMContentLoaded',
 }
 
-export enum ScriptType {
-  Js = 'js',
-  Css = 'css',
+export type UrlMatchPattern = string;
+
+export type ScriptResource = {
+  url: string,
+  code: string,
 }
 
-export type Script = {
-  type: ScriptType,
-  runAt: ScriptRuntimeProcess,
-  // matches: UrlMatchPattern,
-  // js: Script,
-  // css: Script,
+// https://developer.chrome.com/extensions/content_scripts
+export type Script<T = ScriptResource> = {
+  matches: UrlMatchPattern[],
+  exclude_matches?: UrlMatchPattern[],
+  include_globs?: UrlMatchPattern[],
+  exclude_globs?: UrlMatchPattern[],
+  all_frames?: boolean, // default to false
+  run_at?: ScriptRuntimeManifest, // default to document_idle
+  js?: T[],
+  css?: T[],
 }
 
-export type UserScripts = {
+export type UserScripts<T = ScriptResource> = {
   isolatedWorlId: number,
   humanName: string,
   contentSecurityPolicy: string,
   contentSecurityOrigin: string,
-  scripts: Script[],
+  scripts: Script<T>[],
 }
 
-export const backgroundPageProcessFlag = '--electron-chrome-extension-background-page';
+export enum ECxChannels {
+  OnCreateRenderer = 'create-renderer',
+  OnExtensionLoaded = 'extension-loaded',
+  OnExtensionUnloaded = 'extension-unloaded',
+}
+
+export const backgroundPageProcessFlag = '--background-page';

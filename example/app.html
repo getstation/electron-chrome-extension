@@ -28,7 +28,7 @@
       () => Array.from(document.getElementsByTagName('webview'))
         .forEach(
           w => {
-            w.openDevTools();
+            // w.openDevTools();
             w.addEventListener('new-window', (e) => {
               // e.preventDefault();
               // w.loadURL(e.url);
