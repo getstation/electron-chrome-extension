@@ -26,7 +26,10 @@ app.on('ready', async () => {
   createWindow();
 
   require('electron-process-manager').openProcessManager();
-  await loadExtension(join(__dirname, './extensions/'), 'ocpljaamllnldhepankaeljmeeeghnid')
+  await loadExtension(
+    join(__dirname, './extensions/'),
+    'ocpljaamllnldhepankaeljmeeeghnid'
+  );
 });
 
 app.on('window-all-closed', () => {

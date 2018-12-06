@@ -101,8 +101,6 @@ const getBackgroundPage = async (
     ]
   });
 
-  contents.openDevTools();
-
   // Calling setTimeout allows us to bypass the following issue:
   // https://bugs.chromium.org/p/chromium/issues/detail?id=822966
   setTimeout(() => {
@@ -221,6 +219,10 @@ const onCreateRenderer = (event: any) =>
   event.returnValue = Array.from(loadedExtensions.values());
 
 ipcMain.on(ECxChannels.OnCreateRenderer, onCreateRenderer);
+ipcMain.on(
+  ECxChannels.GetExtension,
+  (event: any, id: string) => event.returnValue = loadedExtensions.get(id)
+);
 
 const protocolHandler = (
   request: Electron.RegisterBufferProtocolRequest,

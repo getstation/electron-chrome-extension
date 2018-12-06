@@ -76,6 +76,7 @@ export enum ECxChannels {
   OnCreateRenderer = 'create-renderer',
   OnExtensionLoaded = 'extension-loaded',
   OnExtensionUnloaded = 'extension-unloaded',
+  GetExtension = 'get-extension',
 }
 
 export const backgroundPageProcessFlag = '--background-page';

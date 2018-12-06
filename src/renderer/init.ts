@@ -87,7 +87,7 @@ export const injectExtension = (extension: Extension): void => {
       [{ code: 'window', url: `${id}://api` }],
       false,
       (isolatedWorldWindow: Window) => {
-        injectChromeApi(isolatedWorldWindow, id, false);
+        injectChromeApi(isolatedWorldWindow, extension, false);
         for (const script of scripts) {
           injectScript(isolatedWorlId, script);
         }
@@ -105,7 +105,10 @@ const isBackgroundPage = process.argv.indexOf(backgroundPageProcessFlag) !== -1;
 const { protocol, hostname } = parse(window.location.href);
 
 if (protocol === Protocol.Extension) {
-  injectChromeApi(window, hostname!, isBackgroundPage);
+  const extension: Extension = ipcRenderer.sendSync(
+    ECxChannels.GetExtension, hostname!
+  );
+  injectChromeApi(window, extension, isBackgroundPage);
 
   process.once(
     'loaded',

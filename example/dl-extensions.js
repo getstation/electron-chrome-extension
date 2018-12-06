@@ -25,10 +25,10 @@ const EXTENSIONS = [
     id: 'kbfnbcaeplbcioakkpcpgfkobkghlhen',
     slug: 'grammarly'
   },
-  // {
-  //   id: 'dheionainndbbpoacpnopgmnihkcmnkl',
-  //   slug: 'gmelius'
-  // },
+  {
+    id: 'dheionainndbbpoacpnopgmnihkcmnkl',
+    slug: 'gmelius'
+  },
   // {
   //   id: 'hihakjfhbmlmjdnnhegiciffjplmdhin',
   //   slug: 'rapportive'
@@ -45,10 +45,10 @@ const EXTENSIONS = [
   //   id: 'ghbmnnjooekpmoecnnnilnnbdlolhkhi',
   //   slug: 'google-drive-offline'
   // },
-  // {
-  //   id: 'aomjjhallfgjeglblehebfpbcfeobpgk',
-  //   slug: '1password'
-  // },
+  {
+    id: 'aeblfdkhhhdcdjpifhhbdiojplfjncoa',
+    slug: '1passwordX'
+  },
   // {
   //   id: 'hdokiejnpimakedhajhdlcegeplioahd',
   //   slug: 'lastpass'
