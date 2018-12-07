@@ -1,3 +1,7 @@
+import { ScriptRuntimeManifest } from './constants';
+
+// Cx
+
 export type ExtensionFS = {
   id: string,
   manifest: Manifest,
@@ -9,50 +13,38 @@ export type Extension = ExtensionFS & {
   backgroundPage?: BackgroundPage,
 }
 
-// https://cs.chromium.org/chromium/src/extensions/common/api/_manifest_features.json
-export type Manifest = {
-  name: string,
-  background: {
-    page: string,
-    scripts: Script<string>[],
-  },
-  content_security_policy: string,
-} & any // todo
-
 export type BackgroundPage = {
   name: string,
   html: string | Buffer,
   webContentsId: Electron.WebContents['id'],
 }
 
-export type ChromeApi = any;
-
-export enum Protocol {
-  Extension = 'chrome-extension:',
-  ExtensionDefault = 'chrome-extension:',
-  Chrome = 'chrome:',
-}
-
-export enum ScriptRuntimeManifest {
-  DocumentStart = 'document_start',
-  DocumentEnd = 'document_end',
-  DocumentIdle = 'document_idle',
-}
-
-export enum ScriptRuntimeProcess {
-  DocumentStart = 'document-start',
-  DocumentEnd = 'document-end',
-  DocumentIdle = 'DOMContentLoaded',
-}
-
-export type UrlMatchPattern = string;
-
 export type ScriptResource = {
   url: string,
   code: string,
 }
 
-// https://developer.chrome.com/extensions/content_scripts
+// API
+
+export type ChromeApi = any;
+
+export type UrlMatchPattern = string;
+
+// Manifest
+
+export type Manifest = {
+  name: string,
+  background: {
+    page: string,
+    scripts: string[],
+  },
+  content_security_policy: string,
+  content_scripts: any, // todo
+  permissions: Permission[],
+}
+
+export type Permission = string; // todo: or url match pattern
+
 export type Script<T = ScriptResource> = {
   matches: UrlMatchPattern[],
   exclude_matches?: UrlMatchPattern[],
@@ -71,12 +63,3 @@ export type UserScripts<T = ScriptResource> = {
   contentSecurityOrigin: string,
   scripts: Script<T>[],
 }
-
-export enum ECxChannels {
-  OnCreateRenderer = 'create-renderer',
-  OnExtensionLoaded = 'extension-loaded',
-  OnExtensionUnloaded = 'extension-unloaded',
-  GetExtension = 'get-extension',
-}
-
-export const backgroundPageProcessFlag = '--background-page';

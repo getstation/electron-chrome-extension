@@ -20,3 +20,8 @@ export const addTargetApiPath = (target: any, originalTarget: any, path: string)
     },
   );
 };
+
+// Logger
+
+const { log, warn } = console;
+export { log, warn }

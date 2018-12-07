@@ -4,7 +4,21 @@ import { lookup } from 'mime-types';
 import { join } from 'path';
 import { promisify } from 'util';
 import { format, parse } from 'url';
-import { Protocol, Extension, UserScripts, ExtensionFS, BackgroundPage, backgroundPageProcessFlag, Script, ScriptRuntimeManifest, ScriptResource, ECxChannels, Manifest } from '../shared/types';
+import {
+  Extension,
+  UserScripts,
+  ExtensionFS,
+  BackgroundPage,
+  Script,
+  ScriptResource,
+  Manifest,
+} from '../shared/types';
+import {
+  ECxChannels,
+  Protocol,
+  backgroundPageProcessFlag,
+  ScriptRuntimeManifest,
+} from '../shared/constants';
 import { protocolAsScheme } from '../shared/utils';
 
 // --- Utils
@@ -171,7 +185,7 @@ const getUserScripts = async (extension: ExtensionFS): Promise<UserScripts> => {
 const loadExtension = async (
   dir: string,
   extensionId: Extension['id']
-): Promise<Extension['manifest']['name']> => {
+): Promise<Extension['manifest']['name'] | undefined> => {
   const extensionFs = await getExtensionFromFilesystem(dir, extensionId);
   const { manifest: { name, background, content_scripts } } = extensionFs;
 

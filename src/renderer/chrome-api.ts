@@ -1,129 +1,20 @@
-import { Extension, ChromeApi } from '../shared/types';
-import { getApi, getTypeByReference, resolve, addTargetApiPath } from './utils';
+import { Extension } from '../shared/types';
 import { apis, apiFeatures } from '../shared/definitions';
-
-declare global {
-  interface Window { chrome: ChromeApi; }
-}
-
-const { log, warn } = console;
-
-const targetProvider = { __apiPath: [], apis };
-
-const eventsSubscriptions = new Map<string, Set<Function>>();
-
-const addEventSubscription = (
-  store: Map<string, Set<Function>>,
-  namespace: string,
-  value: Function
-): Set<Function> => {
-  const namespaceEvents = store.get(namespace);
-
-  if (namespaceEvents) {
-    return namespaceEvents.add(value);
-  }
-
-  store.set(namespace, new Set<Function>());
-
-  const a = store.get(namespace)!.add(value);
-  log(store);
-  return a;
-}
-
-const hasEventSubscription = (
-  store: Map<string, Set<Function>>,
-  namespace: string,
-  value: Function
-): boolean => {
-  const namespaceEvents = store.get(namespace);
-
-  if (namespaceEvents) {
-    return namespaceEvents.has(value);
-  }
-
-  return false;
-}
-
-const removeEventSubscription = (
-  store: Map<string, Set<Function>>,
-  namespace: string,
-  value: Function
-): void => {
-  const namespaceEvents = store.get(namespace);
-
-  if (namespaceEvents) {
-    namespaceEvents.delete(value);
-  }
-}
-
-// Content Scripts and Permission check
-const operationAllowed = (
-  features: any,
-  extension: Extension,
-  path: string[],
-  isBackgroundPage: boolean,
-): boolean | void => {
-  if (path.length === 0) return false;
-
-  const feature = features[path.join('.')];
-
-  if (feature) {
-    const contexts = feature['contexts'];
-
-    if (!Boolean(contexts)) {
-      return true;
-    }
-
-    const allowedAsContentScripts = contexts
-      .includes('content_script');
-
-    if (feature['dependencies']) {
-      const requiredPermissions = feature['dependencies']
-        .filter((d: string) => d.startsWith('permission:'));
-
-      if (requiredPermissions.length > 0) {
-        const requiredPermission = requiredPermissions
-          .map((d: string) => d.split(':')[1])[0];
-
-        const { manifest: { permissions } } = extension;
-        const permissionChecked = permissions.includes(requiredPermission);
-
-        if (isBackgroundPage) {
-          if (!permissionChecked) {
-            warn(`Permission missing: ${requiredPermission}`);
-          }
-          return permissionChecked;
-        }
-
-        if (allowedAsContentScripts) {
-          if (!permissionChecked) {
-            warn(`Permission missing: ${requiredPermission}`);
-          }
-
-          return permissionChecked;
-        }
-
-        warn(`Access not allowed for ${path} in content scripts`);
-        return false;
-      }
-    }
-
-    if (isBackgroundPage) {
-      return true;
-    }
-
-    if (allowedAsContentScripts) {
-      return true;
-    }
-
-    warn(`Access not allowed for ${path} in content scripts`);
-    return false;
-  }
-
-  path.pop();
-
-  return operationAllowed(features, extension, path, isBackgroundPage);
-}
+import {
+  getApi,
+  getTypeByReference,
+  resolve,
+  addTargetApiPath,
+  log,
+  warn,
+} from './utils';
+import {
+  addEventSubscription,
+  hasEventSubscription,
+  removeEventSubscription,
+} from './events';
+import { operationAllowed } from './checker';
+import { ipcMain } from 'electron';
 
 const injectChromeApi = (
   context: Window,
@@ -131,8 +22,6 @@ const injectChromeApi = (
   isBackgroundPage: boolean,
 ) => {
   log(`Inject Chrome API for ${extension.id} ${isBackgroundPage}`);
-
-  // Type checking on call
 
   const handler = {
     get(target: any, property: PropertyKey, _: any): any {
@@ -195,9 +84,17 @@ const injectChromeApi = (
             return;
           }
 
-          log([...__apiPath, method.name], method.parameters);
+
           // asynchronous method call
-          return;
+          const mock = (...args: any) => {
+            // ['tabs', 'get']  method
+            log([...__apiPath, method.name], method.parameters)
+            log(args);
+
+            // send { channel: '', args: 'args - cb', ext: Extension, meta :{} } =>
+          };
+
+          return mock;
         }
       }
 
@@ -208,16 +105,18 @@ const injectChromeApi = (
       if (eventMethods.includes(property)) {
         const path = __apiPath.join('.');
 
+        log(Array.from(context.__eventsSubscriptions.keys()));
+
         switch (property) {
           case 'addListener':
             return (callback: Function) =>
-              addEventSubscription(eventsSubscriptions, path, callback);
+              addEventSubscription(context.__eventsSubscriptions, path, callback);
           case 'hasListener':
             return (callback: Function) =>
-              hasEventSubscription(eventsSubscriptions, path, callback);
+              hasEventSubscription(context.__eventsSubscriptions, path, callback);
           case 'removeListener':
             return (callback: Function) =>
-              removeEventSubscription(eventsSubscriptions, path, callback);
+              removeEventSubscription(context.__eventsSubscriptions, path, callback);
         }
       }
 
@@ -234,8 +133,10 @@ const injectChromeApi = (
     },
   };
 
-  // Mute the Window object to add the chrome namespace
-  context.chrome = new Proxy(targetProvider, handler);
+
+  context.__targetProvider = { __apiPath: [], apis };
+  context.__eventsSubscriptions = new Map();
+  context.chrome = new Proxy(context.__targetProvider, handler);
 
   return Object.freeze(context.chrome);
 };

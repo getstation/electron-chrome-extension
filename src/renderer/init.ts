@@ -1,7 +1,18 @@
 import { webFrame, ipcRenderer } from 'electron';
-import { backgroundPageProcessFlag, Protocol, ECxChannels, UserScripts, ScriptRuntimeManifest, Script, ScriptRuntimeProcess, Extension } from '../shared/types';
-import injectChromeApi from './chrome-api';
 import { parse } from 'url';
+import injectChromeApi from './chrome-api';
+import {
+  UserScripts,
+  Script,
+  Extension,
+} from '../shared/types';
+import {
+  backgroundPageProcessFlag,
+  Protocol,
+  ECxChannels,
+  ScriptRuntimeManifest,
+  ScriptRuntimeProcess
+} from '../shared/constants';
 
 // todo: rewrite
 const matchesPattern = (pattern: string): boolean => {
@@ -54,7 +65,7 @@ export const injectExtension = (extension: Extension): void => {
           // @ts-ignore : event type inference suck
           ScriptRuntimeProcess.DocumentEnd,
           () => {
-            var node = document.createElement('style');
+            let node = document.createElement('style');
             node.innerHTML = code;
             window.document.body.appendChild(node);
           }

@@ -28,6 +28,7 @@
     ]
   },
   "include": [
+    "types/**/*",
     "src/**/*.ts",
     "src/**/*.js",
     "src/**/*.json"
