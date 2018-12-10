@@ -61,5 +61,5 @@ typings/
 .env
 
 # Project
-example/extensions
-!example/extensions/dummy-extension
+playground/extensions
+!playground/extensions/dummy-extension

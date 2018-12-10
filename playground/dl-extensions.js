@@ -6,6 +6,10 @@ const fs = require('fs');
 
 const EXTENSIONS = [
   {
+    id: 'dheionainndbbpoacpnopgmnihkcmnkl',
+    slug: 'gmelius'
+  },
+  {
     id: 'pgbdljpkijehgoacbjpolaomhkoffhnl',
     slug: 'mailtracker'
   },
@@ -22,13 +26,13 @@ const EXTENSIONS = [
     slug: 'clearbit-connect'
   },
   {
+    id: 'aeblfdkhhhdcdjpifhhbdiojplfjncoa',
+    slug: '1passwordx'
+  },
+  {
     id: 'kbfnbcaeplbcioakkpcpgfkobkghlhen',
     slug: 'grammarly'
   },
-  // {
-  //   id: 'dheionainndbbpoacpnopgmnihkcmnkl',
-  //   slug: 'gmelius'
-  // },
   // {
   //   id: 'hihakjfhbmlmjdnnhegiciffjplmdhin',
   //   slug: 'rapportive'
@@ -44,10 +48,6 @@ const EXTENSIONS = [
   // {
   //   id: 'ghbmnnjooekpmoecnnnilnnbdlolhkhi',
   //   slug: 'google-drive-offline'
-  // },
-  // {
-  //   id: 'aomjjhallfgjeglblehebfpbcfeobpgk',
-  //   slug: '1password'
   // },
   // {
   //   id: 'hdokiejnpimakedhajhdlcegeplioahd',
