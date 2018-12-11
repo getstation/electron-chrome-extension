@@ -7,6 +7,11 @@ Electron v3.0.4 - Node v8.9.0 - NPM v5.5.1
 
 ## Dev Environment
 
+- Download Extensions
+```sh
+$ npm run dl-extensions
+```
+
 - Watch
 ```sh
 $ npm run watch
@@ -25,7 +30,7 @@ $ npm run test
 ```
 
 We use [electron-mocha](https://github.com/jprichardson/electron-mocha) for run our test suit.
-Warning (because not explained in the lib): test assertions lives in the renderer, 
+Warning (because not explained in the lib): test assertions lives in the renderer,
 the main remains accessible for IPC calls and API calls.
 
 ## Production Environment

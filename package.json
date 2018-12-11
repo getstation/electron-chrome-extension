@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "test": "NODE_ENV=test test/run.sh",
+    "dl-extensions": "node playground/dl-extensions.js",
     "playground": "electron playground/main.js",
     "watch": "tsc --watch -p ./ --outDir lib",
     "lint": "tslint -p .",

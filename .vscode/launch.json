@@ -1,0 +1,48 @@
+  {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Playground: Main",
+        "protocol": "inspector",
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+        "runtimeArgs": [
+          "${workspaceRoot}/playground/main.js",
+          "--remote-debugging-port=9223",
+        ],
+        "windows": {
+          "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+        }
+      },
+      {
+        "name": "Playground: Renderer",
+        "type": "chrome",
+        "request": "attach",
+        "port": 9223,
+        "webRoot": "${workspaceFolder}",
+        "timeout": 30000
+      },
+      {
+        "name": "Playground: Webview",
+        "type": "chrome",
+        "request": "attach",
+        "port": 9223,
+        "targetTypes": [
+          "webview"
+        ],
+        "webRoot": "${workspaceFolder}",
+        "timeout": 30000
+      }
+    ],
+    "compounds": [
+      {
+        "name": "Playground: All",
+        "configurations": [
+          "Playground: Main",
+          "Playground: Renderer",
+          "Playground: Webview"
+        ]
+      }
+    ]
+  }
