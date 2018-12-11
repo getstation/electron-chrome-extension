@@ -44,7 +44,7 @@
         "configurations": [
           "Playground: Main",
           "Playground: Renderer",
-          "Playground: Webview"
+          // "Playground: Webview"
         ]
       }
     ]
