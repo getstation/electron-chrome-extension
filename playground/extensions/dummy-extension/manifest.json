@@ -1,11 +1,26 @@
 {
-   "content_scripts": [ {
-      "css": [ "/hello.css" ],
-      "js": [ "/a.js", "/b.js", "/web-request.js", "/crash.js"],
-      "__matches": [ "https://github.com/*", "https://developer.mozilla.org/*", "https://mail.google.com/*"],
-      "matches": [ "<all_urls>"],
-      "run_at": "document_end"
-   }],
+   "content_scripts": [
+      {
+         "css": [
+            "/hello.css"
+         ],
+         "js": [
+            "/a.js",
+            "/b.js",
+            "/crash.js",
+            "/web-request.js"
+         ],
+         "__matches": [
+            "https://github.com/*",
+            "https://developer.mozilla.org/*",
+            "https://mail.google.com/*"
+         ],
+         "matches": [
+            "<all_urls>"
+         ],
+         "run_at": "document_end"
+      }
+   ],
    "permissions": [
       "webRequest",
       "webRequestBlocking",

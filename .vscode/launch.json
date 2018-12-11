@@ -32,7 +32,10 @@
           "webview"
         ],
         "webRoot": "${workspaceFolder}",
-        "timeout": 30000
+        "timeout": 30000,
+        "sourceMapPathOverrides": {
+          "chrome-extension://*": "${workspaceFolder}/playground/extensions/*"
+        }
       }
     ],
     "compounds": [

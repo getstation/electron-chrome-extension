@@ -26,7 +26,7 @@ app.on('ready', () => {
   createWindow();
 
   // require('electron-process-manager').openProcessManager();
-  addExtension(join(__dirname, './extensions/dummy-extension'))
+  addExtension(join(__dirname, './extensions/mixmax'))
 });
 
 app.on('window-all-closed', () => {
