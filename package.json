@@ -8,6 +8,7 @@
     "test": "NODE_ENV=test test/run.sh",
     "playground": "electron playground/main.js",
     "watch": "tsc --watch -p ./ --outDir lib",
+    "lint": "tslint -p .",
     "build": "tsc -p ./ --outDir lib",
     "publish": " NPMInternalBucket=dev.getstation.com ./node_modules/.bin/npm-internal publish -f"
   },

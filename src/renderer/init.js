@@ -17,7 +17,6 @@ if (protocol === `${constants.EXTENSION_PROTOCOL}:`) {
     delete global.clearImmediate
     delete global.global
   })
-} else if (protocol === 'chrome:') {
 } else {
   require('./injectors/content-scripts-injector')
 }
