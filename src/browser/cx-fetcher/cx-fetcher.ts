@@ -33,10 +33,8 @@ export default class CxFetcher extends EventEmitter {
   }
 
   public async fetchOne(extensionId: string) {
-    const destFolder = this.cxStorage.getDestinationFolder('extension');
-    console.log('Dest folder : ', destFolder);
+    const destFolder = this.cxStorage.getDestinationFolder('extensions');
     const filePath = await this.cxDownloader.downloadById(extensionId, destFolder);
-    console.log('DLed : ', extensionId);
     return filePath;
   }
 
