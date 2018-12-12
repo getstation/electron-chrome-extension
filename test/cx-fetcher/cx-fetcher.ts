@@ -3,7 +3,7 @@ import assert = require('assert');
 import CxFetcher from '../../src/browser/cx-fetcher/cx-fetcher';
 
 describe('Chrome Extension Fetcher', () => {
-  it('Instanciate the CxFetcher singleton', () => {
+  it('Instanciate as a singleton', () => {
     const cxFetcher = new CxFetcher();
     assert.equal(cxFetcher instanceof CxFetcher, true);
   });
@@ -22,10 +22,12 @@ describe('Chrome Extension Fetcher', () => {
     assert.equal(true, true);
   });
 
-  it('Download a crx zip file', async () => {
+  it('Can download a crx zip file', async () => {
+    const extensionID = 'dheionainndbbpoacpnopgmnihkcmnkl';
     const cxFetcher = new CxFetcher();
-    console.log(cxFetcher.cxStorage);
-    const filePath = await cxFetcher.fetchOne('dheionainndbbpoacpnopgmnihkcmnkl');
-    assert.equal(filePath, 'blob');
+
+    const filePath = await cxFetcher.fetchOne(extensionID);
+
+    assert.equal(filePath, `/Users/mikael/Documents/Code/electron-chrome-extension/src/browser/cx-fetcher/extensions/${extensionID}.crx`);
   });
 });
