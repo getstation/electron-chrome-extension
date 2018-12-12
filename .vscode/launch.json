@@ -44,7 +44,13 @@
         "configurations": [
           "Playground: Main",
           "Playground: Renderer",
-          // "Playground: Webview"
+        ]
+      },
+      {
+        "name": "Test: All",
+        "configurations": [
+          "Test: Main",
+          "Test: Renderer",
         ]
       }
     ]
