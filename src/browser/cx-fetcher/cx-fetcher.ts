@@ -34,7 +34,7 @@ export default class CxFetcher extends EventEmitter {
 
   public async fetchOne(extensionId: string) {
     const crxPath = await this.cxDownloader.downloadById(extensionId);
-    const extensionPath = await this.cxStorage.extractExtension(crxPath);
+    const extensionPath = await this.cxStorage.extractExtension(extensionId, crxPath);
     return extensionPath;
   }
 
