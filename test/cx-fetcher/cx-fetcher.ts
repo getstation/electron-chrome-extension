@@ -3,31 +3,31 @@ import assert = require('assert');
 import CxFetcher from '../../src/browser/cx-fetcher/cx-fetcher';
 
 describe('Chrome Extension Fetcher', () => {
-  it('Instanciate as a singleton', () => {
+  it('instanciate as a singleton', () => {
     const cxFetcher = new CxFetcher();
     assert.equal(cxFetcher instanceof CxFetcher, true);
   });
 
-  it('Has default downloader provider', () => {
+  it('has default downloader provider', () => {
     const mockStorageProvider = {};
     // @ts-ignore
     const cxFetcher = new CxFetcher(mockStorageProvider, undefined);
     assert.equal(true, true);
   });
 
-  it('Has default storage provider', () => {
+  it('has default storage provider', () => {
     const mockDlProvider = {};
     // @ts-ignore
     const cxFetcher = new CxFetcher(undefined, mockDlProvider);
     assert.equal(true, true);
   });
 
-  it('Can download a crx zip file', async () => {
-    const extensionID = 'dheionainndbbpoacpnopgmnihkcmnkl';
-    const cxFetcher = new CxFetcher();
-
+  it('fetch a chrome extension', async () => {
+    const extensionID = 'dheionainndbbpoacpnopgmnihkcmnkl';   // Use gmelius extension id
+    const cxFetcher = new CxFetcher();                        // Use default providers
+    // Fetch the extension
     const filePath = await cxFetcher.fetchOne(extensionID);
-
+    // Check it arrived at the right place
     assert.equal(filePath, `/Users/mikael/Documents/Code/electron-chrome-extension/src/browser/cx-fetcher/extensions/${extensionID}.crx`);
   });
 });
