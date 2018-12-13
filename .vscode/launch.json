@@ -4,6 +4,20 @@
       {
         "type": "node",
         "request": "launch",
+        "name": "Test",
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron-mocha",
+        "runtimeArgs": [
+          "--debug",
+          "--debug-brk",
+          "--require-main",
+          "test/main-loader.js",
+          "--renderer",
+          "test/loader.js"
+        ]
+      },
+      {
+        "type": "node",
+        "request": "launch",
         "name": "Playground: Main",
         "protocol": "inspector",
         "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
@@ -40,17 +54,10 @@
     ],
     "compounds": [
       {
-        "name": "Playground: All",
+        "name": "Playground",
         "configurations": [
           "Playground: Main",
           "Playground: Renderer",
-        ]
-      },
-      {
-        "name": "Test: All",
-        "configurations": [
-          "Test: Main",
-          "Test: Renderer",
         ]
       }
     ]
