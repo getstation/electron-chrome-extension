@@ -38,6 +38,7 @@ jspm_packages/
 
 # Build directory
 lib/
+lib-test
 
 # Typescript v1 declaration files
 typings/
