@@ -2,6 +2,8 @@ import assert = require('assert');
 // import { ipcRenderer } from 'electron';
 import CxFetcher from '../../src/browser/cx-fetcher/cx-fetcher';
 
+const EXTENSION_ID = 'dheionainndbbpoacpnopgmnihkcmnkl';
+
 describe('Chrome Extension Fetcher', () => {
   it('instanciate as a singleton', () => {
     const cxFetcher = new CxFetcher();
@@ -23,11 +25,13 @@ describe('Chrome Extension Fetcher', () => {
   });
 
   it('fetch a chrome extension', async () => {
-    const extensionID = 'dheionainndbbpoacpnopgmnihkcmnkl';   // Use gmelius extension id
-    const cxFetcher = new CxFetcher();                        // Use default providers
-    // Fetch the extension
-    const filePath = await cxFetcher.fetchOne(extensionID);
+    const cxFetcher = new CxFetcher();
+    const actualCxPath = await cxFetcher.fetchOne(EXTENSION_ID);
+
     // Check it arrived at the right place
-    assert.equal(filePath, `/Users/mikael/Documents/Code/electron-chrome-extension/src/browser/cx-fetcher/extensions/${extensionID}.crx`);
+    assert.equal(
+      actualCxPath,
+      `/Users/mikael/Documents/Code/electron-chrome-extension/src/browser/cx-fetcher/extensions/${EXTENSION_ID}/8.4.2`
+    );
   });
 });

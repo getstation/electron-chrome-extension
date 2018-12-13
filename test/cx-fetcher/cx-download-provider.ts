@@ -1,4 +1,5 @@
 import assert = require('assert');
+const fs = require('fs').promises;
 // import { ipcRenderer } from 'electron';
 import DownloadProvider from '../../src/browser/cx-fetcher/cx-download-provider';
 
@@ -10,8 +11,15 @@ describe('Default Download Provider', () => {
     assert.equal(type, 'function');
   });
 
-  it('can download a crx archive', async () => {
+  it('can download a crx archive with an ID', async () => {
     const crxPath = await DownloadProvider.downloadById(EXTENSION_ID);
-    assert.equal(crxPath, '');
+    const crxInfo = await fs.stat(crxPath);
+
+    // TODO : Remove this
+    console.log(crxPath);
+
+    // Check that the downloaded thing is actually a file
+    assert.equal(crxInfo.isFile(), true);
+    assert.notEqual(crxInfo.size, 0);
   });
 });
