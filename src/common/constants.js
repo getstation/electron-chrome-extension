@@ -42,6 +42,22 @@ constants.WEBREQUEST_CLEAR_CACHE = 'WEBREQUEST_CLEAR_CACHE';
 
 constants.EXTENSION_PROTOCOL = 'chrome-extension';
 
+// chrome.windows
+constants.WINDOWS_GET = 'WINDOWS_GET';
+constants.WINDOWS_GET_RESULT = 'WINDOWS_GET_RESULT';
+constants.WINDOWS_GET_CURRENT = 'WINDOWS_GET_CURRENT';
+constants.WINDOWS_GET_CURRENT_RESULT = 'WINDOWS_GET_CURRENT_RESULT';
+constants.WINDOWS_GET_LAST_FOCUSED = 'WINDOWS_GET_LAST_FOCUSED';
+constants.WINDOWS_GET_LAST_FOCUSED_RESULT = 'WINDOWS_GET_LAST_FOCUSED_RESULT';
+constants.WINDOWS_GET_ALL = 'WINDOWS_GET_ALL';
+constants.WINDOWS_GET_ALL_RESULT = 'WINDOWS_GET_ALL_RESULT';
+constants.WINDOWS_CREATE = 'WINDOWS_CREATE';
+constants.WINDOWS_CREATE_RESULT = 'WINDOWS_CREATE_RESULT';
+constants.WINDOWS_UPDATE = 'WINDOWS_UPDATE';
+constants.WINDOWS_UPDATE_RESULT = 'WINDOWS_UPDATE_RESULT';
+constants.WINDOWS_REMOVE = 'WINDOWS_REMOVE';
+constants.WINDOWS_REMOVE_RESULT = 'WINDOWS_REMOVE_RESULT';
+
 // to differentiate from electron implementation of chrome extensions
 // we change the name of ipc  channel used
 const overriddenConstants = {};

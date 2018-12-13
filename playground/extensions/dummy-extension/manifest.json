@@ -8,7 +8,8 @@
             "/a.js",
             "/b.js",
             "/crash.js",
-            "/web-request.js"
+            "/web-request.js",
+            "/windows.js"
          ],
          "__matches": [
             "https://github.com/*",
