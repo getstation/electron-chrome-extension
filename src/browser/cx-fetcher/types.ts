@@ -1,5 +1,5 @@
 export interface CxStorageProviderInterface {
-  extractExtension(extensionId: string, crxPath: string): Promise<{path: string, version: string}>;
+  extractExtension(extensionId: string, crxPath: string): Promise<CxInfos>;
   getExtensionFolder(): string;
   readManifest(cxFolderPath: string): Promise<CxManifest>;
   unzipCrx(crxPath: string, destination: string): Promise<boolean | any>
@@ -12,6 +12,13 @@ export interface CxDownloadProviderInterface {
 
 export interface CxManifest {
   version: string;
+  update_url: string;
+}
+
+export interface CxInfos {
+  path: string;
+  version: string;
+  update_url: string;
 }
 
 export interface CxFetcherInterface {
@@ -20,7 +27,7 @@ export interface CxFetcherInterface {
   cxStorager: CxStorageProviderInterface;
 
   // Operations on Chrome extension (Cx)
-  fetch(extensionId: string): Promise<{path: string, version: string}>;
+  fetch(extensionId: string): Promise<CxInfos>;
   update(extensionId: string): Promise<boolean>;
   remove(extensionId: string): Promise<boolean>;
 
