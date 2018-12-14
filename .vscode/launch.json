@@ -29,6 +29,7 @@
         "request": "attach",
         "port": 9223,
         "targetTypes": [
+          "page",
           "webview"
         ],
         "webRoot": "${workspaceFolder}",

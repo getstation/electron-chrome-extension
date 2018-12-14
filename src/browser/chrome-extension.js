@@ -375,7 +375,7 @@ const chromeExtensionHandler = function (request, callback) {
   })
 }
 
-// protocol.registerStandardSchemes([constants.EXTENSION_PROTOCOL], { secure: true });
+protocol.registerStandardSchemes([constants.EXTENSION_PROTOCOL], { secure: true });
 
 app.on('session-created', function (ses) {
   if (constants.EXTENSION_PROTOCOL === constants.DEFAULT_EXTENSION_PROTOCOL) {

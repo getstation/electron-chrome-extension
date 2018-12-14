@@ -11,6 +11,7 @@
     "test-runner": "test/run.sh",
     "dl-extensions": "node playground/dl-extensions.js",
     "playground": "electron playground/main.js",
+    "playground-cleandata": "rm -rf ~/Library/Application\\ Support/Electron/",
     "watch": "tsc --watch -p ./ --outDir lib",
     "lint": "tslint -p .",
     "build": "tsc -p ./ --outDir lib",

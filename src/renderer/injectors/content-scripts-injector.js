@@ -20,7 +20,7 @@ const setupContentScript = function (extensionId, worldId, callback) {
 
   webFrame.executeJavaScriptInIsolatedWorld(worldId, [{ code: 'window', url: `${extensionId}://ChromeAPI` }], function (isolatedWorldWindow) {
     isolatedWorldWindow.chrome = chromeAPIs;
-    callback()
+    callback(isolatedWorldWindow)
   });
 }
 
@@ -88,7 +88,21 @@ Object.keys(contentScripts).forEach(key => {
   }
 
   if (cs.contentScripts) {
-    setupContentScript(cs.extensionId, worldId, function () {
+    setupContentScript(cs.extensionId, worldId, function (isolatedWorldWindow) {
+      // native window open workaround
+      const { ipcRenderer } = require('electron');
+
+      const { guestInstanceId, openerId } = process;
+      const hiddenPage = process.argv.includes('--hidden-page');
+      const usesNativeWindowOpen = process.argv.includes('--native-window-open');
+
+      // Any URL that shouldn't be loaded as `nativeWindowOpen` as a popup
+      // should appear here if parent window uses `nativeWindowOpen`
+      const overrideNativeWindowOpenList = [];
+
+      require('../window-setup')(isolatedWorldWindow, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesNativeWindowOpen, overrideNativeWindowOpenList);
+      // end workaround
+
       for (const script of cs.contentScripts) {
         addContentScript(cs.extensionId, script)
       }
