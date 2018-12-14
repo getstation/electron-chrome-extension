@@ -25,6 +25,11 @@ class CxDownloadProvider implements CxDownloadProviderInterface {
     const tmpDir = this.downloads.get(extensionId);
     fse.remove(tmpDir);
   }
+  
+  async fetchUpdateManifest(updateUrl: string) {
+    console.log(`Fetching ${updateUrl}`);
+    return 'AH AH AH';
+  }
 }
 
 export default CxDownloadProvider;

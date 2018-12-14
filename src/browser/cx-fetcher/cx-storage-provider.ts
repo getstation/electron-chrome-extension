@@ -1,4 +1,8 @@
-import { CxStorageProviderInterface, CxManifest } from './types';
+import {
+  CxStorageProviderInterface,
+  CxManifest,
+  CxInfos,
+} from './types';
 const path = require('path');
 const unzip = require('unzip-crx');
 const fse = require('fs-extra');
@@ -18,7 +22,7 @@ class CxStorageProvider implements CxStorageProviderInterface {
    * @param extensionId   Extension ID used for the final folder path
    * @param crxPath       Path of the CRX archive, as a string
    */
-  async extractExtension(extensionId: string, crxPath: string): Promise<{path: string, version: string}> {
+  async extractExtension(extensionId: string, crxPath: string): Promise<CxInfos> {
     try {
       const rootExtensionFolder = this.getExtensionFolder();
       // Extract temporarily in a sub temporary folder
@@ -29,13 +33,15 @@ class CxStorageProvider implements CxStorageProviderInterface {
       const cxInfo = await this.readManifest(tempDestination);
       const versionDestination = path.resolve(rootExtensionFolder, extensionId, cxInfo.version);
 
-      // TODO : Improve the unzip again ?
-      // Extract the archive into the version subfolder and remove garbage
-      this.unzipCrx(crxPath, versionDestination);
-      fse.remove(tempDestination);
+      // Move the extracted file to the final versionned folder
+      await fse.move(tempDestination, versionDestination);
 
       // Return new extension folder path
-      return { path: versionDestination, version: cxInfo.version };
+      return {
+        path: versionDestination,
+        version: cxInfo.version,
+        update_url: cxInfo.update_url,
+      };
     } catch (err) {
       throw new Error(err);
     }

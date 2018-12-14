@@ -5,6 +5,7 @@ import {
   CxFetcherInterface,
   CxDownloadProviderInterface,
   CxStorageProviderInterface,
+  CxInfos,
 } from './types';
 
 class CxFetcher extends EventEmitter implements CxFetcherInterface {
@@ -14,7 +15,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   public cxDownloader: CxDownloadProviderInterface;
   // Sets of what's happening with Chrome extensions
   private inUse: Map<string, string>;
-  private available: Map<string, {}>;
+  private available: Map<string, CxInfos>;
 
   // Constructor with dependencies injection
   constructor(cxStorager?: CxStorageProviderInterface, cxDownloader?: CxDownloadProviderInterface) {
@@ -46,7 +47,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   }
 
   // Fetch a Chrome extension
-  async fetch(extensionId: string): Promise<{path: string, version: string}> {
+  async fetch(extensionId: string): Promise<CxInfos> {
     // Check if it's already in use
     if (this.inUse.has(extensionId)) {
       throw new Error(`Extension ${extensionId} is already being used`);
