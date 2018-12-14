@@ -1,7 +1,7 @@
 class Tab {
-  constructor (tabId) {
+  constructor(tabId, url = '') {
     this.id = tabId;
-    this.url = '';
+    this.url = url;
   }
 }
 
