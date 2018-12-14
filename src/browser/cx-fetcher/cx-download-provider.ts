@@ -3,12 +3,28 @@
 import * as downloadCrx from 'download-crx';
 // @ts-ignore
 import * as tmp from 'tmp';
+const fse = require('fs-extra');
+import { CxDownloadProviderInterface } from './types';
 
-const downloadById = (extensionId: string) => {
-  const tempDir = tmp.dirSync().name;
-  return downloadCrx.downloadById(extensionId, tempDir, extensionId);
-};
+class CxDownloadProvider implements CxDownloadProviderInterface {
+  // Track what have been downloaded for cleanups
+  private downloads: Map<string, string>;
 
-export default {
-  downloadById,
-};
+  constructor() {
+    console.log('Building myself too');
+    this.downloads = new Map();
+  }
+
+  async downloadById(extensionId: string) {
+    const tempDir = tmp.dirSync().name;
+    this.downloads.set(extensionId, tempDir);
+    return downloadCrx.downloadById(extensionId, tempDir, extensionId);
+  }
+
+  async cleanupById(extensionId: string) {
+    const tmpDir = this.downloads.get(extensionId);
+    fse.remove(tmpDir);
+  }
+}
+
+export default CxDownloadProvider;

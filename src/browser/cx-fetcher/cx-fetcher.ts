@@ -1,19 +1,23 @@
 import EventEmitter = require('events');
 import defaultCxStorage from './cx-storage-provider';
 import defaultCxDownloader from './cx-download-provider';
+import {
+  CxFetcherInterface,
+  CxDownloadProviderInterface,
+  CxStorageProviderInterface,
+} from './types';
 
-export default class CxFetcher extends EventEmitter {
-  // Hold the singleton instance
-  private static instance:CxFetcher;
-  public cxStorage:any;
-  public cxDownloader:any;
+class CxFetcher extends EventEmitter implements CxFetcherInterface {
+  // Singleton instance & injected dependencies
+  private static instance: CxFetcher;
+  public cxStorager: CxStorageProviderInterface;
+  public cxDownloader: CxDownloadProviderInterface;
+  // Sets of what's happening with Chrome extensions
+  private inUse: Map<string, string>;
+  private available: Map<string, {}>;
 
-  /**
-   * Construct the singleton, return the only instance if already created, build it if not
-   * @param cxStorage Dependence that will handle all file system storage
-   * @param cxDownloader Dependence that will handle download and external fetch
-   */
-  constructor(cxStorage?: any, cxDownloader?: any) {
+  // Constructor with dependencies injection
+  constructor(cxStorager?: CxStorageProviderInterface, cxDownloader?: CxDownloadProviderInterface) {
     // Let this be a singleton
     if (CxFetcher.instance) {
       return CxFetcher.instance;
@@ -23,8 +27,12 @@ export default class CxFetcher extends EventEmitter {
     super();
 
     // Registrer the downloader and storage handler
-    this.cxStorage = (cxStorage) ? cxStorage : defaultCxStorage;
-    this.cxDownloader = (cxDownloader) ? cxDownloader : defaultCxDownloader;
+    // @ts-ignore
+    this.cxStorager = (cxStorager) ? cxStorager : new defaultCxStorage();
+    // @ts-ignore
+    this.cxDownloader = (cxDownloader) ? cxDownloader : new defaultCxDownloader();
+    this.inUse = new Map();
+    this.available = new Map();
 
     // Start auto-update
     this.autoFetchUpdates();
@@ -32,17 +40,53 @@ export default class CxFetcher extends EventEmitter {
     CxFetcher.instance = this;
   }
 
-  public async fetchOne(extensionId: string) {
+  // Expose the list of availabel and installed Chrome extensions
+  availableCX() {
+    return this.available;
+  }
+
+  // Fetch a Chrome extension
+  async fetch(extensionId: string): Promise<{path: string, version: string}> {
+    // Check if it's already in use
+    if (this.inUse.has(extensionId)) {
+      throw new Error(`Extension ${extensionId} is already being used`);
+    }
+
+    // Record the extension has being toyed with already
+    this.inUse.set(extensionId, 'downloading');
+    // Start downloading -> unzipping -> cleaning
     const crxPath = await this.cxDownloader.downloadById(extensionId);
-    const extensionPath = await this.cxStorage.extractExtension(extensionId, crxPath);
-    return extensionPath;
+    const fetchedCxInfo = await this.cxStorager.extractExtension(extensionId, crxPath);
+    await this.cxDownloader.cleanupById(extensionId);
+
+    // Clear status, add to installed and emit ready event for this cx
+    this.inUse.delete(extensionId);
+    this.available.set(extensionId, fetchedCxInfo);
+
+    return fetchedCxInfo;
   }
 
-  public checkForUpdate() {
-
+  // Update a Chrome extension
+  async update(extensionId: string) {
+    console.log(`Updating ${extensionId}`);
+    return true;
   }
 
-  private autoFetchUpdates() {
+  // Remove a Chrome extension
+  async remove(extensionId: string) {
+    console.log(`Removing ${extensionId}`);
+    return true;
+  }
 
+  // Check if a Chrome extension can be updated
+  checkForUpdate() {
+    return true;
+  }
+
+  // Auto update all installed extensions automatically
+  autoFetchUpdates() {
+    return true;
   }
 }
+
+export default CxFetcher;
