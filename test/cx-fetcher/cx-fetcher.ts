@@ -46,6 +46,16 @@ describe('Chrome Extension Fetcher', () => {
     );
   });
 
+  it('discovers installed chrome extensions', async () => {
+    const cxFetcher = new CxFetcher();
+    const beforeScan = cxFetcher.availableCx();
+    await cxFetcher.scanInstalledExtensions();
+    const afterScan = cxFetcher.availableCx();
+
+    assert.equal(beforeScan.size, 0);
+    assert.equal(afterScan.size, 1);
+  });
+
   it('can check if an update is available', async () => {
     // Mock downloader to return fake XML
     const mockDownloader = new class {
@@ -53,8 +63,7 @@ describe('Chrome Extension Fetcher', () => {
       fetchUpdateManifest(url: string) { return FAKE_UPDATE_XML; }
     };
 
-    // @ts-ignore // TODO : Replace this with something else
-    delete CxFetcher._instance;
+    CxFetcher.reset();
 
     // @ts-ignore
     const cxFetcher = new CxFetcher(undefined, mockDownloader);

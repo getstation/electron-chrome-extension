@@ -14,9 +14,12 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   private static _instance: CxFetcher;
   public cxStorager: CxStorageProviderInterface;
   public cxDownloader: CxDownloadProviderInterface;
-  // Sets of what's happening with Chrome extensions
+  // Maps of what's happening with Chrome extensions
   private inUse: Map<string, string>;
   private available: Map<string, CxInfos>;
+  // Auto update related
+  private autoUpdateLoop: NodeJS.Timer;
+  // private autoUpdateInterval: number;
 
   // Constructor with dependencies injection
   constructor(cxStorager?: CxStorageProviderInterface, cxDownloader?: CxDownloadProviderInterface) {
@@ -34,20 +37,28 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     // @ts-ignore
     this.cxDownloader = (cxDownloader) ? cxDownloader : new defaultCxDownloader();
 
-    this.inUse = new Map();
+    // Initialise internal maps of extensions (with those already installed, if ever)
     this.available = new Map();
+    this.inUse = new Map();
 
     // Start auto-update
-    this.autoFetchUpdates();
+    // this.autoUpdateLoop = setInterval(this.autoUpdate, this.autoUpdateInterval);
 
+    // Save the one and only instance
     CxFetcher._instance = this;
   }
 
+  // Static method to reset the unique instance
+  public static reset() {
+    delete CxFetcher._instance;
+  }
+
   // Expose the list of available and installed Chrome extensions
-  availableCX() {
+  availableCx() {
     return this.available;
   }
 
+  // Add a new Cx to the internal map
   saveCx(extensionId: string, cxInfos: CxInfos) {
     this.available.set(extensionId, cxInfos);
     return true;
@@ -60,6 +71,9 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
       throw new Error(`Extension ${extensionId} is already being used`);
     }
 
+    // TODO : check if the extension already exists with this version ?
+    // TODO : React to errors
+
     // Record the extension has being toyed with already
     this.inUse.set(extensionId, 'downloading');
     // Start downloading -> unzipping -> cleaning
@@ -69,7 +83,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
 
     // Clear status, add to installed and emit ready event for this cx
     this.inUse.delete(extensionId);
-    this.available.set(extensionId, fetchedCxInfo);
+    this.saveCx(extensionId, fetchedCxInfo);
 
     return fetchedCxInfo;
   }
@@ -93,8 +107,9 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     if (!cxInfos) throw new Error('Unknown extension');
 
     const updateManifest = await this.cxDownloader.fetchUpdateManifest(cxInfos.update_url);
-    const lastVersion = this.extractVersion(updateManifest);
 
+    // Extract all the work on manifest into its own dependency (no parsing stuff in the CxFetcher)
+    const lastVersion = this.extractVersion(updateManifest);
     if (this.gt(this.parseVersion(lastVersion), this.parseVersion(cxInfos.version))) {
       return true;
     }
@@ -103,8 +118,20 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   }
 
   // Auto update all installed extensions automatically
-  autoFetchUpdates() {
+  autoUpdate() {
+    console.log('Auto-updating');
     return true;
+  }
+
+  stopAutoUpdate() {
+    clearInterval(this.autoUpdateLoop);
+  }
+
+  async scanInstalledExtensions() {
+    console.log('Discovering extensions');
+    const installedManifest = await this.cxStorager.getInstalledManifests();
+    console.log('installed manifest : ', installedManifest);
+    this.available = new Map();
   }
 
   private extractVersion(updateManifest: string): string {
