@@ -1,5 +1,6 @@
 export interface CxStorageProviderInterface {
   extractExtension(extensionId: string, crxPath: string): Promise<CxInfos>;
+  getInstalledManifests(): Promise<Map<string, Map<string, object>>>;
   getExtensionFolder(): string;
   readManifest(cxFolderPath: string): Promise<CxManifest>;
   unzipCrx(crxPath: string, destination: string): Promise<boolean | any>
@@ -34,5 +35,7 @@ export interface CxFetcherInterface {
 
   // Handling updates
   checkForUpdate(extensionId: string): Promise<boolean>;
-  autoFetchUpdates(): boolean;
+  autoUpdate(): boolean;
+
+  // Utils
 }
