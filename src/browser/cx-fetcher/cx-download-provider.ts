@@ -11,7 +11,6 @@ class CxDownloadProvider implements CxDownloadProviderInterface {
   private downloads: Map<string, string>;
 
   constructor() {
-    console.log('Building myself too');
     this.downloads = new Map();
   }
 

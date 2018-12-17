@@ -14,7 +14,6 @@ const TEMP_SORT_FOLDER = '_sorting';
 class CxStorageProvider implements CxStorageProviderInterface {
   // Constructor ! (@captainObvious)
   constructor() {
-    console.log('I am building myself');
   }
 
   /**
