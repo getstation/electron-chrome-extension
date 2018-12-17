@@ -1,6 +1,7 @@
 import EventEmitter = require('events');
 import defaultCxStorage from './cx-storage-provider';
 import defaultCxDownloader from './cx-download-provider';
+import * as xmlConvert from 'xml-js';
 import {
   CxFetcherInterface,
   CxDownloadProviderInterface,
@@ -10,7 +11,7 @@ import {
 
 class CxFetcher extends EventEmitter implements CxFetcherInterface {
   // Singleton instance & injected dependencies
-  private static instance: CxFetcher;
+  private static _instance: CxFetcher;
   public cxStorager: CxStorageProviderInterface;
   public cxDownloader: CxDownloadProviderInterface;
   // Sets of what's happening with Chrome extensions
@@ -20,8 +21,8 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   // Constructor with dependencies injection
   constructor(cxStorager?: CxStorageProviderInterface, cxDownloader?: CxDownloadProviderInterface) {
     // Let this be a singleton
-    if (CxFetcher.instance) {
-      return CxFetcher.instance;
+    if (CxFetcher._instance) {
+      return CxFetcher._instance;
     }
 
     // Never forget this guy
@@ -32,18 +33,24 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     this.cxStorager = (cxStorager) ? cxStorager : new defaultCxStorage();
     // @ts-ignore
     this.cxDownloader = (cxDownloader) ? cxDownloader : new defaultCxDownloader();
+
     this.inUse = new Map();
     this.available = new Map();
 
     // Start auto-update
     this.autoFetchUpdates();
 
-    CxFetcher.instance = this;
+    CxFetcher._instance = this;
   }
 
-  // Expose the list of availabel and installed Chrome extensions
+  // Expose the list of available and installed Chrome extensions
   availableCX() {
     return this.available;
+  }
+
+  saveCx(extensionId: string, cxInfos: CxInfos) {
+    this.available.set(extensionId, cxInfos);
+    return true;
   }
 
   // Fetch a Chrome extension
@@ -80,13 +87,46 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   }
 
   // Check if a Chrome extension can be updated
-  checkForUpdate() {
-    return true;
+  async checkForUpdate(extensionId: string) {
+    const cxInfos = this.available.get(extensionId);
+
+    if (!cxInfos) throw new Error('Unknown extension');
+
+    const updateManifest = await this.cxDownloader.fetchUpdateManifest(cxInfos.update_url);
+    const lastVersion = this.extractVersion(updateManifest);
+
+    if (this.gt(this.parseVersion(lastVersion), this.parseVersion(cxInfos.version))) {
+      return true;
+    }
+
+    return false;
   }
 
   // Auto update all installed extensions automatically
   autoFetchUpdates() {
     return true;
+  }
+
+  private extractVersion(updateManifest: string): string {
+    const updateInfos = xmlConvert.xml2js(updateManifest, { compact: true });
+    // @ts-ignore
+    return updateInfos.gupdate.app.updatecheck._attributes.version;
+  }
+
+  // TODO : Update this
+  private parseVersion(version:string) {
+    const split = version.split('.');
+    return split.map((elem: string) => parseInt(elem, 10));
+  }
+
+  // TODO : update this
+  private gt(a: number[], b: number[]) {
+    for (let i = 0; i < a.length; i = i + 1) {
+      if (a[i] < b[i]) return false;
+      if (a[i] > b[i]) return true;
+    }
+
+    return false;
   }
 }
 

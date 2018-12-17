@@ -8,6 +8,7 @@ export interface CxStorageProviderInterface {
 export interface CxDownloadProviderInterface {
   downloadById(extensionId: string): Promise<string>;
   cleanupById(extensionId: string): void;
+  fetchUpdateManifest(updateUrl: string): Promise<any>;   // TODO : update this
 }
 
 export interface CxManifest {
@@ -32,6 +33,6 @@ export interface CxFetcherInterface {
   remove(extensionId: string): Promise<boolean>;
 
   // Handling updates
-  checkForUpdate(): boolean;
+  checkForUpdate(extensionId: string): Promise<boolean>;
   autoFetchUpdates(): boolean;
 }
