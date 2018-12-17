@@ -108,7 +108,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
 
     const updateManifest = await this.cxDownloader.fetchUpdateManifest(cxInfos.update_url);
 
-    // Extract all the work on manifest into its own dependency (no parsing stuff in the CxFetcher)
+    // TODO : Extract all the work on manifest into its own dependency (no parsing stuff in the CxFetcher)
     const lastVersion = this.extractVersion(updateManifest);
     if (this.gt(this.parseVersion(lastVersion), this.parseVersion(cxInfos.version))) {
       return true;
@@ -128,8 +128,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   }
 
   async scanInstalledExtensions() {
-    console.log('Discovering extensions');
-    const installedManifest = await this.cxStorager.getInstalledManifests();
+    const installedManifest = await this.cxStorager.getInstalledExtension();
     console.log('installed manifest : ', installedManifest);
     this.available = new Map();
   }

@@ -3,10 +3,10 @@ import {
   CxManifest,
   CxInfos,
 } from './types';
+import * as glob from 'glob';
 const path = require('path');
 const unzip = require('unzip-crx');
 const fse = require('fs-extra');
-const fs = require('fs').promises;
 
 const EXTENSION_FOLDER = 'extensions';
 const ROOT_FOLDER = __dirname;
@@ -33,60 +33,38 @@ class CxStorageProvider implements CxStorageProviderInterface {
       await this.unzipCrx(crxPath, tempDestination);
 
       // Find version in manifest and create a new destination subfolder
-      const cxInfo = await this.readManifest(tempDestination);
-      const versionDestination = path.resolve(rootExtensionFolder, extensionId, cxInfo.version);
+      const cxInfos = await this.squeezeManifest(`${tempDestination}/manifest.json`);
+      const versionDestination = path.resolve(rootExtensionFolder, extensionId, cxInfos.version);
 
       // TODO : check if the destination already exists and fall back (with cleanup)
-      
       // Move the extracted file to the final versionned folder
       await fse.move(tempDestination, versionDestination);
 
-      // Return new extension folder path
-      return {
-        path: versionDestination,
-        version: cxInfo.version,
-        update_url: cxInfo.update_url,
-      };
+      // Return gathered cx infos
+      return cxInfos;
+
     } catch (err) {
       throw new Error(err);
     }
   }
 
-  // TODO : Simplify this (OH SO MUCH)
-  async getInstalledManifests() {
-    const installedCxManifest = new Map();
+  // Gather all installed Cx Infos from installation folder
+  async getInstalledExtension() {
+    const installedCxInfos = {};
     const installationFolder = this.getExtensionFolder();
-    const cxFolders = await fs.readdir(installationFolder, { withFileTypes: true });
+    const cxFolders = glob.sync(path.join(installationFolder, '**/manifest.json'));
 
-    console.log('cxFolderds : ', cxFolders);
-    
-    // For each chrome extrension folder, lookup the versions sub folders (tree is like : /extension_id/version/<files>)
-    await cxFolders.forEach(async (cxFolder: any) => {
-      console.log('cxFolder name : ', cxFolder);
-      if (cxFolder.isDirectory()) {
-        console.log('i am a directory');
-        const versionsCx = new Map();
-        const currentCxFolderPath = `${installationFolder}/${cxFolder.name}`;
-        const versionFolders = await fse.readdir(currentCxFolderPath, { withFileTypes: true });
+    for (const manifestPath of cxFolders) {
+      const extensionTree = manifestPath.split('/');
+      const version = extensionTree[extensionTree.length - 2];
+      const extensionId = extensionTree[extensionTree.length - 3];
 
-        // For each version sub folder, grab the manifest.json, read it and store it
-        await versionFolders.forEach(async (vsFolder: any) => {
-          if (vsFolder.isDirectory()) {
-            const currentManifestPath = `${currentCxFolderPath}/${vsFolder.name}/manifest.json`;
-            const manifestIsReadable = await fse.access(currentManifestPath, fse.constants.F_OK | fse.constants.W_OK);
-            if (manifestIsReadable) {
-              versionsCx.set(vsFolder.name, await this.readManifest(currentManifestPath));
-            }
-          }
-        });
+      if (!installedCxInfos[extensionId]) installedCxInfos[extensionId] = {};
+      installedCxInfos[extensionId][version] = await this.squeezeManifest(manifestPath);
+    }
 
-        // Store all the versions manifest found under the extension ID
-        installedCxManifest.set(cxFolder.name, versionsCx);
-      }
-    });
-
-    // Return all manifests found under their version / extension ID
-    return installedCxManifest;
+    // Return all CxInfos found under their version / extension ID
+    return installedCxInfos;
   }
 
   /**
@@ -102,8 +80,19 @@ class CxStorageProvider implements CxStorageProviderInterface {
    * @param cxFolderPath  Path of the chrome extension folder
    * @returns   Object parsed from manifest.json
    */
-  async readManifest(cxFolderPath: string): Promise<CxManifest> {
-    return fse.readJson(`${cxFolderPath}/manifest.json`);
+  async readManifest(manifestPath: string): Promise<CxManifest> {
+    return fse.readJson(manifestPath);
+  }
+
+  // TODO : Rename this (ahem)
+  async squeezeManifest(manifestPath: string): Promise<CxInfos> {
+    const manifest = await this.readManifest(manifestPath);
+    const cxInfos = {
+      path: manifestPath.slice(0, -14),   // TODO : This is a bit ugly
+      version: manifest.version,
+      update_url: manifest.update_url,
+    };
+    return cxInfos;
   }
 
   /**
