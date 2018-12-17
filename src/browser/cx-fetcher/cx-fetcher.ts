@@ -74,7 +74,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     // TODO : check if the extension already exists with this version ?
     // TODO : React to errors
 
-    // Record the extension has being toyed with already
+    // Record theat extension is being toyed with already
     this.inUse.set(extensionId, 'downloading');
     // Start downloading -> unzipping -> cleaning
     const crxPath = await this.cxDownloader.downloadById(extensionId);
@@ -82,6 +82,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     await this.cxDownloader.cleanupById(extensionId);
 
     // Clear status, add to installed and emit ready event for this cx
+    // TODO : emit an event
     this.inUse.delete(extensionId);
     this.saveCx(extensionId, fetchedCxInfo);
 
@@ -97,13 +98,27 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   // Remove a Chrome extension
   async remove(extensionId: string) {
     console.log(`Removing ${extensionId}`);
+    const cxInfos = this.available.get(extensionId);
+    // Check if it exists, or if it's in use already
+    if (!cxInfos) throw new Error('Unknown extension');
+    if (this.inUse.has(extensionId)) throw new Error(`Extension ${extensionId} is already being used`);
+
+    // Record that extension is being toyed with already
+    this.inUse.set(extensionId, 'removing');
+
+    // Remove
+    this.available.delete(extensionId);
+    await this.cxStorager.removeExtension(extensionId, cxInfos);
+
+    // Clear status and emit ready event for this cx
+    // TODO : emit an event
+    this.inUse.delete(extensionId);
     return true;
   }
 
   // Check if a Chrome extension can be updated
   async checkForUpdate(extensionId: string) {
     const cxInfos = this.available.get(extensionId);
-
     if (!cxInfos) throw new Error('Unknown extension');
 
     const updateManifest = await this.cxDownloader.fetchUpdateManifest(cxInfos.update_url);
@@ -131,6 +146,8 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     const installedManifest = await this.cxStorager.getInstalledExtension();
     console.log('installed manifest : ', installedManifest);
     this.available = new Map();
+
+    // TODO : emit event for each chrome extension
   }
 
   private extractVersion(updateManifest: string): string {
