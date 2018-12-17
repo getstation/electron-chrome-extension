@@ -4,7 +4,8 @@ import StorageProvider from '../../src/browser/cx-fetcher/cx-storage-provider';
 
 describe('Default Storage Provider', () => {
   it('has an extractExtension function', () => {
-    const type = typeof StorageProvider.extractExtension;
+    const storer = new StorageProvider();
+    const type = typeof storer.extractExtension;
     assert.equal(type, 'function');
   });
 

@@ -7,16 +7,15 @@ const EXTENSION_ID = 'dheionainndbbpoacpnopgmnihkcmnkl';
 
 describe('Default Download Provider', () => {
   it('has a downloadById function', () => {
-    const type = typeof DownloadProvider.downloadById;
+    const downloader = new DownloadProvider();
+    const type = typeof downloader.downloadById;
     assert.equal(type, 'function');
   });
 
   it('can download a crx archive with an ID', async () => {
-    const crxPath = await DownloadProvider.downloadById(EXTENSION_ID);
+    const downloader = new DownloadProvider();
+    const crxPath = await downloader.downloadById(EXTENSION_ID);
     const crxInfo = await fs.stat(crxPath);
-
-    // TODO : Remove this
-    console.log(crxPath);
 
     // Check that the downloaded thing is actually a file
     assert.equal(crxInfo.isFile(), true);
