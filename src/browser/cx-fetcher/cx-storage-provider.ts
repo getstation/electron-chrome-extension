@@ -25,6 +25,7 @@ class CxStorageProvider implements CxStorageProviderInterface {
   async extractExtension(extensionId: string, crxPath: string): Promise<CxInfos> {
     try {
 
+      // TODO : this should rather be called "installExtension"
       // TODO : ensureDir at some point
 
       const rootExtensionFolder = this.getExtensionFolder();
@@ -65,6 +66,10 @@ class CxStorageProvider implements CxStorageProviderInterface {
 
     // Return all CxInfos found under their version / extension ID
     return installedCxInfos;
+  }
+
+  async removeExtension(extensionId: string) {
+    return 'LET US DO THIS';
   }
 
   /**
