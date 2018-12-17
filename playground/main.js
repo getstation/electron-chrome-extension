@@ -6,8 +6,6 @@ const { addExtension } = require('../index');
 
 let mainWindow;
 
-// require('electron-local-crash-reporter').start();
-
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 800, height: 600 });
 
@@ -25,8 +23,8 @@ function createWindow() {
 app.on('ready', () => {
   createWindow();
 
-  // require('electron-process-manager').openProcessManager();
-  addExtension(join(__dirname, './extensions/mixmax'))
+  require('electron-process-manager').openProcessManager();
+  addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
 });
 
 app.on('window-all-closed', () => {

@@ -15,7 +15,7 @@ const EXTENSIONS = [
   },
   {
     id: 'ocpljaamllnldhepankaeljmeeeghnid',
-    slug: 'mixmax'
+    slug: 'ocpljaamllnldhepankaeljmeeeghnid'
   },
   {
     id: 'mdanidgdpmkimeiiojknlnekblgmpdll',

@@ -110,6 +110,7 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesN
     win.opener = getOrCreateProxy(ipcRenderer, openerId);
   }
 
+  // todo warn: diff with electron
   ipcRenderer.removeAllListeners('ELECTRON_GUEST_WINDOW_POSTMESSAGE');
   ipcRenderer.on('ELECTRON_GUEST_WINDOW_POSTMESSAGE', (event, sourceId, message, sourceOrigin) => {
     event = new MessageEvent('message', { data: message, origin: sourceOrigin });
