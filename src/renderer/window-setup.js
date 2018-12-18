@@ -87,16 +87,19 @@ function useNativeWindowOpen(usesNativeWindowOpen, nativeWindowOverrideList, url
 
 module.exports = (win, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesNativeWindowOpen, nativeWindowOverrideList) => {
   const originalWindowOpen = win.open;
+  // const originalWindowClose = win.close;
+
+  // win.close = () => { console.log('CLOSE') };
 
   // Make the browser window or guest view emit "new-window" event.
   win.open = (url, frameName, features) => {
     if (url != null && url !== '') {
       url = resolveURL(url);
     }
-    // console.log('url', url);
+
     if (useNativeWindowOpen(usesNativeWindowOpen, nativeWindowOverrideList, url)) {
       // console.log('using native window.open');
-      return originalWindowOpen.apply(window, [url, frameName, features]);
+      return originalWindowOpen.apply(win, [url, frameName, features]);
     }
     // console.log('using overriden window.open');
     const guestId = ipcRenderer.sendSync('ELECTRON_GUEST_WINDOW_MANAGER_WINDOW_OPEN', url, toString(frameName), toString(features));
@@ -115,6 +118,13 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesN
   ipcRenderer.on('ELECTRON_GUEST_WINDOW_POSTMESSAGE', (event, sourceId, message, sourceOrigin) => {
     event = new MessageEvent('message', { data: message, origin: sourceOrigin });
     event.source = getOrCreateProxy(ipcRenderer, sourceId);
+    console.log(event);
     win.dispatchEvent(event);
+  });
+
+  Object.defineProperty(window.navigator, 'userAgent', {
+    value: window.navigator.userAgent.replace(/Electron\/\S*\s/, ''),
+    configurable: false,
+    writable: false,
   });
 };

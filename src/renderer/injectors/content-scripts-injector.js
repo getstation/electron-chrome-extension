@@ -1,6 +1,7 @@
 const { ipcRenderer, webFrame } = require('electron')
 const { runInThisContext } = require('vm')
 const constants = require('../../common/constants')
+const RecursiveOverride = require('../utils');
 
 webFrame.registerURLSchemeAsPrivileged(constants.EXTENSION_PROTOCOL, { corsEnabled: false })
 
@@ -98,9 +99,13 @@ Object.keys(contentScripts).forEach(key => {
 
       // Any URL that shouldn't be loaded as `nativeWindowOpen` as a popup
       // should appear here if parent window uses `nativeWindowOpen`
-      const overrideNativeWindowOpenList = [];
+      const overrideNativeWindowOpenList = ['app.mixmax.com/_oauth/google'];
 
-      require('../window-setup')(isolatedWorldWindow, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesNativeWindowOpen, overrideNativeWindowOpenList);
+      RecursiveOverride(isolatedWorldWindow.document, isolatedWorldWindow, (winObj) => {
+        console.log('recursive: ', isolatedWorldWindow, isolatedWorldWindow.document)
+        require('../window-setup')(winObj, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesNativeWindowOpen, overrideNativeWindowOpenList);
+      })
+
       // end workaround
 
       for (const script of cs.contentScripts) {
