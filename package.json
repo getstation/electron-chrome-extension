@@ -35,6 +35,7 @@
   "dependencies": {
     "@types/glob": "^7.1.1",
     "capitalize": "^2.0.0",
+    "electron-fetch": "^1.3.0",
     "electron-ipc-plus": "^1.3.4",
     "electron-simple-rpc": "github:alexstrat/electron-simple-rpc",
     "fs-extra": "^7.0.1",
