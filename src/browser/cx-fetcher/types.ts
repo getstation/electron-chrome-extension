@@ -42,6 +42,14 @@ export interface CxInterpreterProviderInterface {
   sortLastVersion(versions: IterableIterator<string>): string;
 }
 
+export interface CxFetcherConfig {
+  cxDownloader?: CxDownloadProviderInterface;
+  cxStorager?: CxStorageProviderInterface;
+  cxInterpreter?: CxInterpreterProviderInterface;
+  autoUpdateInterval?: number;
+  autoUpdate?: boolean;
+}
+
 export interface CxFetcherInterface {
   // Injected dependencies
   cxDownloader: CxDownloadProviderInterface;

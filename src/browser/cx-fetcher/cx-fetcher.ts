@@ -3,6 +3,7 @@ import defaultCxStorage from './cx-storage-provider';
 import defaultCxDownloader from './cx-download-provider';
 import defaultCxInterpreter from './cx-interpreter-provider';
 import {
+  CxFetcherConfig,
   CxFetcherInterface,
   CxDownloadProviderInterface,
   CxStorageProviderInterface,
@@ -11,8 +12,12 @@ import {
 } from './types';
 
 // TODO : A default config state
-const defaultConfig = {
-
+const DEFAULT_CONFIG: CxFetcherConfig = {
+  cxDownloader: new defaultCxDownloader(),
+  cxStorager: new defaultCxStorage(),
+  cxInterpreter: new defaultCxInterpreter(),
+  autoUpdateInterval: 300000,
+  autoUpdate: false,
 };
 
 class CxFetcher extends EventEmitter implements CxFetcherInterface {
@@ -26,14 +31,10 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   private available: Map<string, CxInfos>;
   // Auto update related
   private autoUpdateLoop: NodeJS.Timer;
-  // private autoUpdateInterval: number;
+  private autoUpdateInterval: number;
 
   // Constructor with dependencies injection
-  constructor(
-    cxStorager?: CxStorageProviderInterface,
-    cxDownloader?: CxDownloadProviderInterface,
-    cxIntepreter?: CxInterpreterProviderInterface
-  ) {
+  constructor(specifiedConfig: CxFetcherConfig = DEFAULT_CONFIG) {
     // Let this be a singleton
     if (CxFetcher._instance) {
       return CxFetcher._instance;
@@ -42,19 +43,25 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     // Never forget this guy
     super();
 
+    // Merge specified options with default options
+    const config = Object.assign({}, DEFAULT_CONFIG, specifiedConfig);
+
     // Registrer the downloader and storage handler
-    // @ts-ignore
-    this.cxStorager = (cxStorager) ? cxStorager : new defaultCxStorage();
-    // @ts-ignore
-    this.cxDownloader = (cxDownloader) ? cxDownloader : new defaultCxDownloader();
-    this.cxInterpreter = (cxIntepreter) ? cxIntepreter : new defaultCxInterpreter();
+    this.cxStorager = config.cxStorager;
+    this.cxDownloader = config.cxDownloader;
+    this.cxInterpreter = config.cxInterpreter;
+
+    // Initialise options
+    this.autoUpdateInterval = config.autoUpdateInterval;
 
     // Initialise internal maps of extensions (with those already installed, if ever)
     this.available = new Map();
     this.inUse = new Map();
 
     // Start auto-update
-    // this.autoUpdateLoop = setInterval(this.autoUpdate, this.autoUpdateInterval);
+    if (config.autoUpdate) {
+      this.autoUpdateLoop = setInterval(this.autoUpdate, this.autoUpdateInterval);
+    }
 
     // Save the one and only instance
     CxFetcher._instance = this;
