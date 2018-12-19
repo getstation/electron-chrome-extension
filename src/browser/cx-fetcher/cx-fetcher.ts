@@ -11,7 +11,7 @@ import {
   CxInterpreterProviderInterface,
 } from './types';
 
-// TODO : A default config state
+// Default config for CxFetcher
 const DEFAULT_CONFIG: CxFetcherConfig = {
   cxDownloader: new defaultCxDownloader(),
   cxStorager: new defaultCxStorage(),
@@ -34,7 +34,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   private autoUpdateInterval: number;
 
   // Constructor with dependencies injection
-  constructor(specifiedConfig: CxFetcherConfig = DEFAULT_CONFIG) {
+  constructor(specifiedConfig: Partial<CxFetcherConfig> = {}) {
     // Let this be a singleton
     if (CxFetcher._instance) {
       return CxFetcher._instance;
@@ -141,7 +141,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     const installedCxInfos = await this.cxStorager.getInstalledExtension();
 
     for (const [key, value] of installedCxInfos) {
-      const versions = value.keys();
+      const versions = Array.from(value.keys());
       const latestVersion = this.cxInterpreter.sortLastVersion(versions);
       const cxInfo = this.cxInterpreter.interpret(value.get(latestVersion));
       this.available.set(key, cxInfo);
@@ -153,7 +153,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     // TODO : emit event for each chrome extension
   }
 
-  // @ts-ignore // Auto update all installed extensions
+  // Auto update all installed extensions
   public async autoUpdate() {
     const updated = [];
     for (const extensionId of this.available.keys()) {

@@ -41,11 +41,22 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
     return false;
   }
 
-  sortLastVersion(versions: IterableIterator<string>) {
-    let highest = '0';
+  sortLastVersion(versions: string[]) {
+    let highest = undefined;
+    // Loop through all versions
     for (const current of versions) {
-      if (this.gt(current, highest)) highest = current;
+      try {
+        // If no highest already defined, define one  // TODO : Fix the first highest problem
+        if (! highest) highest = current;
+        else if (this.gt(current, highest)) {
+          highest = current;
+        }
+      } catch (err) {
+        continue;
+      }
     }
+
+    if (!highest) throw new Error('No versions could be read and found');
     return highest;
   }
 

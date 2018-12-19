@@ -8,13 +8,15 @@ const path = require('path');
 const unzip = require('unzip-crx');
 const fse = require('fs-extra');
 
-const EXTENSION_FOLDER = 'extensions';
-const ROOT_FOLDER = __dirname;
+const EXTENSIONS_FOLDER = path.join(__dirname, 'extensions');
 const TEMP_SORT_FOLDER = '_sorting';
 
 class CxStorageProvider implements CxStorageProviderInterface {
+  public extensionsFolder: string;
+
   // Constructor ! (@captainObvious)
-  constructor() {
+  constructor(extensionsFolder?: string) {
+    this.extensionsFolder = (extensionsFolder) ? extensionsFolder : EXTENSIONS_FOLDER;
   }
 
   /**
@@ -26,15 +28,14 @@ class CxStorageProvider implements CxStorageProviderInterface {
     try {
       // TODO : ensureDir at some point
 
-      const rootExtensionFolder = this.getExtensionsFolder();
       // Extract temporarily in a sub temporary folder
       // TODO : Improve how is created the temporary folder
-      const tempDestination = path.resolve(rootExtensionFolder, TEMP_SORT_FOLDER, extensionId);
+      const tempDestination = path.resolve(this.extensionsFolder, TEMP_SORT_FOLDER, extensionId);
       await this.unzipCrx(crxDownload.path, tempDestination);
 
       // Find version in manifest and create a new destination subfolder
       const manifest = await this.readManifest(path.join(tempDestination, 'manifest.json'));
-      const versionDestination = path.resolve(rootExtensionFolder, extensionId, manifest.version);
+      const versionDestination = path.resolve(this.extensionsFolder, extensionId, manifest.version);
 
       // TODO : check if the destination already exists and fall back (with cleanup)
       // Move the extracted file to the final versionned folder
@@ -54,8 +55,7 @@ class CxStorageProvider implements CxStorageProviderInterface {
   // Gather all installed Cx Infos from installation folder
   async getInstalledExtension() {
     const installedCxInfos = new Map();
-    const installationFolder = this.getExtensionsFolder();
-    const cxFolders = glob.sync(path.join(installationFolder, '**/manifest.json'));
+    const cxFolders = glob.sync(path.join(this.extensionsFolder, '**/manifest.json'));
 
     for (const manifestPath of cxFolders) {
       const extensionTree = manifestPath.split('/');
@@ -65,7 +65,7 @@ class CxStorageProvider implements CxStorageProviderInterface {
       if (!installedCxInfos[extensionId]) installedCxInfos.set(extensionId, new Map());
 
       const manifest = await this.readManifest(manifestPath);
-      // TODO : This is a bit ugly
+      // TODO : This is a bit ugly ?
       installedCxInfos.get(extensionId).set(version, {
         path: manifestPath.slice(0, -14),
         manifest,
@@ -74,14 +74,6 @@ class CxStorageProvider implements CxStorageProviderInterface {
 
     // Return all Installation Infos found under their version / extension ID
     return installedCxInfos;
-  }
-
-  /**
-   * Return destination folder path to store chrome extensions.
-   * @returns   String representing the folder path where the extensions will be extracted
-   */
-  getExtensionsFolder(): string {
-    return path.resolve(ROOT_FOLDER, EXTENSION_FOLDER);
   }
 
   /**
