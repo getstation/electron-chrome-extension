@@ -23,9 +23,12 @@ export interface CxManifest {
 }
 
 export interface CxStorageProviderInterface {
+  // Parameters
+  extensionsFolder: string;
+
+  // Methods
   installExtension(extensionId: string, crxDownload: DownloadDescriptor): Promise<InstallDescriptor>;
   getInstalledExtension(): Promise<Map<string, Map<string, InstallDescriptor>>>;
-  getExtensionsFolder(): string;
   readManifest(cxFolderPath: string): Promise<CxManifest>;
   unzipCrx(crxPath: string, destination: string): Promise<boolean>
 }
@@ -39,15 +42,15 @@ export interface CxDownloadProviderInterface {
 export interface CxInterpreterProviderInterface {
   interpret(manifest: InstallDescriptor | undefined): CxInfos;
   shouldUpdate(extensionId: string, cxInfos: CxInfos, updateInfos: UpdateDescriptor): boolean;
-  sortLastVersion(versions: IterableIterator<string>): string;
+  sortLastVersion(versions: string[]): string;
 }
 
 export interface CxFetcherConfig {
-  cxDownloader?: CxDownloadProviderInterface;
-  cxStorager?: CxStorageProviderInterface;
-  cxInterpreter?: CxInterpreterProviderInterface;
-  autoUpdateInterval?: number;
-  autoUpdate?: boolean;
+  cxDownloader: CxDownloadProviderInterface;
+  cxStorager: CxStorageProviderInterface;
+  cxInterpreter: CxInterpreterProviderInterface;
+  autoUpdateInterval: number;
+  autoUpdate: boolean;
 }
 
 export interface CxFetcherInterface {
@@ -67,6 +70,6 @@ export interface CxFetcherInterface {
 
   // Handling updates
   checkForUpdate(extensionId: string): Promise<boolean>;
-  autoUpdate(): CxInfos[];
+  autoUpdate(): Promise<(false | CxInfos)[]>;
   stopAutoUpdate(): void;
 }
