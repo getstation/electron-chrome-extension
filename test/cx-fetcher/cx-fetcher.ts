@@ -6,14 +6,6 @@ const EXTENSION_ID = 'dheionainndbbpoacpnopgmnihkcmnkl';
 const EXTENSION_UPDATE_URL = '';
 const EXTENSION_PATH = '';
 const FAKE_CX_INFOS = { version: '1.0.0', update_url: EXTENSION_UPDATE_URL, path: EXTENSION_PATH };
-const FAKE_UPDATE_XML = `
-<?xml version='1.0' encoding='UTF-8'?>
-<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
-  <app appid='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'>
-    <updatecheck codebase='http://myhost.com/mytestextension/mte_v2.crx' version='1.2.0' />
-  </app>
-</gupdate>
-`;
 
 describe('Chrome Extension Fetcher', () => {
   it('instanciate as a singleton', () => {
@@ -23,15 +15,13 @@ describe('Chrome Extension Fetcher', () => {
 
   it('has default downloader provider', () => {
     const mockStorageProvider = {};
-    // @ts-ignore
     const cxFetcher = new CxFetcher(mockStorageProvider, undefined);
     assert.equal(true, true);
   });
 
   it('has default storage provider', () => {
-    const mockDlProvider = {};
-    // @ts-ignore
-    const cxFetcher = new CxFetcher(undefined, mockDlProvider);
+    const mockDlProvider = { downloadById: () => null, cleanupById: () => null, getUpdateInfo: () => null };
+    const cxFetcher = new CxFetcher({ cxDownloader: mockDlProvider });
     assert.equal(true, true);
   });
 
@@ -60,7 +50,7 @@ describe('Chrome Extension Fetcher', () => {
     // Mock downloader to return fake XML
     const mockDownloader = new class {
       // @ts-ignore
-      fetchUpdateManifest(url: string) { return FAKE_UPDATE_XML; }
+      getUpdateInfo(url: string) { return FAKE_UPDATE_XML; }
     };
 
     CxFetcher.reset();
