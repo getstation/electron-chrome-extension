@@ -15,6 +15,7 @@ export const EXTENSION_VERSION = '8.4.2';
 export const TEST_ASSETS = path.join(__dirname, '..', 'assets');
 export const TEST_ARCHIVE_PATH = path.join(TEST_ASSETS, 'archives', 'dheionainndbbpoacpnopgmnihkcmnkl.crx');
 export const TEST_EXTENSION_FOLDER = path.join(TEST_ASSETS, 'extensions');
+export const TEST_INSTALLED_FOLDER = path.join(TEST_ASSETS, 'installed');
 
 // Fake content
 export const FAKE_ARCHIVE_MANIFEST = {

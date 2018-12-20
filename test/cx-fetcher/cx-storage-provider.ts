@@ -24,16 +24,15 @@ describe('Default Storage Provider', () => {
     assert.equal(storager.extensionsFolder, expected);
   });
 
-  // TODO : clean up all generated files after each test
-  describe('install extension', () => {
+  describe('installing extension', () => {
 
     afterEach(async () => {
       await fse.remove(TEST_EXTENSION_FOLDER);
     });
 
-    it('returns a correct CxInfos from a DownloadDescriptor', async () => {
+    it('returns a correct InstallDescriptor from a DownloadDescriptor', async () => {
       const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
-      const cxInfos = await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
+      const installDescriptor = await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
 
       const expected = {
         path: path.join(TEST_EXTENSION_FOLDER, FAKE_EXTENSION_ID, EXTENSION_VERSION),
@@ -42,9 +41,9 @@ describe('Default Storage Provider', () => {
 
       // Do not check the whole manifest, only the interestings parts
       // TODO : Make sure that we check the CxManifest type entirely and automaticaly
-      assert.equal(cxInfos.path, expected.path);
-      assert.equal(cxInfos.manifest.version, expected.manifest.version);
-      assert.equal(cxInfos.manifest.update_url, expected.manifest.update_url);
+      assert.equal(installDescriptor.path, expected.path);
+      assert.equal(installDescriptor.manifest.version, expected.manifest.version);
+      assert.equal(installDescriptor.manifest.update_url, expected.manifest.update_url);
     });
 
     it('extracts files in correct folder tree', async () => {
@@ -100,8 +99,8 @@ describe('Default Storage Provider', () => {
     });
   });
 
-  describe('get all installed extensions', () => {
-    it('return an array of CxInfos from an installation folder', () => {
+  describe('gathering installed extensions', () => {
+    it('returns an array of InstallDescriptor from an installation folder', () => {
 
     });
 
