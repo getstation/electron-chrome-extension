@@ -10,6 +10,11 @@
         "kind": "test",
         "isDefault": true
       }
+    },
+    {
+      "label": "prestart",
+      "type": "npm",
+      "script": "prestart"
     }
   ]
 }

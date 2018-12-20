@@ -37,12 +37,23 @@
         "sourceMapPathOverrides": {
           "chrome-extension://*": "${workspaceFolder}/playground/extensions/*"
         }
-      }
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Playground: Watch",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": [
+          "start:watch",
+        ],
+        "preLaunchTask": "prestart"
+      },
     ],
     "compounds": [
       {
         "name": "Playground",
         "configurations": [
+          "Playground: Watch",
           "Playground: Main",
           "Playground: Renderer",
         ]

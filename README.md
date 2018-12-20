@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/getstation/electron-chrome-extension.svg?token=NLebjoCo6B1MogiwMcNq&branch=fix/explorations-for-revamp)](https://travis-ci.com/getstation/electron-chrome-extension)
 
 ## Environment
-Test with `Electron v3.0.4` - `Node v8.9.0` - `NPM v5.5.1`
+Tested with `Electron v3.0.4` - `Node v8.9.0` - `NPM v5.5.1`
 
 ## Scripts
 
