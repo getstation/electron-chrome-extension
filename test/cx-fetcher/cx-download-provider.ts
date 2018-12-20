@@ -2,15 +2,16 @@ import assert = require('assert');
 const fs = require('fs').promises;
 // import { ipcRenderer } from 'electron';
 import DownloadProvider from '../../src/browser/cx-fetcher/cx-download-provider';
-
-const EXTENSION_ID = 'dheionainndbbpoacpnopgmnihkcmnkl';
+import {
+  EXTENSION_ID,
+} from './constants';
 
 describe('Default Download Provider', () => {
   describe('downloading', () => {
     it('can download a crx archive with an ID', async () => {
       const downloader = new DownloadProvider();
-      const crxPath = await downloader.downloadById(EXTENSION_ID);
-      const crxInfo = await fs.stat(crxPath);
+      const dlDescriptor = await downloader.downloadById(EXTENSION_ID);
+      const crxInfo = await fs.stat(dlDescriptor.path);
 
       // Check that the downloaded thing is actually a file
       assert.equal(crxInfo.isFile(), true);

@@ -147,9 +147,6 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
       this.available.set(key, cxInfo);
     }
 
-    console.log('installed manifest : ', installedCxInfos);
-    console.log('installed extension: ', this.available);
-
     // TODO : emit event for each chrome extension
   }
 
