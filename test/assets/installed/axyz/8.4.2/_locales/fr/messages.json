@@ -1,0 +1,10 @@
+{
+   "extDescription": {
+      "description": "Extension description.",
+      "message": "CRM, envois différés, rappels, Email tracking gratuit, modèles, Kanban, annotations, collaboration en temps réel et bien plus."
+   },
+   "extName": {
+      "description": "Extension name.",
+      "message": "CRM collaboratif pour Gmail"
+   }
+}

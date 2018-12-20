@@ -1,0 +1,10 @@
+{
+   "extDescription": {
+      "description": "Extension description.",
+      "message": "Κάνε το Inbox σου πιο έξυπνο: στείλε αργότερα, αναβολή, δωρεάν παρακολούθηση, κοινόχρηστα πρότυπα, πίνακες kanban, σημειώσεις κ.ά."
+   },
+   "extName": {
+      "description": "Extension name.",
+      "message": "Shared Inbox & CRM for Gmail | Gmelius"
+   }
+}

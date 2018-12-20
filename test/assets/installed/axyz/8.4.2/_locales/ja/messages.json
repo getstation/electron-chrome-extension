@@ -1,0 +1,10 @@
+{
+   "extDescription": {
+      "description": "Extension description.",
+      "message": "受信トレイをスマートにする：CRM、後で送信、スヌーズ、電子メールの追跡、テンプレートの共有、かんばんボード、電子メールの通知など"
+   },
+   "extName": {
+      "description": "Extension name.",
+      "message": "Shared Inbox & CRM for Gmail | Gmelius"
+   }
+}
