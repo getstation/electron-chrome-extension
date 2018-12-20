@@ -1,4 +1,4 @@
-import assert = require('assert');
+import * as assert from 'assert';
 const path = require('path');
 const fse = require('fs-extra');
 // import { ipcRenderer } from 'electron';
@@ -32,8 +32,8 @@ describe('Default Storage Provider', () => {
     });
 
     it('returns a correct CxInfos from a DownloadDescriptor', async () => {
-      const interpreter = new StorageProvider(TEST_EXTENSION_FOLDER);
-      const cxInfos = await interpreter.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
+      const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
+      const cxInfos = await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
 
       const expected = {
         path: path.join(TEST_EXTENSION_FOLDER, FAKE_EXTENSION_ID, EXTENSION_VERSION),
@@ -48,9 +48,9 @@ describe('Default Storage Provider', () => {
     });
 
     it('extracts files in correct folder tree', async () => {
-      const interpreter = new StorageProvider(TEST_EXTENSION_FOLDER);
+      const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
 
-      await interpreter.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
+      await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
       const expectedFolder = path.join(TEST_EXTENSION_FOLDER, FAKE_EXTENSION_ID, EXTENSION_VERSION);
       const expectedManifest = path.join(expectedFolder, 'manifest.json');
 
@@ -58,25 +58,33 @@ describe('Default Storage Provider', () => {
       assert.ok(await fse.pathExists(expectedManifest), 'Manifest file is not at the expected location');
     });
 
-    it('fails if the archive cannot be unzipped', () => {
-      const interpreter = new StorageProvider(TEST_EXTENSION_FOLDER);
-      interpreter.unzipCrx = () => Promise.reject('Cannot unzip archive');
+    it('fails if the archive cannot be unzipped', async () => {
+      const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
+      storager.unzipCrx = () => Promise.reject('Cannot unzip archive');
 
-      assert.throws(
-        async () => { await interpreter.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR); },
-        /archive/,
-        'Install should fail if archive cannot be read'
-      );
+      // TODO : someday, use assert.rejects (availabe in node 10)
+      try {
+        await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
+      } catch (err) {
+        assert.equal('Cannot unzip archive', err);
+        return;
+      }
+      assert.fail('Install should fail if archive cannot be unzipped');
     });
 
-    it('fails if the manifest cannot be read', () => {
-      const interpreter = new StorageProvider(TEST_EXTENSION_FOLDER);
-      interpreter.unzipCrx = () => Promise.resolve();
-      interpreter.readManifest = () => Promise.reject('Cannot read manifest');
+    it('fails if the manifest cannot be read', async () => {
+      const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
+      storager.unzipCrx = () => Promise.resolve();
+      storager.readManifest = () => Promise.reject('Cannot read manifest');
 
-      assert.throws(
-        async () => { await interpreter.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR); },
-      );
+      // TODO : HACK -- someday, use assert.rejects (availabe in node 10)
+      try {
+        await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
+      } catch (err) {
+        assert.equal('Cannot read manifest', err);
+        return;
+      }
+      assert.fail('Install should fail if manifest cannot be read');
     });
 
     it('fails if destination already exists', () => {

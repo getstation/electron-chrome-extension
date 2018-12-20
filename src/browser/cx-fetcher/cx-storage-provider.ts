@@ -49,7 +49,6 @@ class CxStorageProvider implements CxStorageProviderInterface {
       };
 
     } catch (err) {
-      console.log('error triggered', err);
       throw err;
     }
   }

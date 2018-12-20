@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as downloadCrx from 'download-crx';
-import fetch from 'electron-fetch';
+// import fetch from 'electron-fetch';
 // @ts-ignore
 import * as tmp from 'tmp';
 const fse = require('fs-extra');
@@ -21,7 +21,7 @@ class CxDownloadProvider implements CxDownloadProviderInterface {
     const tempDir = tmp.dirSync().name;
     this.downloads.set(extensionId, tempDir);
     return {
-      path: downloadCrx.downloadById(extensionId, tempDir, extensionId),
+      path: await downloadCrx.downloadById(extensionId, tempDir, extensionId),
     };
   }
 
@@ -32,13 +32,13 @@ class CxDownloadProvider implements CxDownloadProviderInterface {
 
   async getUpdateInfo(cxInfos: CxInfos) {
     console.log(`Fetching ${cxInfos.update_url}`);
-    const res = await fetch(cxInfos.update_url);
-    console.log('res : ', res);
+    // const res = await fetch(cxInfos.update_url, );
+    // console.log('res : ', res);
 
-    // @ts-ignore
-    if (!res.ok) throw new Error(`Http Status not ok: ${res.httpStatus}`);
-    const xml = await res.text();
-
+    // // @ts-ignore
+    // if (!res.ok) throw new Error(`Http Status not ok: ${res.httpStatus}`);
+    // const xml = await res.text();
+    const xml = 'test';
     return {
       xml,
     };

@@ -22,32 +22,35 @@ describe('Default Interpreter Provider', () => {
   });
 
   describe('detecting updated version', () => {
-    it('is true with a greater proposed version', () => {
+    it('is true when update version is higher than the current', () => {
       const interpreter = new InterpreterProvider();
-      FAKE_CX_INFOS.version = '2.0.0.0';
+      // Represents the current version (the fake update version is 1.2.0)
+      FAKE_CX_INFOS.version = '1.0.0.0';
       const actual = interpreter.shouldUpdate(FAKE_EXTENSION_ID, FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 
       assert.equal(actual, true);
     });
 
-    it('is false with equal proposed versions', () => {
+    it('is false when both versions are equal', () => {
       const interpreter = new InterpreterProvider();
+      // Represents the current version (the fake update version is 1.2.0)
       FAKE_CX_INFOS.version = '1.2.0';
       const actual = interpreter.shouldUpdate(FAKE_EXTENSION_ID, FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 
       assert.equal(actual, false);
     });
 
-    it('is false with a lower proposed version', () => {
+    it('is false when the update version is lower than the current', () => {
       const interpreter = new InterpreterProvider();
-      FAKE_CX_INFOS.version = '0.1';
+      // Represents the current version (the fake update version is 1.2.0)
+      FAKE_CX_INFOS.version = '10.2.0';
       const actual = interpreter.shouldUpdate(FAKE_EXTENSION_ID, FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 
       assert.equal(actual, false);
     });
   });
 
-  describe('sorting versins', () => {
+  describe('sorting versions', () => {
     it('return the highest version from an array', () => {
       const interpreter = new InterpreterProvider();
       const highest = interpreter.sortLastVersion(FAKE_VERSION_ARRAY);
@@ -60,7 +63,7 @@ describe('Default Interpreter Provider', () => {
       assert.throws(
         () => { interpreter.sortLastVersion([]); },
         /No versions could be read and found/,
-        'Sort happened even if no versions has been given'
+        'Sort should fail if an empty array is given'
       );
     });
 
@@ -69,7 +72,7 @@ describe('Default Interpreter Provider', () => {
       assert.throws(
         () => { interpreter.sortLastVersion(['azz', 'buioo', 'boom']); },
         /No versions could be read and found/,
-        'Sort happened even if no valid values has been given'
+        'Sort should fail if no valid versions have been given'
       );
     });
   });
