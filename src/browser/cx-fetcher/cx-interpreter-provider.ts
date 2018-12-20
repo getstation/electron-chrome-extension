@@ -42,13 +42,11 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
   }
 
   sortLastVersion(versions: string[]) {
-    let highest = undefined;
+    let highest = '-1';
     // Loop through all versions
     for (const current of versions) {
       try {
-        // If no highest already defined, define one  // TODO : Fix the first highest problem
-        if (! highest) highest = current;
-        else if (this.gt(current, highest)) {
+        if (this.gt(current, highest)) {
           highest = current;
         }
       } catch (err) {
@@ -56,7 +54,7 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
       }
     }
 
-    if (!highest) throw new Error('No versions could be read and found');
+    if (parseInt(highest, 10) === -1) throw new Error('No versions could be read and found');
     return highest;
   }
 
@@ -69,11 +67,12 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
   // Find the extensionId related update data (a manifest can reference many different extension updates)
   private findCxUpdate(extensionId: string, parsedUpdates: any): any {
     const updates = parsedUpdates.elements[0].elements;
-    updates.forEach((update: any) => {
+
+    for (const update of updates) {
       if (extensionId === update.attributes.appid) {
         return update;
       }
-    });
+    }
 
     return false;
   }
