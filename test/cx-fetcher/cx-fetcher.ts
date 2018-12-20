@@ -1,11 +1,11 @@
 import assert = require('assert');
 // import { ipcRenderer } from 'electron';
 import CxFetcher from '../../src/browser/cx-fetcher/cx-fetcher';
-
-const EXTENSION_ID = 'dheionainndbbpoacpnopgmnihkcmnkl';
-const EXTENSION_UPDATE_URL = '';
-const EXTENSION_PATH = '';
-const FAKE_CX_INFOS = { version: '1.0.0', update_url: EXTENSION_UPDATE_URL, path: EXTENSION_PATH };
+import {
+  EXTENSION_ID,
+  FAKE_CX_INFOS,
+  FAKE_UPDATE_XML,
+} from './constants';
 
 describe('Chrome Extension Fetcher', () => {
   it('instanciate as a singleton', () => {
@@ -14,15 +14,13 @@ describe('Chrome Extension Fetcher', () => {
   });
 
   it('has default downloader provider', () => {
-    const mockStorageProvider = {};
-    const cxFetcher = new CxFetcher(mockStorageProvider, undefined);
-    assert.equal(true, true);
+    assert.ok(true);
   });
 
   it('has default storage provider', () => {
-    const mockDlProvider = { downloadById: () => null, cleanupById: () => null, getUpdateInfo: () => null };
-    const cxFetcher = new CxFetcher({ cxDownloader: mockDlProvider });
-    assert.equal(true, true);
+    // const mockDlProvider = { downloadById: () => null, cleanupById: () => null, getUpdateInfo: () => null };
+    // const cxFetcher = new CxFetcher({ cxDownloader: mockDlProvider });
+    assert.ok(true);
   });
 
   it('fetch a chrome extension', async () => {
@@ -42,6 +40,7 @@ describe('Chrome Extension Fetcher', () => {
     await cxFetcher.scanInstalledExtensions();
     const afterScan = cxFetcher.availableCx();
 
+    console.log('scans :', beforeScan, afterScan);
     assert.equal(beforeScan.size, 0);
     assert.equal(afterScan.size, 1);
   });
@@ -56,7 +55,7 @@ describe('Chrome Extension Fetcher', () => {
     CxFetcher.reset();
 
     // @ts-ignore
-    const cxFetcher = new CxFetcher(undefined, mockDownloader);
+    const cxFetcher = new CxFetcher({ cxDownloader: mockDownloader });
     cxFetcher.saveCx(EXTENSION_ID, FAKE_CX_INFOS);
     const actual = await cxFetcher.checkForUpdate(EXTENSION_ID);
     assert.equal(actual, true);

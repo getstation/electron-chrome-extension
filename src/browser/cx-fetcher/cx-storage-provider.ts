@@ -1,12 +1,13 @@
+// @ts-ignore
+import * as glob from 'glob';
+const fse = require('fs-extra');
+const path = require('path');
+const unzip = require('unzip-crx');
 import {
   CxStorageProviderInterface,
   CxManifest,
   DownloadDescriptor,
 } from './types';
-import * as glob from 'glob';
-const path = require('path');
-const unzip = require('unzip-crx');
-const fse = require('fs-extra');
 
 const EXTENSIONS_FOLDER = path.join(__dirname, 'extensions');
 const TEMP_SORT_FOLDER = '_sorting';
@@ -48,7 +49,8 @@ class CxStorageProvider implements CxStorageProviderInterface {
       };
 
     } catch (err) {
-      throw new Error(err);
+      console.log('error triggered', err);
+      throw err;
     }
   }
 
