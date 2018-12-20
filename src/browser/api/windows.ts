@@ -1,80 +1,68 @@
-import { BrowserWindow, ipcMain } from 'electron';
-import { CreateData, GetInfo, UpdateInfo } from '../../common/types/api-windows';
-const constants = require('../../common/constants');
+import { BrowserWindow } from 'electron';
+import { CreateData, CxWindowsApi, GetInfo, UpdateInfo } from '../../common/types/api-windows';
+import { CxApiChannels } from '../../common/types/api';
+const { RpcIpcManager } = require('electron-simple-rpc');
+const capitalize = require('capitalize');
 
 class ChromeWindowsAPIHandler {
-  constructor() {
-    this.handleWindowsGet = this.handleWindowsGet.bind(this);
-    ipcMain.on(constants.WINDOWS_GET, this.handleWindowsGet);
+  protected scope: string;
+  protected RpcIpcManager: any;
 
-    this.handleWindowsGetCurrent = this.handleWindowsGetCurrent.bind(this);
-    ipcMain.on(constants.WINDOWS_GET_CURRENT, this.handleWindowsGetCurrent);
+  constructor(extensionId: string) {
+    const library = {};
+    [CxWindowsApi.GetCurrent].forEach(channel => {
+      const handler = this[`handle${capitalize(channel)}`];
+      library[channel] = (...args: any[]) => {
+        return handler.apply(this, args);
+      };
+    });
 
-    this.handleWindowsGetLastFocused = this.handleWindowsGetLastFocused.bind(this);
-    ipcMain.on(constants.WINDOWS_GET_LAST_FOCUSED, this.handleWindowsGetLastFocused);
+    this.scope = `${CxApiChannels.Windows}-${extensionId}`;
 
-    this.handleWindowsGetAll = this.handleWindowsGetAll.bind(this);
-    ipcMain.on(constants.WINDOWS_GET_ALL, this.handleWindowsGetAll);
-
-    this.handleWindowsCreate = this.handleWindowsCreate.bind(this);
-    ipcMain.on(constants.WINDOWS_CREATE, this.handleWindowsCreate);
-
-    this.handleWindowsUpdate = this.handleWindowsUpdate.bind(this);
-    ipcMain.on(constants.WINDOWS_UPDATE, this.handleWindowsUpdate);
-
-    this.handleWindowsRemove = this.handleWindowsRemove.bind(this);
-    ipcMain.on(constants.WINDOWS_REMOVE, this.handleWindowsRemove);
+    this.RpcIpcManager = new RpcIpcManager(library, this.scope);
   }
 
-  handleWindowsGet(e: Electron.Event, windowId: number, _getInfo: GetInfo) {
+  handleGet(windowId: number, _getInfo: GetInfo) {
     const win = BrowserWindow.getAllWindows().find((window) => window.webContents.id === windowId);
-    const payload = {
+    return {
       id: win && win.webContents.id,
       focused: win && win.isFocused(),
       incognito: false,
       alwaysOnTop: false,
     };
-
-    e.sender.send(constants.WINDOWS_GET_RESULT, payload);
   }
 
-  handleWindowsGetCurrent(e: Electron.Event, _getInfo: GetInfo) {
-    const win = BrowserWindow.getAllWindows()[0];
-    const payload = {
-      id: win.webContents.id,
-      focused: true,
+  handleGetCurrent(_getInfo: GetInfo) {
+    const win = BrowserWindow.getFocusedWindow();
+    return {
+      id: win && win.webContents.id,
+      focused: win && win.isFocused(),
       incognito: false,
       alwaysOnTop: false,
     };
-
-    e.sender.send(constants.WINDOWS_GET_CURRENT_RESULT, payload);
   }
 
-  handleWindowsGetLastFocused(e: Electron.Event, _getInfo: GetInfo) {
-    const win = BrowserWindow.getAllWindows()[0];
-    const payload = {
-      id: win.webContents.id,
-      focused: true,
+  handleGetLastFocused(_getInfo: GetInfo) {
+    const win = BrowserWindow.getFocusedWindow();
+    return {
+      id: win && win.webContents.id,
+      focused: win && win.isFocused(),
       incognito: false,
       alwaysOnTop: false,
     };
-
-    e.sender.send(constants.WINDOWS_GET_LAST_FOCUSED_RESULT, payload);
   }
 
-  handleWindowsGetAll(e: Electron.Event, _getInfo: GetInfo) {
+  handleGetAll(_getInfo: GetInfo) {
     const win = BrowserWindow.getAllWindows();
-    const payload = win.map((window) => ({
+    return win.map((window) => ({
       id: window.webContents.id,
       focused: window.isFocused(),
       incognito: false,
       alwaysOnTop: false,
     }));
-
-    e.sender.send(constants.WINDOWS_GET_ALL_RESULT, payload);
   }
 
-  handleWindowsCreate(e: Electron.Event, createData: CreateData) {
+  handleCreate(createData: CreateData) {
     const win = new BrowserWindow({
       width: createData.width || 800,
       height: createData.height || 600,
@@ -84,17 +72,15 @@ class ChromeWindowsAPIHandler {
 
     if (createData.url) win.loadURL(createData.url);
 
-    const payload = {
+    return {
       id: win.webContents.id,
-      focused: true,
+      focused: win.isFocused(),
       incognito: false,
       alwaysOnTop: false,
     };
-
-    e.sender.send(constants.WINDOWS_CREATE_RESULT, payload);
   }
 
-  handleWindowsUpdate(e: Electron.Event, windowId: number, updateInfo: UpdateInfo) {
+  handleUpdate(windowId: number, updateInfo: UpdateInfo) {
     const win = BrowserWindow.getAllWindows().find((window) => window.webContents.id === windowId);
 
     if (win && updateInfo) {
@@ -111,24 +97,24 @@ class ChromeWindowsAPIHandler {
 
     if (updateInfo.focused) win && win.focus();
 
-    const payload = {
+    return {
       id: win && win.webContents.id,
       focused: win && win.isFocused(),
       incognito: false,
       alwaysOnTop: false,
     };
-
-    e.sender.send(constants.WINDOWS_UPDATE_RESULT, payload);
   }
 
-  handleWindowsRemove(e: Electron.Event, windowId: number) {
+  handleRemove(windowId: number) {
     const win = BrowserWindow.getAllWindows().find((window) => window.webContents.id === windowId);
     win && win.close();
 
-    e.sender.send(constants.WINDOWS_REMOVE_RESULT);
+    return; // TODO: What should I return?
   }
 
-  release () {}
+  release () {
+    this.RpcIpcManager.release();
+  }
 }
 
 module.exports = ChromeWindowsAPIHandler;

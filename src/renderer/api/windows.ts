@@ -1,17 +1,18 @@
-import { CreateData, GetInfo, UpdateInfo } from '../../common/types/api-windows';
-
+import { Callback, CreateData, CxApiHandler, CxWindowsApi, GetInfo, UpdateInfo } from '../../common/types/api-windows';
+const { rpc } = require('electron-simple-rpc');
 const Event = require('./event');
-const { ipcRenderer } = require('electron');
-const constants = require('../../common/constants');
 
 class ChromeWindowsAPIClient {
+  scope: string;
   WINDOW_ID_NONE: number;
   WINDOW_ID_CURRENT: number;
   onCreated: Event;
   onRemoved: Event;
   onFocusChanged: Event;
 
-  constructor() {
+  constructor(extensionId: string) {
+    this.scope = `${CxApiHandler}-${extensionId}`;
+
     this.WINDOW_ID_NONE = -1;
     this.WINDOW_ID_CURRENT = -2;
 
@@ -20,54 +21,33 @@ class ChromeWindowsAPIClient {
     this.onFocusChanged = new Event();
   }
 
-  get(windowId: number, getInfo: GetInfo, callback: (payload: Window) => void) {
-    ipcRenderer.send(`${constants.WINDOWS_GET}`, windowId, getInfo);
-    ipcRenderer.on(`${constants.WINDOWS_GET_RESULT}`,
-      (_event: Electron.Event, payload: Window) => callback(payload)
-    );
+  get(windowId: number, getInfo: GetInfo, callback: Callback) {
+    rpc(this.scope, CxWindowsApi.Get)(windowId, getInfo).then(callback);
   }
 
-  getCurrent (getInfo: GetInfo, callback: (payload: Window) => void) {
-    ipcRenderer.send(`${constants.WINDOWS_GET_CURRENT}`, getInfo);
-    ipcRenderer.on(`${constants.WINDOWS_GET_CURRENT_RESULT}`,
-      (_event: Electron.Event, payload: Window) => callback(payload)
-    );
+  getCurrent(getInfo: GetInfo, callback: Callback) {
+    rpc(this.scope, CxWindowsApi.GetCurrent)(getInfo).then(callback);
   }
 
-  getLastFocused (getInfo: GetInfo, callback: (payload: Window) => void) {
-    ipcRenderer.send(`${constants.WINDOWS_GET_LAST_FOCUSED}`, getInfo);
-    ipcRenderer.on(`${constants.WINDOWS_GET_LAST_FOCUSED_RESULT}`,
-      (_event: Electron.Event, payload: Window) => callback(payload)
-    );
+  getLastFocused(getInfo: GetInfo, callback: Callback) {
+    rpc(this.scope, CxWindowsApi.GetLastFocused)(getInfo).then(callback);
   }
 
-  getAll (getInfo: GetInfo, callback: (payload: Window) => void) {
-    ipcRenderer.send(`${constants.WINDOWS_GET_ALL}`, getInfo);
-    ipcRenderer.on(`${constants.WINDOWS_GET_ALL_RESULT}`,
-      (_event: Electron.Event, payload: Window) => callback(payload)
-    );
+  getAll(getInfo: GetInfo, callback: Callback) {
+    rpc(this.scope, CxWindowsApi.GetAll)(getInfo).then(callback);
   }
 
-  create (createData: CreateData, callback: (payload: Window) => void) {
-    ipcRenderer.send(`${constants.WINDOWS_CREATE}`, createData);
-    ipcRenderer.on(`${constants.WINDOWS_CREATE_RESULT}`,
-      (_event: Electron.Event, payload: Window) => callback && callback(payload)
-    );
+  create(createData: CreateData, callback: Callback) {
+    rpc(this.scope, CxWindowsApi.Create)(createData).then(callback);
   }
 
-  update (windowId: number, updateInfo: UpdateInfo, callback: (payload: Window) => void) {
-    ipcRenderer.send(`${constants.WINDOWS_UPDATE}`, windowId, updateInfo);
-    ipcRenderer.on(`${constants.WINDOWS_UPDATE_RESULT}`,
-      (_event: Electron.Event, payload: Window) => callback && callback(payload)
-    );
+  update(windowId: number, updateInfo: UpdateInfo, callback: Callback) {
+    rpc(this.scope, CxWindowsApi.Update)(windowId, updateInfo).then(callback);
   }
 
-  remove (windowId: number, callback: () => void) {
-    ipcRenderer.send(`${constants.WINDOWS_REMOVE}`, windowId);
-    ipcRenderer.on(`${constants.WINDOWS_REMOVE_RESULT}`,
-      () => callback && callback()
-    );
+  remove(windowId: number, callback: () => void) {
+    rpc(this.scope, CxWindowsApi.GetCurrent)(windowId).then(callback);
   }
 }
 
-exports.setup = () => new ChromeWindowsAPIClient();
+exports.setup = (extensionId: string) => new ChromeWindowsAPIClient(extensionId);

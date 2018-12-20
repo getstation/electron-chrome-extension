@@ -3,14 +3,32 @@
  * See https://developer.chrome.com/extensions/windows
  */
 
+export type Callback = (payload: Window) => void;
+export const CxApiHandler = 'cx-handler';
+
+export enum CxWindowsApi {
+  Get = 'get',
+  GetCurrent = 'get-current',
+  GetLastFocused = 'get-last-focused',
+  GetAll = 'get-all',
+  Create = 'create',
+  Update= 'update',
+  Remove= 'remove',
+}
+
 // https://developer.chrome.com/extensions/windows#type-WindowType
-export enum WINDOW_TYPE {
-  NORMAL, POPUP, DEVTOOLS,
+export enum WindowType {
+  NORMAL = 'normal',
+  POPUP = 'popup',
+  DEVTOOLS = 'devtools',
 }
 
 // https://developer.chrome.com/extensions/windows#type-WindowState
-export enum WINDOW_STATE {
-  NORMAL, MINIMIZED, MAXIMIZED, FULLSCREEN,
+export enum WindowState {
+  NORMAL = 'normal',
+  MINIMIZED = 'minimized',
+  MAXIMIZED = 'maximized',
+  FULLSCREEN = 'fullscreen',
 }
 
 // https://developer.chrome.com/extensions/windows#type-Window
@@ -23,20 +41,21 @@ export interface Window {
   height?: number,
   tabs?: any[],
   incognito: boolean,
-  type?: WINDOW_TYPE,
-  state?: WINDOW_STATE,
+  type?: WindowType,
+  state?: WindowState,
   alwaysOnTop: boolean,
   sessionId?: string,
 }
 
 // https://developer.chrome.com/extensions/windows#type-CreateType
-export enum CREATE_TYPE {
-  NORMAL, POPUP,
+export enum CreateType {
+  NORMAL = 'normal',
+  POPUP = 'popup',
 }
 
 export interface GetInfo {
   populate?: boolean,
-  windowTypes?: WINDOW_TYPE[],
+  windowTypes?: WindowType[],
 }
 
 export interface CreateData {
@@ -48,8 +67,8 @@ export interface CreateData {
   height?: number,
   focused?: boolean,
   incognito?: boolean,
-  type?: WINDOW_TYPE,
-  state?: WINDOW_STATE,
+  type?: WindowType,
+  state?: WindowState,
   setSelfAsOpener?: boolean,
 }
 
@@ -60,5 +79,5 @@ export interface UpdateInfo {
   height?: number,
   focused?: boolean,
   drawAttention?: boolean,
-  state?: WINDOW_STATE,
+  state?: WindowState,
 }
