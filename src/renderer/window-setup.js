@@ -96,7 +96,7 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesN
     // console.log('url', url);
     if (useNativeWindowOpen(usesNativeWindowOpen, nativeWindowOverrideList, url)) {
       // console.log('using native window.open');
-      return originalWindowOpen.apply(window, [url, frameName, features]);
+      return originalWindowOpen.apply(win, [url, frameName, features]);
     }
     // console.log('using overriden window.open');
     const guestId = ipcRenderer.sendSync('ELECTRON_GUEST_WINDOW_MANAGER_WINDOW_OPEN', url, toString(frameName), toString(features));
@@ -115,6 +115,15 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesN
   ipcRenderer.on('ELECTRON_GUEST_WINDOW_POSTMESSAGE', (event, sourceId, message, sourceOrigin) => {
     event = new MessageEvent('message', { data: message, origin: sourceOrigin });
     event.source = getOrCreateProxy(ipcRenderer, sourceId);
+
+    // This crappy code block fix an ugly behaviour from Mixmax who open
+    // a window from an iframe and catch message in the extension content
+    // script. References are lost between contexts.
+    // We manually trigger the intented effect.
+    if (event.data && event.data.method === 'loginFinished') {
+      win.location.reload();
+    }
+
     win.dispatchEvent(event);
   });
 };
