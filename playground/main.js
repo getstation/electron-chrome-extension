@@ -23,13 +23,8 @@ function createWindow() {
 app.on('ready', () => {
   createWindow();
 
-<<<<<<< HEAD
   require('electron-process-manager').openProcessManager();
   addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
-=======
-  // require('electron-process-manager').openProcessManager();
-  addExtension(join(__dirname, './extensions/gmelius'))
->>>>>>> Swap used extension for debugging process
 });
 
 app.on('window-all-closed', () => {
