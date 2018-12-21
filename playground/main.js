@@ -24,7 +24,7 @@ app.on('ready', () => {
   createWindow();
 
   require('electron-process-manager').openProcessManager();
-  addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
+  addExtension(join(__dirname, './extensions/gmelius'))
 });
 
 app.on('window-all-closed', () => {
