@@ -1,22 +1,25 @@
+import { sync } from 'glob';
+import { join, resolve } from 'path';
+import { move, readJson } from 'fs-extra';
 // @ts-ignore
-import * as glob from 'glob';
-const fse = require('fs-extra');
-const path = require('path');
-const unzip = require('unzip-crx');
+import unzip from 'unzip-crx';
 import {
   CxStorageProviderInterface,
-  CxManifest,
-  DownloadDescriptor,
+  ICxManifest,
+  IDownload,
+  ILocation,
 } from './types';
 
-const EXTENSIONS_FOLDER = path.join(__dirname, 'extensions');
+const EXTENSIONS_FOLDER = {
+  path: join(__dirname, 'extensions'),
+};
 const TEMP_SORT_FOLDER = '_sorting';
 
 class CxStorageProvider implements CxStorageProviderInterface {
-  public extensionsFolder: string;
+  public extensionsFolder: ILocation;
 
   // Constructor ! (@captainObvious)
-  constructor(extensionsFolder?: string) {
+  constructor(extensionsFolder?: ILocation) {
     this.extensionsFolder = (extensionsFolder) ? extensionsFolder : EXTENSIONS_FOLDER;
   }
 
@@ -25,38 +28,36 @@ class CxStorageProvider implements CxStorageProviderInterface {
    * @param extensionId   Extension ID used for the final folder path
    * @param crxPath       Path of the CRX archive, as a string
    */
-  async installExtension(extensionId: string, crxDownload: DownloadDescriptor) {
-    try {
-      // TODO : ensureDir at some point
+  async installExtension(crxDownload: IDownload) {
+    // TODO : ensureDir at some point
 
-      // Extract temporarily in a sub temporary folder
-      // TODO : Improve how is created the temporary folder
-      const tempDestination = path.resolve(this.extensionsFolder, TEMP_SORT_FOLDER, extensionId);
-      await this.unzipCrx(crxDownload.path, tempDestination);
+    // Extract temporarily in a sub temporary folder
+    // TODO : Improve how is created the temporary folder
+    const tempDestination = resolve(this.extensionsFolder.path, TEMP_SORT_FOLDER, crxDownload.id);
+    await this.unzipCrx(crxDownload.location, tempDestination);
 
-      // Find version in manifest and create a new destination subfolder
-      const manifest = await this.readManifest(path.join(tempDestination, 'manifest.json'));
-      const versionDestination = path.resolve(this.extensionsFolder, extensionId, manifest.version);
+    // Find version in manifest and create a new destination subfolder
+    const manifest = await this.readManifest(join(tempDestination, 'manifest.json'));
+    const versionDestination = resolve(this.extensionsFolder, crxDownload.id, manifest.version);
 
-      // TODO : check if the destination already exists and fall back (with cleanup)
-      // Move the extracted file to the final versionned folder
-      await fse.move(tempDestination, versionDestination);
+    // TODO : check if the destination already exists and fall back (with cleanup)
+    // Move the extracted file to the final versionned folder
+    await move(tempDestination, versionDestination);
 
-      // Return Installation Infos
-      return {
+    // Return Installation Infos
+    return {
+      id: crxDownload.id,
+      location: {
         path: versionDestination,
-        manifest,
-      };
-
-    } catch (err) {
-      throw err;
-    }
+      },
+      manifest,
+    };
   }
 
   // Gather all installed Cx Infos from installation folder
   async getInstalledExtension() {
     const installedCxInfos = new Map();
-    const cxFolders = glob.sync(path.join(this.extensionsFolder, '**/manifest.json'));
+    const cxFolders = sync(join(this.extensionsFolder.path, '**/manifest.json'));
 
     for (const manifestPath of cxFolders) {
       const extensionTree = manifestPath.split('/');
@@ -77,27 +78,19 @@ class CxStorageProvider implements CxStorageProviderInterface {
     return installedCxInfos;
   }
 
-  /**
-   * Return parsed manifest json from a given chrome extension folder.
-   * @param cxFolderPath  Path of the chrome extension folder
-   * @returns   Object parsed from manifest.json
-   */
-  async readManifest(manifestPath: string): Promise<CxManifest> {
-    return fse.readJson(manifestPath);
+  // Parse a manifest.json into a JSON object
+  async readManifest(location: ILocation): Promise<ICxManifest> {
+    return readJson(location.path);
   }
 
-  /**
-   * Return a promise that resolves when the CRX archive (found at the given path) has been extracted
-   * to the given destination folder.
-   * @param crxPath       Path of the chrome extension archive
-   * @param destination   Folder in which the archive will be unzipped
-   */
-  async unzipCrx(crxPath: string, destination: string): Promise<boolean | any> {
-    return new Promise((resolve, reject) => {
-      unzip(crxPath, destination)
-        .then(() => resolve(true))
-        .catch((err: any) => reject(err));
-    });
+  // Unzip archive to the given path
+  async unzipCrx(crxPath: ILocation, destination: ILocation): Promise<boolean> {
+    try {
+      await unzip(crxPath, destination);
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 }
 

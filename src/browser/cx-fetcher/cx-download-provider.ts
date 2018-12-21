@@ -1,37 +1,42 @@
 // @ts-ignore
-import * as downloadCrx from 'download-crx';
+import { downloadCrxById } from 'download-crx';
 // import fetch from 'electron-fetch';
 // @ts-ignore
-import * as tmp from 'tmp';
-const fse = require('fs-extra');
+import { dir } from 'tmp';
+import { remove } from 'fs-extra';
 import {
   CxDownloadProviderInterface,
-  CxInfos,
+  IExtension,
+  IDownload,
 } from './types';
 
 class CxDownloadProvider implements CxDownloadProviderInterface {
   // Track what have been downloaded for cleanups
-  private downloads: Map<string, string>;
+  private downloads: Map<IExtension['id'], IDownload['location']>;
 
   constructor() {
     this.downloads = new Map();
   }
 
-  async downloadById(extensionId: string) {
-    const tempDir = tmp.dirSync().name;
+  async downloadById(extensionId: IExtension['id']) {
+    const tempDir = await dir().name;
     this.downloads.set(extensionId, tempDir);
+    const path = await downloadCrxById(extensionId, tempDir, extensionId);
     return {
-      path: await downloadCrx.downloadById(extensionId, tempDir, extensionId),
+      id: extensionId,
+      location: {
+        path,
+      },
     };
   }
 
-  async cleanupById(extensionId: string) {
+  async cleanupById(extensionId: IExtension['id']) {
     const tmpDir = this.downloads.get(extensionId);
-    fse.remove(tmpDir);
+    if (tmpDir) await remove(tmpDir.path);
   }
 
-  async getUpdateInfo(cxInfos: CxInfos) {
-    console.log(`Fetching ${cxInfos.update_url}`);
+  async getUpdateInfo(extension: IExtension) {
+    console.log(`Fetching ${extension.updateUrl}`);
     // const res = await fetch(cxInfos.update_url, );
     // console.log('res : ', res);
 

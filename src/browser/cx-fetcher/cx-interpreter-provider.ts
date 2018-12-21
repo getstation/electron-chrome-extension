@@ -1,71 +1,84 @@
-import * as xmlConvert from 'xml-js';
+import { xml2js } from 'xml-js';
 import {
   CxInterpreterProviderInterface,
-  UpdateDescriptor,
-  InstallDescriptor,
-  CxInfos,
+  IVersion,
+  IExtension,
+  IInstall,
+  IUpdate,
 } from './types';
 
 class CxInterpreterProvider implements CxInterpreterProviderInterface {
-  constructor() {
-
-  }
-
-  // TODO : Do I really need to put undefined here ?
-  interpret(installedCx: InstallDescriptor | undefined) {
-    if (! installedCx) throw new Error('No installation descriptor given');
-
-    // Build understandable info for the CxManager
-    const cxInfos = {
-      path: installedCx.path,
-      version: installedCx.manifest.version,
-      update_url: installedCx.manifest.update_url,
+  // Create an IVersion from a version represented in a string
+  public static parseVersion(version:string) {
+    const split = version.split('.');
+    const parsed = split.map((elem: string) => parseInt(elem, 10));
+    return {
+      number: version,
+      parsed,
     };
-
-    return cxInfos;
   }
 
-  shouldUpdate(extensionId: string, cxInfos: CxInfos, updateInfos: UpdateDescriptor) {
+  // Transform an Installation (from the CxStorage) into a registerable IExtension
+  interpret(installedCx: IInstall) {
+    const {
+      id,
+      location,
+      manifest: {
+        updateUrl,
+        version,
+      },
+    } = installedCx;
+    const parsedVersion = CxInterpreterProvider.parseVersion(version);
+
+    return {
+      id,
+      location,
+      version: parsedVersion,
+      updateUrl,
+    };
+  }
+
+  // Check against update data if a given extension should be updated
+  shouldUpdate(extension: IExtension, updateInfos: IUpdate) {
     const parsedUpdates = this.readUpdateManifest(updateInfos.xml);
-    const cxUpdateCheck = this.findCxUpdate(extensionId, parsedUpdates);
+    const cxUpdateCheck = this.findCxUpdate(extension.id, parsedUpdates);
 
     if (!cxUpdateCheck) return false;
 
     const newVersion = this.getNewVersion(cxUpdateCheck);
 
     // If new version is greater than the current one
-    if (this.gt(newVersion, cxInfos.version)) {
+    if (this.greaterThan(newVersion, extension.version)) {
       return true;
     }
 
     return false;
   }
 
-  sortLastVersion(versions: string[]) {
-    let highest = '-1';
-    // Loop through all versions
-    for (const current of versions) {
-      try {
-        if (this.gt(current, highest)) {
-          highest = current;
-        }
-      } catch (err) {
-        continue;
-      }
+  // Sort the highest IVersion in an array of IVersion
+  sortLastVersion(versions: IVersion[]) {
+    const noVersion = { number: '', parsed: [] };
+    const highest = versions.reduce((previous, value) => {
+      const greater = this.greaterThan(value, previous);
+      if (greater) return value;
+      return previous;
+    }, noVersion);
+
+    if (highest === noVersion) {
+      throw new Error('No versions could be read and found');
     }
 
-    if (parseInt(highest, 10) === -1) throw new Error('No versions could be read and found');
     return highest;
   }
 
   // Parse the xml manifest and return a json object
   private readUpdateManifest(xml: string): object {
-    return xmlConvert.xml2js(xml, { compact: false });
+    return xml2js(xml, { compact: false });
   }
 
   // TODO : Improve the "any"
   // Find the extensionId related update data (a manifest can reference many different extension updates)
-  private findCxUpdate(extensionId: string, parsedUpdates: any): any {
+  private findCxUpdate(extensionId: IExtension['id'], parsedUpdates: any): any {
     const updates = parsedUpdates.elements[0].elements;
 
     for (const update of updates) {
@@ -78,27 +91,25 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
   }
 
   // Extract version from an extension update data
-  private getNewVersion(cxUpdateCheck: any): string {
-    return cxUpdateCheck.elements[0].attributes.version;
+  private getNewVersion(cxUpdateCheck: any): IVersion {
+    // TODO : Make it safer
+    const version = cxUpdateCheck.elements[0].attributes.version;
+    return CxInterpreterProvider.parseVersion(version);
   }
 
-  // TODO : update this
-  private gt(a: number[] | string, b: number[] | string) {
-    // Convert if need be
-    const x = ('string' === typeof a) ? this.parseVersion(a) : a;
-    const y = ('string' === typeof b) ? this.parseVersion(b) : b;
-    // Compare
+  // Compare if the first argument is greater than the second
+  private greaterThan(a: IVersion, b: IVersion) {
+    const x = a.parsed;
+    const y = b.parsed;
+    // Compare each digit of the version
     for (let i = 0; i < x.length; i = i + 1) {
-      if (x[i] < y[i]) return false;
-      if (x[i] > y[i]) return true;
+      // The order of the rules is important
+      if (!y[i]) return false;        // If B[i] has no value when A[i] has at least one, A is higher
+      if (x[i] < y[i]) return false;  // If A[i] is lower than B[i], then A is not higher
+      if (x[i] > y[i]) return true;   // If A[i] is higher than B[i], then A is higher
+      // If none of the rules returned, then the numbers are equal, go to the next step
     }
     return false;
-  }
-
-  // TODO : Update this
-  private parseVersion(version:string) {
-    const split = version.split('.');
-    return split.map((elem: string) => parseInt(elem, 10));
   }
 }
 
