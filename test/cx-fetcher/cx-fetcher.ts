@@ -4,13 +4,19 @@ import * as path from 'path';
 import CxFetcher from '../../src/browser/cx-fetcher/cx-fetcher';
 import {
   EXTENSION_ID,
+  EXTENSION_VERSION,
+  TEST_INSTALLED_FOLDER,
   FAKE_CX_INFOS,
   FAKE_UPDATE_XML,
-  TEST_INSTALLED_FOLDER,
   FAKE_EXTENSION_ID,
-  EXTENSION_VERSION,
+  FAKE_EXTENSION_PATH,
+  FAKE_EXTENSION_UPDATE_URL,
+  FAKE_INSTALL_DESCRIPTOR,
+  FAKE_DL_DESCRIPTOR,
 } from './constants';
 import CxStorageProvider from '../../src/browser/cx-fetcher/cx-storage-provider';
+import CxDownloadProvider from '../../src/browser/cx-fetcher/cx-download-provider';
+import CxInterpreterProvider from '../../src/browser/cx-fetcher/cx-interpreter-provider';
 
 describe('Chrome Extension Fetcher', () => {
 
@@ -20,37 +26,88 @@ describe('Chrome Extension Fetcher', () => {
 
   it('instanciates as a singleton', () => {
     const cxFetcher = new CxFetcher();
-    assert.equal(cxFetcher instanceof CxFetcher, true);
+    const evilTwin = new CxFetcher();
+    assert.equal(cxFetcher, evilTwin);
   });
 
   it('has default downloader provider', () => {
-    assert.ok(true);
+    const cxFetcher = new CxFetcher();
+    const downloader = cxFetcher.cxDownloader;
+    assert.ok(downloader);
+    assert.ok(downloader instanceof CxDownloadProvider);
   });
 
   it('has default storage provider', () => {
-    // const mockDlProvider = { downloadById: () => null, cleanupById: () => null, getUpdateInfo: () => null };
-    // const cxFetcher = new CxFetcher({ cxDownloader: mockDlProvider });
-    assert.ok(true);
+    const cxFetcher = new CxFetcher();
+    const storager = cxFetcher.cxStorager;
+    assert.ok(storager);
+    assert.ok(storager instanceof CxStorageProvider);
+  });
+
+  it('has a default interpreter', () => {
+    const cxFetcher = new CxFetcher();
+    const interpreter = cxFetcher.cxInterpreter;
+    assert.ok(interpreter);
+    assert.ok(interpreter instanceof CxInterpreterProvider);
   });
 
   describe('fetching chrome extension', () => {
+    beforeEach(() => {
+      // Mockup all the external stuff
+      const cxDownloader = new CxDownloadProvider();
+      const cxStorager = new CxStorageProvider();
+      const cxInterpreter = new CxInterpreterProvider();
+      cxDownloader.downloadById = () => Promise.resolve(FAKE_DL_DESCRIPTOR);
+      cxDownloader.cleanupById = () => Promise.resolve();
+      cxStorager.installExtension = () => Promise.resolve(FAKE_INSTALL_DESCRIPTOR);
+      cxInterpreter.interpret = () => FAKE_CX_INFOS;
+
+      // Override with mockups
+      new CxFetcher({
+        cxDownloader,
+        cxStorager,
+        cxInterpreter,
+      });
+    });
+
     it('executes the whole cycle and register the expected Cx', async () => {
       const cxFetcher = new CxFetcher();
       const cxInfos = await cxFetcher.fetch(EXTENSION_ID);
 
-      // Check it arrived at the right place
-      assert.equal(
-        cxInfos.path,
-        `/Users/mikael/Documents/Code/electron-chrome-extension/src/browser/cx-fetcher/extensions/${EXTENSION_ID}/8.4.2`
-      );
+      // Check the registered extension and its installation
+      assert.equal(cxInfos.path, FAKE_EXTENSION_PATH);
+      assert.equal(cxInfos.version, '1.0.0');
+      assert.equal(cxInfos.update_url, FAKE_EXTENSION_UPDATE_URL);
     });
 
-    it('records the extension as "in use" while installing', () => {
+    it('records the extension as "in use" while installing', async () => {
+      const cxFetcher = new CxFetcher();
+      cxFetcher.cxDownloader.cleanupById = () => new Promise((resolve) => {
+        setTimeout(() => resolve('test'), 5000);
+      });
+      // Don't await, we want to check while it execs
+      cxFetcher.fetch(EXTENSION_ID);
 
+      assert.ok(cxFetcher.isInUse(EXTENSION_ID));
+      assert.equal(cxFetcher.getInUse(EXTENSION_ID), 'installing');
     });
 
-    it('does not execute if the extension is in use already (update/remove)', () => {
+    it('does not execute if the extension is in use already (update/remove)', async () => {
+      const cxFetcher = new CxFetcher();
+      cxFetcher.cxDownloader.cleanupById = () => new Promise((resolve) => {
+        setTimeout(() => resolve('test'), 5000);
+      });
+      // Don't await the first call, we want to check while it execs
+      cxFetcher.fetch(EXTENSION_ID);
+      try {
+        // Await the second (to catch the error);
+        await cxFetcher.fetch(EXTENSION_ID);
+      } catch (err) {
+        assert.equal(err.message, `Extension ${EXTENSION_ID} is already being used`);
+        return;
+      }
 
+      assert.fail('Should not execute on an already installing extension');
     });
   });
 
