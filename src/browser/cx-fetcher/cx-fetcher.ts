@@ -86,6 +86,21 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     }
   }
 
+  // Get a registered Cx
+  getCx(extensionId: string) {
+    return this.available.get(extensionId);
+  }
+
+  // Check if a Cx is being used in another process
+  isInUse(extensionId: string) {
+    return this.inUse.has(extensionId);
+  }
+
+  // Get the "in use status" of a Cx (if in use, of course)
+  getInUse(extensionId: string) {
+    return this.inUse.get(extensionId);
+  }
+
   // Fetch, install and register (as available) a Chrome extension
   async fetch(extensionId: string): Promise<CxInfos> {
     // Check if it's already in use
@@ -95,7 +110,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     // TODO : React to errors
 
     // Record theat extension is being toyed with already
-    this.inUse.set(extensionId, 'downloading');
+    this.inUse.set(extensionId, 'installing');
 
     // Start downloading -> unzipping -> cleaning
     const archiveCrx = await this.cxDownloader.downloadById(extensionId);
