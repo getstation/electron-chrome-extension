@@ -8,19 +8,27 @@ import {
   ICxManifest,
   IDownload,
   ILocation,
+  CxStorageProviderConfig,
 } from './types';
 
-const EXTENSIONS_FOLDER = {
-  path: join(__dirname, 'extensions'),
+// Default configuration
+const defaultConfig = {
+  // TODO : Default folder should be in Station "cache"
+  extensionsFolder:  { path: join(__dirname, 'extensions') },
+  sortingFolder: { path: '_sorting' },
 };
-const TEMP_SORT_FOLDER = '_sorting';
 
 class CxStorageProvider implements CxStorageProviderInterface {
   public extensionsFolder: ILocation;
+  public sortingFolder: ILocation;
 
   // Constructor ! (@captainObvious)
-  constructor(extensionsFolder?: ILocation) {
-    this.extensionsFolder = (extensionsFolder) ? extensionsFolder : EXTENSIONS_FOLDER;
+  constructor(customConfiguration: Partial<CxStorageProviderConfig> = {}) {
+    // Merge custom options with default options
+    const configuration = { ...defaultConfig, ...customConfiguration };
+
+    this.extensionsFolder = configuration.extensionsFolder;
+    this.sortingFolder = configuration.sortingFolder;
   }
 
   /**
@@ -33,12 +41,12 @@ class CxStorageProvider implements CxStorageProviderInterface {
 
     // Extract temporarily in a sub temporary folder
     // TODO : Improve how is created the temporary folder
-    const tempDestination = resolve(this.extensionsFolder.path, TEMP_SORT_FOLDER, crxDownload.id);
-    await this.unzipCrx(crxDownload.location, tempDestination);
+    const tempDestination = resolve(this.extensionsFolder.path, this.sortingFolder.path, crxDownload.id);
+    await this.unzipCrx(crxDownload.location, { path: tempDestination });
 
     // Find version in manifest and create a new destination subfolder
-    const manifest = await this.readManifest(join(tempDestination, 'manifest.json'));
-    const versionDestination = resolve(this.extensionsFolder, crxDownload.id, manifest.version);
+    const manifest = await this.readManifest({ path: join(tempDestination, 'manifest.json') });
+    const versionDestination = resolve(this.extensionsFolder.path, crxDownload.id, manifest.version);
 
     // TODO : check if the destination already exists and fall back (with cleanup)
     // Move the extracted file to the final versionned folder
@@ -64,17 +72,22 @@ class CxStorageProvider implements CxStorageProviderInterface {
       const version = extensionTree[extensionTree.length - 2];
       const extensionId = extensionTree[extensionTree.length - 3];
 
-      if (!installedCxInfos[extensionId]) installedCxInfos.set(extensionId, new Map());
+      if (!installedCxInfos[extensionId]) {
+        installedCxInfos.set(extensionId, new Map());
+      }
 
-      const manifest = await this.readManifest(manifestPath);
+      const manifest = await this.readManifest({ path: manifestPath });
       // TODO : This is a bit ugly ?
       installedCxInfos.get(extensionId).set(version, {
-        path: manifestPath.slice(0, -14),
+        id: extensionId,
+        location: {
+          path: manifestPath.slice(0, -14),
+        },
         manifest,
       });
     }
 
-    // Return all Installation Infos found under their version / extension ID
+    // Return all IExtension found under their version / extension ID
     return installedCxInfos;
   }
 

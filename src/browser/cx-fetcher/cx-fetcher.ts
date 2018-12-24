@@ -27,14 +27,14 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   public cxDownloader: CxDownloadProviderInterface;
   public cxInterpreter: CxInterpreterProviderInterface;
   // Maps of what's happening with Chrome extensions
-  private mutex: Map<IExtension['id'], string>;
+  private mutex: Map<IExtension['id'], string>; // TODO : Use an enum there
   private available: Map<IExtension['id'], IExtension>;
   // Auto update related
   private autoUpdateLoop: NodeJS.Timer;
   private autoUpdateInterval: number;
 
   // Constructor with dependencies injection
-  constructor(specifiedConfig: Partial<CxFetcherConfig> = {}) {
+  constructor(customConfiguration: Partial<CxFetcherConfig> = {}) {
     // Let this be a singleton
     if (CxFetcher.instance) {
       return CxFetcher.instance;
@@ -43,8 +43,8 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     // Never forget this guy
     super();
 
-    // Merge specified options with default options
-    const configuration = { ...DEFAULT_CONFIG, ...specifiedConfig };
+    // Merge custom options with default options
+    const configuration = { ...DEFAULT_CONFIG, ...customConfiguration };
 
     // Registrer the downloader and storage handler
     const {
@@ -100,7 +100,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     return this.mutex.has(extensionId);
   }
 
-  // Get the "in use status" of a Cx (if in use, of course)
+  // Get the "mutex status" of a Cx (if has one, of course)
   getMutex(extensionId: IExtension['id']) {
     return this.mutex.get(extensionId);
   }
@@ -123,7 +123,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     const installedCx = await this.cxStorager.installExtension(archiveCrx);
     await this.cxDownloader.cleanupById(extensionId);
 
-    // Translate raw data from installation into handled CxInfos
+    // Translate raw data from installation into handled IExtension
     const fetchedCx = this.cxInterpreter.interpret(installedCx);
 
     // Clear status, add to installed and emit ready event for this cx
@@ -158,10 +158,11 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   async scanInstalledExtensions() {
     const installedCxInfos = await this.cxStorager.getInstalledExtension();
 
-    // TODO : use .map()
     for (const [key, value] of installedCxInfos) {
-      const rawVersions = Array.from(value.keys());
-      const parsedVersions = rawVersions.map((version:string) => CxInterpreterProvider.parseVersion(version));
+      const parsedVersions = Array.from(
+        value.keys(),
+        (version:string) => CxInterpreterProvider.parseVersion(version)
+      );
       const latestVersion = this.cxInterpreter.sortLastVersion(parsedVersions);
       const cxInstall = value.get(latestVersion.number);
 
@@ -176,14 +177,13 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
 
   // Auto update all installed extensions
   public async autoUpdate() {
-    const updated = [];
-
-    // TODO : use .reduce()
+    const updates = [];
     for (const extensionId of this.available.keys()) {
-      // TODO : Transform this into good information, not just false / cxInfos (promisify better with extensionId)
-      updated.push(this.update(extensionId));
+      updates.push(this.update(extensionId));
     }
-    return await Promise.all(updated);
+
+    const updatesResult = await Promise.all(updates);
+    return updatesResult.filter((value) => value);
   }
 
   stopAutoUpdate() {

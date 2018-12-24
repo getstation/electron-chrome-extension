@@ -15,9 +15,9 @@ describe('Default Interpreter Provider', () => {
       const interpreter = new InterpreterProvider();
       const cxInfos = interpreter.interpret(FAKE_INSTALL_DESCRIPTOR);
 
-      assert(cxInfos.path, 'test/to/files');
+      assert(cxInfos.location.path, 'test/to/files');
       assert(cxInfos.version, '0.0.1');
-      assert(cxInfos.update_url, 'https://unknown.destination.lost');
+      assert(cxInfos.updateUrl, 'https://unknown.destination.lost');
     });
   });
 
@@ -26,7 +26,7 @@ describe('Default Interpreter Provider', () => {
       const interpreter = new InterpreterProvider();
       // Represents the current version (the fake update version is 1.2.0)
       FAKE_CX_INFOS.version = '1.0.0.0';
-      const actual = interpreter.shouldUpdate(FAKE_EXTENSION_ID, FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
+      const actual = interpreter.shouldUpdate(FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 
       assert.equal(actual, true);
     });
@@ -35,7 +35,7 @@ describe('Default Interpreter Provider', () => {
       const interpreter = new InterpreterProvider();
       // Represents the current version (the fake update version is 1.2.0)
       FAKE_CX_INFOS.version = '1.2.0';
-      const actual = interpreter.shouldUpdate(FAKE_EXTENSION_ID, FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
+      const actual = interpreter.shouldUpdate(FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 
       assert.equal(actual, false);
     });
@@ -44,7 +44,7 @@ describe('Default Interpreter Provider', () => {
       const interpreter = new InterpreterProvider();
       // Represents the current version (the fake update version is 1.2.0)
       FAKE_CX_INFOS.version = '10.2.0';
-      const actual = interpreter.shouldUpdate(FAKE_EXTENSION_ID, FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
+      const actual = interpreter.shouldUpdate(FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 
       assert.equal(actual, false);
     });

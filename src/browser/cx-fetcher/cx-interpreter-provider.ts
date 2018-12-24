@@ -43,16 +43,12 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
     const parsedUpdates = this.readUpdateManifest(updateInfos.xml);
     const cxUpdateCheck = this.findCxUpdate(extension.id, parsedUpdates);
 
-    if (!cxUpdateCheck) return false;
-
-    const newVersion = this.getNewVersion(cxUpdateCheck);
-
-    // If new version is greater than the current one
-    if (this.greaterThan(newVersion, extension.version)) {
-      return true;
+    if (!cxUpdateCheck) {
+      return false;
     }
 
-    return false;
+    const newVersion = this.getNewVersion(cxUpdateCheck);
+    return this.greaterThan(newVersion, extension.version);
   }
 
   // Sort the highest IVersion in an array of IVersion
@@ -60,8 +56,7 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
     const noVersion = { number: '', parsed: [] };
     const highest = versions.reduce((previous, value) => {
       const greater = this.greaterThan(value, previous);
-      if (greater) return value;
-      return previous;
+      return (greater) ? value : previous;
     }, noVersion);
 
     if (highest === noVersion) {
@@ -87,7 +82,7 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
       }
     }
 
-    return false;
+    return undefined;
   }
 
   // Extract version from an extension update data

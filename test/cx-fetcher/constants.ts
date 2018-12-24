@@ -101,7 +101,7 @@ export const FAKE_DL_DESCRIPTOR = {
 
 export const FAKE_CX_INFOS = {
   version: '1.0.0',
-  update_url: FAKE_EXTENSION_UPDATE_URL,
+  updateUrl: FAKE_EXTENSION_UPDATE_URL,
   path: FAKE_EXTENSION_PATH,
 };
 

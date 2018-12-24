@@ -32,16 +32,21 @@ class CxDownloadProvider implements CxDownloadProviderInterface {
 
   async cleanupById(extensionId: IExtension['id']) {
     const tmpDir = this.downloads.get(extensionId);
-    if (tmpDir) await remove(tmpDir.path);
+    if (tmpDir) {
+      await remove(tmpDir.path);
+    }
   }
 
   async getUpdateInfo(extension: IExtension) {
     console.log(`Fetching ${extension.updateUrl}`);
-    // const res = await fetch(cxInfos.update_url, );
+    // const res = await fetch(extension.updateUrl, );
     // console.log('res : ', res);
 
-    // // @ts-ignore
-    // if (!res.ok) throw new Error(`Http Status not ok: ${res.httpStatus}`);
+    // if (!res.ok) {
+    //   // @ts-ignore
+    //   throw new Error(`Http Status not ok: ${res.httpStatus}`);
+    // }
+
     // const xml = await res.text();
     const xml = 'test';
     return {

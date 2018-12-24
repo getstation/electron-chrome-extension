@@ -32,7 +32,7 @@ describe('Default Storage Provider', () => {
 
     it('returns a correct InstallDescriptor from a DownloadDescriptor', async () => {
       const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
-      const installDescriptor = await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
+      const installDescriptor = await storager.installExtension(FAKE_DL_DESCRIPTOR);
 
       const expected = {
         path: path.join(TEST_EXTENSION_FOLDER, FAKE_EXTENSION_ID, EXTENSION_VERSION),
@@ -49,7 +49,7 @@ describe('Default Storage Provider', () => {
     it('extracts files in correct folder tree', async () => {
       const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
 
-      await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
+      await storager.installExtension(FAKE_DL_DESCRIPTOR);
       const expectedFolder = path.join(TEST_EXTENSION_FOLDER, FAKE_EXTENSION_ID, EXTENSION_VERSION);
       const expectedManifest = path.join(expectedFolder, 'manifest.json');
 
@@ -63,7 +63,7 @@ describe('Default Storage Provider', () => {
 
       // TODO : someday, use assert.rejects (availabe in node 10)
       try {
-        await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
+        await storager.installExtension(FAKE_DL_DESCRIPTOR);
       } catch (err) {
         assert.equal('Cannot unzip archive', err);
         return;
@@ -73,12 +73,12 @@ describe('Default Storage Provider', () => {
 
     it('fails if the manifest cannot be read', async () => {
       const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
-      storager.unzipCrx = () => Promise.resolve();
+      storager.unzipCrx = () => Promise.resolve(true);
       storager.readManifest = () => Promise.reject('Cannot read manifest');
 
       // TODO : HACK -- someday, use assert.rejects (availabe in node 10)
       try {
-        await storager.installExtension(FAKE_EXTENSION_ID, FAKE_DL_DESCRIPTOR);
+        await storager.installExtension(FAKE_DL_DESCRIPTOR);
       } catch (err) {
         assert.equal('Cannot read manifest', err);
         return;

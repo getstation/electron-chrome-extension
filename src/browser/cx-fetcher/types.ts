@@ -38,9 +38,19 @@ export interface IInstalledExtensions {
 
 }
 
+/**
+ *  STORAGE PROVIDER
+ */
+
+export interface CxStorageProviderConfig {
+  extensionsFolder: ILocation,
+  sortingFolder: ILocation,
+}
+
 export interface CxStorageProviderInterface {
   // Parameters
   extensionsFolder: ILocation;
+  sortingFolder: ILocation;
 
   // Methods
   installExtension(crxDownload: IDownload): Promise<IInstall>;
@@ -49,17 +59,29 @@ export interface CxStorageProviderInterface {
   unzipCrx(crxPath: ILocation, destination: ILocation): Promise<boolean>
 }
 
+/**
+ * DOWNLOAD PROVIDER
+ */
+
 export interface CxDownloadProviderInterface {
   downloadById(extensionId: IExtension['id']): Promise<IDownload>;
   cleanupById(extensionId: IExtension['id']): void;
   getUpdateInfo(extension: IExtension): Promise<IUpdate>;
 }
 
+/**
+ * INTERPRETER PROVIDER
+ */
+
 export interface CxInterpreterProviderInterface {
   interpret(installedCx: IInstall): IExtension;
   shouldUpdate(extension: IExtension, updateInfos: IUpdate): boolean;
   sortLastVersion(versions: IVersion[]): IVersion;
 }
+
+/**
+ * CX FETCHER
+ */
 
 export interface CxFetcherConfig {
   cxDownloader: CxDownloadProviderInterface;

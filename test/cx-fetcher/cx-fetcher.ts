@@ -75,9 +75,9 @@ describe('Chrome Extension Fetcher', () => {
       const cxInfos = await cxFetcher.fetch(EXTENSION_ID);
 
       // Check the registered extension and its installation
-      assert.equal(cxInfos.path, FAKE_EXTENSION_PATH);
+      assert.equal(cxInfos.location.path, FAKE_EXTENSION_PATH);
       assert.equal(cxInfos.version, '1.0.0');
-      assert.equal(cxInfos.update_url, FAKE_EXTENSION_UPDATE_URL);
+      assert.equal(cxInfos.updateUrl, FAKE_EXTENSION_UPDATE_URL);
     });
 
     it('records the extension as "in use" while installing', async () => {
@@ -88,8 +88,8 @@ describe('Chrome Extension Fetcher', () => {
       // Don't await, we want to check while it execs
       cxFetcher.fetch(EXTENSION_ID);
 
-      assert.ok(cxFetcher.isInUse(EXTENSION_ID));
-      assert.equal(cxFetcher.getInUse(EXTENSION_ID), 'installing');
+      assert.ok(cxFetcher.hasMutex(EXTENSION_ID));
+      assert.equal(cxFetcher.getMutex(EXTENSION_ID), 'installing');
     });
 
     it('does not execute if the extension is in use already (update/remove)', async () => {
