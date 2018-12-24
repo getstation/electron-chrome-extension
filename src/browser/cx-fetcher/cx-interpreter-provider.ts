@@ -74,7 +74,9 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
   // TODO : Improve the "any"
   // Find the extensionId related update data (a manifest can reference many different extension updates)
   private findCxUpdate(extensionId: IExtension['id'], parsedUpdates: any): any {
-    const updates = parsedUpdates.elements[0].elements;
+    // was this before : parsedUpdates.elements[0].elements;
+    const updates = this.getNested(parsedUpdates, ['elements', '0', 'elements']);
+    if (!updates) return undefined;
 
     for (const update of updates) {
       if (extensionId === update.attributes.appid) {
@@ -88,7 +90,11 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
   // Extract version from an extension update data
   private getNewVersion(cxUpdateCheck: any): IVersion {
     // TODO : Make it safer
-    const version = cxUpdateCheck.elements[0].attributes.version;
+    // was this before : cxUpdateCheck.elements[0].attributes.version;
+    const version = this.getNested(cxUpdateCheck, ['elements', '0', 'attributes', 'version']);
+    if (!version) {
+      throw new Error('No version found in the update manifest');
+    }
     return CxInterpreterProvider.parseVersion(version);
   }
 
@@ -105,6 +111,13 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
       // If none of the rules returned, then the numbers are equal, go to the next step
     }
     return false;
+  }
+
+  private getNested(nestedObj: object, pathArr: string[]) {
+    return pathArr.reduce((obj, key) =>
+      (obj && obj[key]) ? obj[key] : undefined,
+      nestedObj
+    );
   }
 }
 

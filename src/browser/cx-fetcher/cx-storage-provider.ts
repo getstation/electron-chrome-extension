@@ -1,3 +1,4 @@
+import { app } from 'electron';
 import { sync } from 'glob';
 import { join, resolve } from 'path';
 import { move, readJson } from 'fs-extra';
@@ -14,8 +15,8 @@ import {
 // Default configuration
 const defaultConfig = {
   // TODO : Default folder should be in Station "cache"
-  extensionsFolder:  { path: join(__dirname, 'extensions') },
-  sortingFolder: { path: '_sorting' },
+  extensionsFolder:  { path: join(app.getPath('userData'), 'ChromeExtensions') },
+  sortingFolder: { path: join(app.getPath('userData'), 'ChromeExtensions-cache') },
 };
 
 class CxStorageProvider implements CxStorageProviderInterface {
