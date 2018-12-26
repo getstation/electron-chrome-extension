@@ -1,7 +1,9 @@
 const glob = require('glob');
 const { join, resolve } = require('path');
 
-for (const path of glob.sync(join(__dirname, '..', 'lib-test', '**/*.js'))) {
+const rendererTests = join(__dirname, '..', 'lib', 'test', '**/*.js');
+
+for (const path of glob.sync(rendererTests)) {
   if (!path.endsWith('.main.js')) {
     require(resolve(path));
   }

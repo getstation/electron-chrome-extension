@@ -1,18 +1,37 @@
 # Electron Chrome Extension
 
-[![Build Status](https://travis-ci.com/getstation/electron-chrome-extension.svg?token=NLebjoCo6B1MogiwMcNq&branch=fix/explorations-for-revamp)](https://travis-ci.com/getstation/electron-chrome-extension)
+[![Build Status](https://travis-ci.com/getstation/electron-chrome-extension.svg?token=NLebjoCo6B1MogiwMcNq&branch=master](https://travis-ci.com/getstation/electron-chrome-extension)
 
 ## Environment
 Tested with `Electron v3.0.4` - `Node v8.9.0` - `NPM v5.5.1`
 
-## Scripts
+## Setup
+
+- **Renderer - preload**
+
+```ts
+require('electron-chrome-extension/preload');
+```
+
+*For some reasons the navigator user agent is not inherited from the session so you will need
+to redefine the user agent via the `Object.defineProperty` method after the import*
+
+- **Main**
+
+```ts
+import { addExtension } from 'electron-chrome-extension';
+
+addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
+```
+
+## Tools
 
 - Start Playground
 ```sh
 $ npm start
 ```
 
-You can tweak the playground files at your convenience and extensions would automatically downloaded.
+You can tweak the playground files at your convenience and extensions would automatically downloaded and clean app data with `$ npm run clean:playground`
 
 - Test
 ```sh
@@ -27,3 +46,9 @@ the main remains accessible for IPC calls and Electron Main API calls.
 ```sh
 $ npm publish
 ```
+
+## References
+
+- [Chrome Extensions Overview](https://developer.chrome.com/extensions/overview)
+- [Chrome Extensions API index](https://developer.chrome.com/extensions/api_index)
+- [Station Exploration](https://www.notion.so/stationhq/Chrome-Extensions-c964f683125f4a758490b60b5d8e28be)

@@ -3,6 +3,8 @@
     "outDir": "lib",
     // "declaration": true,
     "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "removeComments": false,
     "preserveConstEnums": true,
@@ -20,18 +22,25 @@
     "module": "commonjs",
     "target": "es2016",
     "baseUrl": ".",
+    "paths": {
+      "@src/*": [
+        "src/*"
+      ],
+      "@test/*": [
+        "test/*"
+      ]
+    },
     "lib": [
       "es2017",
       "dom"
     ]
   },
   "include": [
+    "types/**/*",
     "src/**/*.ts",
-    "src/**/*.js"
+    "src/**/*.js",
+    "src/**/*.json",
+    "test/**/*.ts",
+    "test/**/*.js"
   ],
-  "exclude": [
-    "node_modules",
-    "playground",
-    "test/**/*.ts"
-  ]
 }
