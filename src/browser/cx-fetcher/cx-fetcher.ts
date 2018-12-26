@@ -1,4 +1,4 @@
-import EventEmitter = require('events');
+import { EventEmitter } from 'events';
 import CxStorageProvider from './cx-storage-provider';
 import CxDownloadProvider from './cx-download-provider';
 import CxInterpreterProvider from './cx-interpreter-provider';
