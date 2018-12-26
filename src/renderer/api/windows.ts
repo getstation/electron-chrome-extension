@@ -6,12 +6,12 @@ import {
   CxWindowsApi,
   GetInfo,
   UpdateInfo,
-} from '@src/common/apis/windows';
+} from '../../common/apis/windows';
 import {
   CxApiHandler,
   Callback,
   CxApiChannels,
-} from '@src/common/apis';
+} from '../../common/apis';
 
 class ChromeWindowsAPIClient {
   WINDOW_ID_NONE: number;

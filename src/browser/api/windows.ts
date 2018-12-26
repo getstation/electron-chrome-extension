@@ -5,8 +5,8 @@ import {
   CxWindowsApi,
   GetInfo,
   UpdateInfo,
-} from '@src/common/apis/windows';
-import { CxApiChannels, CxApiHandler } from '@src/common/apis';
+} from '../../common/apis/windows';
+import { CxApiChannels, CxApiHandler } from '../../common/apis';
 const { RpcIpcManager } = require('electron-simple-rpc');
 
 class ChromeWindowsAPIHandler {

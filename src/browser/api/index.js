@@ -1,6 +1,6 @@
 const ChromeStorageAPIHandler = require('./storage');
 const ChromeWebRequestAPIHandler = require('./web-request');
-const ChromeWindowsAPIHandler = require('@src/browser/api/windows');
+const ChromeWindowsAPIHandler = require('./windows');
 
 class ChromeAPIHandler {
     constructor(extensionId) {

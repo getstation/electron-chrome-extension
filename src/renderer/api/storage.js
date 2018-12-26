@@ -5,7 +5,6 @@ const Event = require('./event');
 class ChromeStorageAreaAPIClient {
   constructor(areaName, extensionId) {
     this.rpcScope = `chrome-storage-${areaName}-${extensionId}`;
-    // this.rpcManager = new RpcIpcManager({ }, this.rpcScope);
   }
   get(keys, callback) {
     rpc(this.rpcScope, 'get')(keys)
@@ -31,10 +30,10 @@ module.exports = {
       payload => changedEvent.emit.apply(changedEvent, payload)
     )
 
-    return  {
-        sync: new ChromeStorageAreaAPIClient('sync', extensionId),
-        local: new ChromeStorageAreaAPIClient('local', extensionId),
-        onChanged: changedEvent,
-      };
+    return {
+      sync: new ChromeStorageAreaAPIClient('sync', extensionId),
+      local: new ChromeStorageAreaAPIClient('local', extensionId),
+      onChanged: changedEvent,
+    };
   }
 }

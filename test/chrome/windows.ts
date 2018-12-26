@@ -1,15 +1,13 @@
 import * as assert from 'assert';
-import { Window } from '@src/common/apis/windows';
+import { Window } from '../../src/common/apis/windows';
 
 describe('chrome.windows', () => {
   before(() => {
-    import('@src/renderer/chrome-api' as any)
-      .then(m => m.injectTo('test', false, window));
+    require('../../src/renderer/chrome-api').injectTo('test', false, window);
   });
 
   it('API Available', () => {
-    // @ts-ignore
-    const namespace = window.chrome;
+    const namespace = window.chrome.windows;
 
     assert.equal(Boolean(namespace), true);
   });
@@ -19,9 +17,17 @@ describe('chrome.windows', () => {
       url: 'google.com',
     };
 
-    // @ts-ignore
     window.chrome.windows.create(
       win,
+      (w: Window) => {
+        assert.notEqual(w.id, undefined);
+      }
+    );
+  });
+
+  it('Get Current Window', () => {
+    window.chrome.windows.getCurrent(
+      {},
       (w: Window) => {
         assert.notEqual(w.id, undefined);
       }

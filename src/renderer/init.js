@@ -2,6 +2,15 @@ const url = require('url');
 const constants = require('../common/constants');
 const isBackgroundPage = process.argv.indexOf('--electron-chrome-extension-background-page') !== -1;
 
+// Electron itself isn't responsible for navigator behavior
+// as the Electron team don't overwrite any of those APIs for now.
+// ref: https://github.com/electron/electron/issues/11290#issuecomment-362301961
+Object.defineProperty(window.navigator, 'userAgent', {
+  value: window.navigator.userAgent.replace(/Electron\/\S*\s/, ''),
+  configurable: false,
+  writable: false,
+});
+
 const { protocol, hostname } = url.parse(window.location.href);
 
 if (protocol === `${constants.EXTENSION_PROTOCOL}:`) {
@@ -18,18 +27,5 @@ if (protocol === `${constants.EXTENSION_PROTOCOL}:`) {
     delete global.global
   })
 } else {
-  // native window open workaround
-  const { ipcRenderer } = require('electron');
-
-  const { guestInstanceId, openerId } = process;
-  const hiddenPage = process.argv.includes('--hidden-page');
-  const usesNativeWindowOpen = process.argv.includes('--native-window-open');
-
-  // Any URL that shouldn't be loaded as `nativeWindowOpen` as a popup
-  // should appear here if parent window uses `nativeWindowOpen`
-  const overrideNativeWindowOpenList = [];
-
-  require('./window-setup')(window, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesNativeWindowOpen, overrideNativeWindowOpenList);
-  // end workaround
   require('./injectors/content-scripts-injector')
 }

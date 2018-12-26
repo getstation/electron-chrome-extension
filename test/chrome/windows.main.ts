@@ -1,3 +1,3 @@
-import ChromeWindowsAPIHandler from '@src/browser/api/windows';
+import ChromeWindowsAPIHandler from '../../src/browser/api/windows';
 
 new ChromeWindowsAPIHandler('test');
