@@ -4,11 +4,11 @@ const fse = require('fs-extra');
 // import { ipcRenderer } from 'electron';
 import StorageProvider from '../../src/browser/cx-fetcher/cx-storage-provider';
 import {
-  EXTENSION_VERSION,
-  TEST_EXTENSION_FOLDER,
+  EXAMPLE_EXTENSION_VERSION,
+  TEST_PATH_EXTENSIONS,
   FAKE_EXTENSION_ID,
   FAKE_DL_DESCRIPTOR,
-  FAKE_ARCHIVE_MANIFEST,
+  EXAMPLE_ARCHIVE_MANIFEST,
 } from './constants';
 
 describe('Default Storage Provider', () => {
@@ -19,38 +19,38 @@ describe('Default Storage Provider', () => {
   });
 
   it('accepts custom installation folder', () => {
-    const storager = new StorageProvider('path/to/files');
+    const storager = new StorageProvider({ extensionsFolder: { path: 'path/to/files' } });
     const expected = 'path/to/files';
-    assert.equal(storager.extensionsFolder, expected);
+    assert.equal(storager.extensionsFolder.path, expected);
   });
 
   describe('installing extension', () => {
 
     afterEach(async () => {
-      await fse.remove(TEST_EXTENSION_FOLDER);
+      await fse.remove(TEST_PATH_EXTENSIONS);
     });
 
-    it('returns a correct InstallDescriptor from a DownloadDescriptor', async () => {
-      const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
-      const installDescriptor = await storager.installExtension(FAKE_DL_DESCRIPTOR);
+    it('returns a correct IInstall from a IDownload', async () => {
+      const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
+      const actual = await storager.installExtension(FAKE_DL_DESCRIPTOR);
 
       const expected = {
-        path: path.join(TEST_EXTENSION_FOLDER, FAKE_EXTENSION_ID, EXTENSION_VERSION),
-        manifest: FAKE_ARCHIVE_MANIFEST,
+        path: path.join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION),
+        manifest: EXAMPLE_ARCHIVE_MANIFEST,
       };
 
       // Do not check the whole manifest, only the interestings parts
       // TODO : Make sure that we check the CxManifest type entirely and automaticaly
-      assert.equal(installDescriptor.path, expected.path);
-      assert.equal(installDescriptor.manifest.version, expected.manifest.version);
-      assert.equal(installDescriptor.manifest.update_url, expected.manifest.update_url);
+      assert.equal(actual.location.path, expected.path);
+      assert.equal(actual.manifest.version, expected.manifest.version);
+      assert.equal(actual.manifest.update_url, expected.manifest.update_url);
     });
 
     it('extracts files in correct folder tree', async () => {
-      const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
+      const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
 
       await storager.installExtension(FAKE_DL_DESCRIPTOR);
-      const expectedFolder = path.join(TEST_EXTENSION_FOLDER, FAKE_EXTENSION_ID, EXTENSION_VERSION);
+      const expectedFolder = path.join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION);
       const expectedManifest = path.join(expectedFolder, 'manifest.json');
 
       assert.ok(await fse.pathExists(expectedFolder), 'Folder does not exists at the expected location');
@@ -58,7 +58,7 @@ describe('Default Storage Provider', () => {
     });
 
     it('fails if the archive cannot be unzipped', async () => {
-      const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
+      const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
       storager.unzipCrx = () => Promise.reject('Cannot unzip archive');
 
       // TODO : someday, use assert.rejects (availabe in node 10)
@@ -72,11 +72,11 @@ describe('Default Storage Provider', () => {
     });
 
     it('fails if the manifest cannot be read', async () => {
-      const storager = new StorageProvider(TEST_EXTENSION_FOLDER);
+      const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
       storager.unzipCrx = () => Promise.resolve(true);
       storager.readManifest = () => Promise.reject('Cannot read manifest');
 
-      // TODO : HACK -- someday, use assert.rejects (availabe in node 10)
+      // TODO : someday, use assert.rejects (availabe in node 10)
       try {
         await storager.installExtension(FAKE_DL_DESCRIPTOR);
       } catch (err) {

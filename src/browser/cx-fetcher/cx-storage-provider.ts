@@ -1,9 +1,10 @@
-import { app } from 'electron';
+// import { app } from 'electron';
 import { sync } from 'glob';
 import { join, resolve } from 'path';
 import { move, readJson } from 'fs-extra';
 // @ts-ignore
 import unzip from 'unzip-crx';
+import Location from './Location';
 import {
   CxStorageProviderInterface,
   ICxManifest,
@@ -15,8 +16,8 @@ import {
 // Default configuration
 const defaultConfig = {
   // TODO : Default folder should be in Station "cache"
-  extensionsFolder:  { path: join(app.getPath('userData'), 'ChromeExtensions') },
-  sortingFolder: { path: join(app.getPath('userData'), 'ChromeExtensions-cache') },
+  extensionsFolder:  new Location(join(__dirname, 'ChromeExtensions')),
+  sortingFolder: new Location(join(__dirname, 'ChromeExtensions-cache')),
 };
 
 class CxStorageProvider implements CxStorageProviderInterface {
@@ -43,10 +44,10 @@ class CxStorageProvider implements CxStorageProviderInterface {
     // Extract temporarily in a sub temporary folder
     // TODO : Improve how is created the temporary folder
     const tempDestination = resolve(this.extensionsFolder.path, this.sortingFolder.path, crxDownload.id);
-    await this.unzipCrx(crxDownload.location, { path: tempDestination });
+    await this.unzipCrx(crxDownload.location, new Location(tempDestination));
 
     // Find version in manifest and create a new destination subfolder
-    const manifest = await this.readManifest({ path: join(tempDestination, 'manifest.json') });
+    const manifest = await this.readManifest(new Location(join(tempDestination, 'manifest.json')));
     const versionDestination = resolve(this.extensionsFolder.path, crxDownload.id, manifest.version);
 
     // TODO : check if the destination already exists and fall back (with cleanup)
@@ -56,9 +57,7 @@ class CxStorageProvider implements CxStorageProviderInterface {
     // Return Installation Infos
     return {
       id: crxDownload.id,
-      location: {
-        path: versionDestination,
-      },
+      location: new Location(versionDestination),
       manifest,
     };
   }
@@ -77,13 +76,11 @@ class CxStorageProvider implements CxStorageProviderInterface {
         installedCxInfos.set(extensionId, new Map());
       }
 
-      const manifest = await this.readManifest({ path: manifestPath });
+      const manifest = await this.readManifest(new Location(manifestPath));
       // TODO : This is a bit ugly ?
       installedCxInfos.get(extensionId).set(version, {
         id: extensionId,
-        location: {
-          path: manifestPath.slice(0, -14),
-        },
+        location: new Location(manifestPath.slice(0, -14)),
         manifest,
       });
     }

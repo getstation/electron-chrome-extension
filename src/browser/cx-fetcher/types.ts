@@ -1,3 +1,19 @@
+export enum MutexStatus {
+  Installing = 'installing',
+  Updating = 'updating',
+}
+
+export enum CxStatus {
+  Installed = 'chrome-extension-installed',
+  Updated = 'chrome-extension-updated',
+  Removed = 'chrome-extension-removed',
+  Discovered = 'chrome-extension-discoverd',
+}
+
+/**
+ * TRANSITIONING DATA
+ */
+
 export interface IExtension {
   id: string;
   version: IVersion;
@@ -31,16 +47,15 @@ export interface IUpdate {
 
 export interface ICxManifest {
   version: string;
-  updateUrl: string;
-}
-
-export interface IInstalledExtensions {
-
+  update_url: string;
 }
 
 /**
  *  STORAGE PROVIDER
  */
+
+export type InstalledExtensions = Map<IExtension['id'], InstalledVersions>;
+export type InstalledVersions = Map<IVersion['number'], IInstall>;
 
 export interface CxStorageProviderConfig {
   extensionsFolder: ILocation,
@@ -54,7 +69,7 @@ export interface CxStorageProviderInterface {
 
   // Methods
   installExtension(crxDownload: IDownload): Promise<IInstall>;
-  getInstalledExtension(): Promise<Map<IExtension['id'], Map<string, IInstall>>>;
+  getInstalledExtension(): Promise<InstalledExtensions>;
   readManifest(cxFolderPath: ILocation): Promise<ICxManifest>;
   unzipCrx(crxPath: ILocation, destination: ILocation): Promise<boolean>
 }

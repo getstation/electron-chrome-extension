@@ -1,24 +1,25 @@
+import CxInterpreterProvider from '../../src/browser/cx-fetcher/cx-interpreter-provider';
+
 /* tslint:disable */
 const path = require('path');
 
-// Fake Extension Info
-export const FAKE_EXTENSION_ID = 'axyz';
-export const FAKE_EXTENSION_UPDATE_URL = 'https://unknown.destination.lost';
-export const FAKE_EXTENSION_PATH = 'test/to/extension/files';
-
-// Asset archive info
-// @ts-ignore
-export const EXTENSION_ID = 'dheionainndbbpoacpnopgmnihkcmnkl';
-export const EXTENSION_VERSION = '8.4.2';
-
 // Paths
-export const TEST_ASSETS = path.join(__dirname, '..', 'assets');
-export const TEST_ARCHIVE_PATH = path.join(TEST_ASSETS, 'archives', 'dheionainndbbpoacpnopgmnihkcmnkl.crx');
-export const TEST_EXTENSION_FOLDER = path.join(TEST_ASSETS, 'extensions');
-export const TEST_INSTALLED_FOLDER = path.join(TEST_ASSETS, 'installed');
+export const TEST_PATH_ASSETS = path.join(__dirname, '..', 'assets');
+export const TEST_PATH_ARCHIVE = path.join(TEST_PATH_ASSETS, 'archives', 'dheionainndbbpoacpnopgmnihkcmnkl.crx');
+export const TEST_PATH_EXTENSIONS = path.join(TEST_PATH_ASSETS, 'extensions');
+export const TEST_PATH_INSTALLED = path.join(TEST_PATH_ASSETS, 'installed');
 
-// Fake content
-export const FAKE_ARCHIVE_MANIFEST = {
+/**
+ * GMELIUS EXAMPLE DATA
+ */
+
+// @ts-ignore
+export const EXAMPLE_EXTENSION_ID = 'dheionainndbbpoacpnopgmnihkcmnkl';
+export const EXAMPLE_EXTENSION_VERSION = {
+  number: '8.4.2',
+  parsed: [8, 4, 2],
+};
+export const EXAMPLE_ARCHIVE_MANIFEST = {
 "update_url": "https://clients2.google.com/service/update2/crx",
 
   "name": "__MSG_extName__",
@@ -85,6 +86,15 @@ export const FAKE_ARCHIVE_MANIFEST = {
   "options_page": "html/dashboard.html"
 };  
 
+/**
+ * FAKE EXTENSION CONTENT
+ */
+
+ // Fake Extension Info
+export const FAKE_EXTENSION_ID = 'axyz';
+export const FAKE_EXTENSION_UPDATE_URL = 'https://unknown.destination.lost';
+export const FAKE_EXTENSION_PATH = 'test/to/extension/files';
+
 export const FAKE_UPDATE_XML = `
 <?xml version='1.0' encoding='UTF-8'?>
 <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
@@ -94,19 +104,34 @@ export const FAKE_UPDATE_XML = `
 </gupdate>
 `;
 
-// Fake inter module data
+/**
+ * FAKE INTER MODULE DATA
+ */
+
 export const FAKE_DL_DESCRIPTOR = {
-  path: TEST_ARCHIVE_PATH,
+  id: FAKE_EXTENSION_ID,
+  location: {
+    path: TEST_PATH_ARCHIVE,
+  }
 };
 
 export const FAKE_CX_INFOS = {
-  version: '1.0.0',
+  id: FAKE_EXTENSION_ID,
+  version: {
+    number: '1.0.0',
+    parsed: [1, 0, 0],
+  },
   updateUrl: FAKE_EXTENSION_UPDATE_URL,
-  path: FAKE_EXTENSION_PATH,
+  location: {
+    path: FAKE_EXTENSION_PATH,
+  }
 };
 
 export const FAKE_INSTALL_DESCRIPTOR = {
-  path: FAKE_EXTENSION_PATH,
+  id: FAKE_EXTENSION_ID,
+  location: {
+    path: FAKE_EXTENSION_PATH,
+  },
   manifest: {
     version: '0.0.1',
     update_url: FAKE_EXTENSION_UPDATE_URL,
@@ -117,4 +142,15 @@ export const FAKE_UPDATE_DESCRIPTOR = {
   xml: FAKE_UPDATE_XML,
 };
 
-export const FAKE_VERSION_ARRAY = ['1.0.0', '2.0', '1.0.3.1', '0.9.9.0'];
+export const FAKE_VERSION_ARRAY = [
+  CxInterpreterProvider.parseVersion('1.0.0'),
+  CxInterpreterProvider.parseVersion('2.0'),
+  CxInterpreterProvider.parseVersion('1.0.3.1'),
+  CxInterpreterProvider.parseVersion('0.9.9.0'),
+];
+
+export const FAKE_VERSION_INVALID_ARRAY = [
+  CxInterpreterProvider.parseVersion('azz'),
+  CxInterpreterProvider.parseVersion('buioo'),
+  CxInterpreterProvider.parseVersion('boom'),
+];

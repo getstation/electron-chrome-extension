@@ -24,7 +24,7 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
       id,
       location,
       manifest: {
-        updateUrl,
+        update_url,
         version,
       },
     } = installedCx;
@@ -34,7 +34,7 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
       id,
       location,
       version: parsedVersion,
-      updateUrl,
+      updateUrl: update_url,
     };
   }
 
@@ -89,7 +89,6 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
 
   // Extract version from an extension update data
   private getNewVersion(cxUpdateCheck: any): IVersion {
-    // TODO : Make it safer
     // was this before : cxUpdateCheck.elements[0].attributes.version;
     const version = this.getNested(cxUpdateCheck, ['elements', '0', 'attributes', 'version']);
     if (!version) {
@@ -105,9 +104,10 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
     // Compare each digit of the version
     for (let i = 0; i < x.length; i = i + 1) {
       // The order of the rules is important
-      if (!y[i]) return false;        // If B[i] has no value when A[i] has at least one, A is higher
-      if (x[i] < y[i]) return false;  // If A[i] is lower than B[i], then A is not higher
-      if (x[i] > y[i]) return true;   // If A[i] is higher than B[i], then A is higher
+      if (isNaN(x[i])) return false;        // If A[i] is not a number, then A cannot be higher or whatever
+      if (y[i] === undefined) return true;  // If B[i] has no value when A[i] has one, A is higher
+      if (x[i] < y[i]) return false;        // If A[i] is lower than B[i], then A is not higher
+      if (x[i] > y[i]) return true;         // If A[i] is higher than B[i], then A is higher
       // If none of the rules returned, then the numbers are equal, go to the next step
     }
     return false;

@@ -2,11 +2,11 @@ import assert = require('assert');
 // import { ipcRenderer } from 'electron';
 import InterpreterProvider from '../../src/browser/cx-fetcher/cx-interpreter-provider';
 import {
-  FAKE_EXTENSION_ID,
   FAKE_CX_INFOS,
   FAKE_INSTALL_DESCRIPTOR,
   FAKE_UPDATE_DESCRIPTOR,
   FAKE_VERSION_ARRAY,
+  FAKE_VERSION_INVALID_ARRAY,
 } from './constants';
 
 describe('Default Interpreter Provider', () => {
@@ -25,7 +25,7 @@ describe('Default Interpreter Provider', () => {
     it('is true when update version is higher than the current', () => {
       const interpreter = new InterpreterProvider();
       // Represents the current version (the fake update version is 1.2.0)
-      FAKE_CX_INFOS.version = '1.0.0.0';
+      FAKE_CX_INFOS.version = { number: '1.0.0.0', parsed: [1, 0, 0, 0] };
       const actual = interpreter.shouldUpdate(FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 
       assert.equal(actual, true);
@@ -34,7 +34,7 @@ describe('Default Interpreter Provider', () => {
     it('is false when both versions are equal', () => {
       const interpreter = new InterpreterProvider();
       // Represents the current version (the fake update version is 1.2.0)
-      FAKE_CX_INFOS.version = '1.2.0';
+      FAKE_CX_INFOS.version = { number: '1.2.0', parsed: [1, 2, 0] };
       const actual = interpreter.shouldUpdate(FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 
       assert.equal(actual, false);
@@ -43,7 +43,7 @@ describe('Default Interpreter Provider', () => {
     it('is false when the update version is lower than the current', () => {
       const interpreter = new InterpreterProvider();
       // Represents the current version (the fake update version is 1.2.0)
-      FAKE_CX_INFOS.version = '10.2.0';
+      FAKE_CX_INFOS.version = { number: '10.2.0', parsed: [10, 2, 0] };
       const actual = interpreter.shouldUpdate(FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 
       assert.equal(actual, false);
@@ -55,7 +55,7 @@ describe('Default Interpreter Provider', () => {
       const interpreter = new InterpreterProvider();
       const highest = interpreter.sortLastVersion(FAKE_VERSION_ARRAY);
 
-      assert.equal(highest, '2.0');
+      assert.equal(highest.number, '2.0');
     });
 
     it('throw an error if array is empty', () => {
@@ -63,16 +63,16 @@ describe('Default Interpreter Provider', () => {
       assert.throws(
         () => { interpreter.sortLastVersion([]); },
         /No versions could be read and found/,
-        'Sort should fail if an empty array is given'
+        'Should fail if an empty array is given'
       );
     });
 
     it('throw an error if no valid values', () => {
       const interpreter = new InterpreterProvider();
       assert.throws(
-        () => { interpreter.sortLastVersion(['azz', 'buioo', 'boom']); },
+        () => { interpreter.sortLastVersion(FAKE_VERSION_INVALID_ARRAY); },
         /No versions could be read and found/,
-        'Sort should fail if no valid versions have been given'
+        'Should fail if no valid versions have been given'
       );
     });
   });

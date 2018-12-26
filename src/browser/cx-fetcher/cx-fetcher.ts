@@ -9,10 +9,12 @@ import {
   CxStorageProviderInterface,
   CxInterpreterProviderInterface,
   IExtension,
+  MutexStatus,
+  CxStatus,
 } from './types';
 
 // Default config for CxFetcher
-const DEFAULT_CONFIG: CxFetcherConfig = {
+const defaultConfig: CxFetcherConfig = {
   cxDownloader: new CxDownloadProvider(),
   cxStorager: new CxStorageProvider(),
   cxInterpreter: new CxInterpreterProvider(),
@@ -27,7 +29,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   public cxDownloader: CxDownloadProviderInterface;
   public cxInterpreter: CxInterpreterProviderInterface;
   // Maps of what's happening with Chrome extensions
-  private mutex: Map<IExtension['id'], string>; // TODO : Use an enum there
+  private mutex: Map<IExtension['id'], MutexStatus>;
   private available: Map<IExtension['id'], IExtension>;
   // Auto update related
   private autoUpdateLoop: NodeJS.Timer;
@@ -44,7 +46,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     super();
 
     // Merge custom options with default options
-    const configuration = { ...DEFAULT_CONFIG, ...customConfiguration };
+    const configuration = { ...defaultConfig, ...customConfiguration };
 
     // Registrer the downloader and storage handler
     const {
@@ -116,7 +118,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     // TODO : React to errors
 
     // Record theat extension is being toyed with already
-    this.mutex.set(extensionId, 'installing');
+    this.mutex.set(extensionId, MutexStatus.Installing);
 
     // Start downloading -> unzipping -> cleaning
     const archiveCrx = await this.cxDownloader.downloadById(extensionId);
@@ -127,9 +129,9 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     const fetchedCx = this.cxInterpreter.interpret(installedCx);
 
     // Clear status, add to installed and emit ready event for this cx
-    // TODO : emit an event
     this.mutex.delete(extensionId);
     this.saveCx(fetchedCx);
+    this.emit(CxStatus.Installed, fetchedCx);
 
     return fetchedCx;
   }
@@ -137,7 +139,14 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
   // Check if an update is available for a Chrome extension and install it if there is
   async update(extensionId: IExtension['id']) {
     const shouldUpdate = await this.checkForUpdate(extensionId);
-    return (shouldUpdate) ? await this.fetch(extensionId) : false;
+
+    if (shouldUpdate) {
+      const updatedCx = await this.fetch(extensionId);
+      this.emit(CxStatus.Updated, updatedCx);
+      return updatedCx;
+    }
+
+    return false;
   }
 
   // Check if a Chrome extension has an update
@@ -169,10 +178,9 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
       if (cxInstall) {
         const cxInfo = this.cxInterpreter.interpret(cxInstall);
         this.available.set(key, cxInfo);
+        this.emit(CxStatus.Discovered, cxInfo);
       }
     }
-
-    // TODO : emit event for each chrome extension
   }
 
   // Auto update all installed extensions
@@ -183,7 +191,7 @@ class CxFetcher extends EventEmitter implements CxFetcherInterface {
     }
 
     const updatesResult = await Promise.all(updates);
-    return updatesResult.filter((value) => value);
+    return updatesResult.filter(Boolean);
   }
 
   stopAutoUpdate() {
