@@ -3,6 +3,8 @@
     "outDir": "lib",
     // "declaration": true,
     "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "removeComments": false,
     "preserveConstEnums": true,
@@ -34,8 +36,10 @@
     ]
   },
   "include": [
+    "types/**/*",
     "src/**/*.ts",
     "src/**/*.js",
+    "src/**/*.json",
     "test/**/*.ts",
     "test/**/*.js"
   ],
