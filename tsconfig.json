@@ -20,6 +20,17 @@
     "module": "commonjs",
     "target": "es2016",
     "baseUrl": ".",
+    "paths": {
+      "@src/*": [
+        "src/*"
+      ],
+      "@lib/*": [
+        "lib/*"
+      ],
+      "@test/*": [
+        "test/*"
+      ]
+    },
     "lib": [
       "es2017",
       "dom"
@@ -32,6 +43,5 @@
   "exclude": [
     "node_modules",
     "playground",
-    "test/**/*.ts"
   ]
 }

@@ -1,4 +1,4 @@
-const {ipcRenderer} = require('electron');
+const { ipcRenderer } = require('electron');
 
 const constants = require('../common/constants');
 const Event = require('./api/event');
@@ -27,6 +27,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   chrome.i18n = require('./api/i18n').setup(extensionId);
   chrome.webNavigation = require('./api/web-navigation').setup();
   chrome.omnibox = require('./api/omnibox').setup(extensionId);
+  chrome.windows = require('./api/windows').setup(extensionId);
 
   chrome.extension = {
     getURL: (...args) => chrome.runtime.getURL(...args),
@@ -39,15 +40,15 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   };
 
   chrome.contextMenus = {
-    create: function() { return {}},
-    update: function() { return {}},
-    remove: function() { return {}},
-    removeAll: function() { return {}},
+    create: function () { return {} },
+    update: function () { return {} },
+    remove: function () { return {} },
+    removeAll: function () { return {} },
     onClicked: new Event()
   };
 
   chrome.tabs = {
-    executeScript (tabId, details, callback) {
+    executeScript(tabId, details, callback) {
       const requestId = ++nextId;
       ipcRenderer.once(`${constants.TABS_EXECUTESCRIPT_RESULT_}${requestId}`, (event, result) => {
         callback([event.result]);
@@ -55,7 +56,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
       ipcRenderer.send(constants.TABS_EXECUTESCRIPT, requestId, tabId, extensionId, details)
     },
 
-    sendMessage (tabId, message, options, responseCallback) {
+    sendMessage(tabId, message, options, responseCallback) {
       if (responseCallback) {
         ipcRenderer.on(`${constants.TABS_SEND_MESSAGE_RESULT_}${chrome.runtime.originResultID}`, (event, result) => responseCallback(result));
       }
@@ -63,7 +64,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
       chrome.runtime.incrementOriginResultID()
     },
 
-    query () {},
+    query() { },
     onUpdated: new Event(),
     onCreated: new Event(),
     onRemoved: new Event(),
@@ -71,13 +72,13 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   };
 
   chrome.pageAction = {
-    show () {},
-    hide () {},
-    setTitle () {},
-    getTitle () {},
-    setIcon () {},
-    setPopup () {},
-    getPopup () {}
+    show() { },
+    hide() { },
+    setTitle() { },
+    getTitle() { },
+    setIcon() { },
+    setPopup() { },
+    getPopup() { }
   };
 
   ipcRenderer.on(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, (event, tabId, portId, connectInfo) => {
