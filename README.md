@@ -5,6 +5,25 @@
 ## Environment
 Tested with `Electron v3.0.4` - `Node v8.9.0` - `NPM v5.5.1`
 
+## Setup
+
+- **Renderer - preload**
+
+```ts
+require('electron-chrome-extension/preload');
+```
+
+*For some reasons the navigator user agent is not inherited from the session so you will need
+to redefine the user agent via the `Object.defineProperty` method after the import*
+
+- **Main**
+
+```ts
+import { addExtension } from 'electron-chrome-extension';
+
+addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
+```
+
 ## Tools
 
 - Start Playground
