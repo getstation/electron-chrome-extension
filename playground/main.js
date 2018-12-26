@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const { join } = require('path');
 const { format } = require('url');
 
-const { addExtension } = require('../index');
+const { addExtension } = require('../lib/src/browser/chrome-extension.js');
 
 let mainWindow;
 
@@ -14,8 +14,6 @@ function createWindow() {
     protocol: 'file:',
     slashes: true,
   }));
-
-  // mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', () => mainWindow = null)
 }

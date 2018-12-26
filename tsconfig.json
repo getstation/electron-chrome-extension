@@ -27,11 +27,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.js"
+    "src/**/*.js",
+    "test/**/*.ts",
+    "test/**/*.js"
   ],
-  "exclude": [
-    "node_modules",
-    "playground",
-    "test/**/*.ts"
-  ]
 }

@@ -5,7 +5,7 @@
 ## Environment
 Tested with `Electron v3.0.4` - `Node v8.9.0` - `NPM v5.5.1`
 
-## Scripts
+## Tools
 
 - Start Playground
 ```sh
@@ -27,3 +27,9 @@ the main remains accessible for IPC calls and Electron Main API calls.
 ```sh
 $ npm publish
 ```
+
+## References
+
+- [Chrome Extensions Overview]()
+- [Chrome Extensions API index]()
+- [Station Exploration]()

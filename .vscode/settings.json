@@ -1,7 +1,6 @@
 {
   "files.exclude": {
     "node_modules": true,
-    "lib": true,
-    "lib-test": true,
+    // "lib": true,
   }
 }
