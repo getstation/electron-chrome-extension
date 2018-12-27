@@ -2,6 +2,8 @@ const url = require('url');
 const constants = require('../common/constants');
 const isBackgroundPage = process.argv.indexOf('--electron-chrome-extension-background-page') !== -1;
 
+// Mixmax detect the navigator user agent for his own desktop app
+// and add a behvior that is not compliant with our mechanism.
 // Electron itself isn't responsible for navigator behavior
 // as the Electron team don't overwrite any of those APIs for now.
 // ref: https://github.com/electron/electron/issues/11290#issuecomment-362301961

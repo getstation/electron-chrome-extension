@@ -1,3 +1,6 @@
-interface Window {
-  chrome: any,
+// @ts-ignore
+declare global {
+  interface Window {
+    chrome: any,
+  }
 }
