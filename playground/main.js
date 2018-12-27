@@ -26,6 +26,7 @@ app.on('ready', async () => {
 
   const cxFetcher = new CxFetcher.default();
   
+  await cxFetcher.fetch('dheionainndbbpoacpnopgmnihkcmnkl');
   await cxFetcher.scanInstalledExtensions();
   console.log('AVAILABLE : ', cxFetcher.availableCx());
   const gmelius = cxFetcher.getCx('dheionainndbbpoacpnopgmnihkcmnkl');
