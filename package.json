@@ -5,7 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "prestart": "tsc -p .",
+    "prestart": "rm -rf ./lib/ && tsc -p .",
     "start": "concurrently -k -r -s first \"npm:start:*\"",
     "start:watch": "tsc -p . -w",
     "start:runner": "electron playground/main.js",
