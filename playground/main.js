@@ -25,10 +25,23 @@ app.on('ready', async () => {
   require('electron-process-manager').openProcessManager();
 
   const cxFetcher = new CxFetcher.default();
-  const gmelius = await cxFetcher.fetch('dheionainndbbpoacpnopgmnihkcmnkl');
-  const mixmax = await cxFetcher.fetch('ocpljaamllnldhepankaeljmeeeghnid');
+  
+  await cxFetcher.scanInstalledExtensions();
+  console.log('AVAILABLE : ', cxFetcher.availableCx());
+  const gmelius = cxFetcher.getCx('dheionainndbbpoacpnopgmnihkcmnkl');
   addExtension(gmelius.id, gmelius.location.path);
-  addExtension(mixmax.id, mixmax.location.path);
+
+  // Check for update
+  const update = await cxFetcher.checkForUpdate(gmelius.id);
+  console.log('CHECK UPDATE (gmelius) : ', update);
+
+  // Try an update anyway
+  const didUpdate = await cxFetcher.update(gmelius.id);
+  console.log('DID UPDATE (gmelius) : ', didUpdate);
+
+  // Auto Update loop
+  const wasUpdated = await cxFetcher.autoUpdate();
+  console.log('AUTO UPDATE (all) : ', wasUpdated);
 });
 
 app.on('window-all-closed', () => {

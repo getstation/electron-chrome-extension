@@ -1,6 +1,6 @@
 // @ts-ignore
 import { downloadById } from 'download-crx';
-// import fetch from 'electron-fetch';
+import fetch from 'electron-fetch';
 import { dir, DirectoryResult } from 'tmp-promise';
 import Location from './Location';
 import {
@@ -34,17 +34,12 @@ class CxDownloadProvider implements CxDownloadProviderInterface {
   }
 
   async getUpdateInfo(extension: IExtension) {
-    console.log(`Fetching ${extension.updateUrl}`);
-    // const res = await fetch(extension.updateUrl, );
-    // console.log('res : ', res);
+    const response = await fetch(extension.updateUrl);
+    if (!response.ok) {
+      throw new Error(`Http Status not ok: ${response.status} ${response.statusText}`);
+    }
 
-    // if (!res.ok) {
-    //   // @ts-ignore
-    //   throw new Error(`Http Status not ok: ${res.httpStatus}`);
-    // }
-
-    // const xml = await res.text();
-    const xml = 'test';
+    const xml = await response.text();
     return {
       xml,
     };
