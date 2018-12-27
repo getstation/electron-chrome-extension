@@ -36,6 +36,9 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Build directory
+lib/
+
 # Typescript v1 declaration files
 typings/
 
@@ -57,10 +60,5 @@ typings/
 # dotenv environment variables file
 .env
 
-# IDEs
-.idea
-
-example/extensions
-!example/extensions/dummy-extension
-
-/.idea
+# Project
+playground/extensions

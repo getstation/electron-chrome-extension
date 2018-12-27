@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Electron Chrome Extensions Playground</title>
+</head>
+
+<body>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    webview {
+      height: 100vh;
+      width: 100vw;
+    }
+  </style>
+
+  <div class="container">
+    <webview allowPopups webpreferences="nativeWindowOpen=yes" preload='../lib/src/renderer/init.js' src="https://mail.google.com/">
+    </webview>
+  </div>
+</body>
+
+</html>

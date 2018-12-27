@@ -1,37 +1,54 @@
-### Revive basic support
-- [x] implement API to load extension
-- [x] rename all IPC call
-- [x] Replace preference manager
-- [x] reimplement the proptocol buffer handler
+# Electron Chrome Extension
 
-### Add corrections
-- [x] remove peristence
-- [x] content_scrips support: support CSS
-- [x] content_scrips support: fix matches rules implementation	
-- [x] content_scrips support: run JS scripts in same context
-- [x] Fix insecure content error for resources load via chrome-extension: (not needed if https://github.com/electron/electron/pull/9950/ gets merged)
-- [x] content_scrips support: fix chrome.storage to access extension data independently of host page's doamain
-- [x] Fix page's URL used to test against content_scripts[].matches
-- [x] Add support for chrome.runtime.getManifest()
-- [x] content_scripts: support `exclude_matches`
-- [x] implement `chrome.storage.onChanged.addListener`
-- [ ] support manifest `permissions` hosts (requires https://github.com/electron/electron/issues/10180)
-- [ ] implement `chrome.tabs.query`
-- [ ] implement `chrome.notifications`
-- [ ] implement `chrome.webRequest`
+[![Build Status](https://travis-ci.com/getstation/electron-chrome-extension.svg?token=NLebjoCo6B1MogiwMcNq&branch=master](https://travis-ci.com/getstation/electron-chrome-extension)
 
-### Dummy-implemented API
-- [x] `chrome.tabs.query`
-- [x] `chrome.browserAction` (no real sense in context of electron)
-- [x] `chrome.notifications`
-- [x] `chrome.webRequest`
-- [ ] `chrome.windows`
+## Environment
+Tested with `Electron v3.0.4` - `Node v8.9.0` - `NPM v5.5.1`
 
-### Extenions supported
+## Setup
 
-See [issues](https://github.com/getstation/electron-chrome-extension/issues?utf8=%E2%9C%93&q=label%3A%22Extension+Support%22+) to get lists and details.
+- **Renderer - preload**
 
-### Notets
-#### Use isoalated script injection
-- check `ScriptInjection::InjectJs` in `extensions/renderer/script_injection.cc`
-- use `inIsolatedWorld` related method from [`blink::webFrame`](https://chromium.googlesource.com/chromium/blink-public/+/master/web/WebLocalFrame.h)
+```ts
+require('electron-chrome-extension/preload');
+```
+
+*For some reasons the navigator user agent is not inherited from the session so you will need
+to redefine the user agent via the `Object.defineProperty` method after the import*
+
+- **Main**
+
+```ts
+import { addExtension } from 'electron-chrome-extension';
+
+addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
+```
+
+## Tools
+
+- Start Playground
+```sh
+$ npm start
+```
+
+You can tweak the playground files at your convenience and extensions would automatically downloaded and clean app data with `$ npm run clean:playground`
+
+- Test
+```sh
+$ npm test
+```
+
+We use [electron-mocha](https://github.com/jprichardson/electron-mocha) for run our test suit.
+Warning (because not explained in the lib): test assertions lives in the renderer,
+the main remains accessible for IPC calls and Electron Main API calls.
+
+- Publish
+```sh
+$ npm publish
+```
+
+## References
+
+- [Chrome Extensions Overview](https://developer.chrome.com/extensions/overview)
+- [Chrome Extensions API index](https://developer.chrome.com/extensions/api_index)
+- [Station Exploration](https://www.notion.so/stationhq/Chrome-Extensions-c964f683125f4a758490b60b5d8e28be)
