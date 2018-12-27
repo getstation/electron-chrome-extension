@@ -3,6 +3,7 @@ const { join } = require('path');
 const { format } = require('url');
 
 const { addExtension } = require('../lib/src/browser/chrome-extension.js');
+const CxFetcher = require('../lib/src/browser/cx-fetcher/cx-fetcher.js');
 
 let mainWindow;
 
@@ -18,11 +19,16 @@ function createWindow() {
   mainWindow.on('closed', () => mainWindow = null)
 }
 
-app.on('ready', () => {
+app.on('ready', async () => {
   createWindow();
 
   require('electron-process-manager').openProcessManager();
-  addExtension(join(__dirname, './extensions/gmelius'))
+
+  const cxFetcher = new CxFetcher.default();
+  const gmelius = await cxFetcher.fetch('dheionainndbbpoacpnopgmnihkcmnkl');
+  const mixmax = await cxFetcher.fetch('ocpljaamllnldhepankaeljmeeeghnid');
+  addExtension(gmelius.id, gmelius.location.path);
+  addExtension(mixmax.id, mixmax.location.path);
 });
 
 app.on('window-all-closed', () => {

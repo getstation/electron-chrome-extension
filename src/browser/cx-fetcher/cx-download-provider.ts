@@ -2,7 +2,6 @@
 import { downloadById } from 'download-crx';
 // import fetch from 'electron-fetch';
 import { dir, DirectoryResult } from 'tmp-promise';
-import { remove } from 'fs-extra';
 import Location from './Location';
 import {
   CxDownloadProviderInterface,
@@ -18,7 +17,7 @@ class CxDownloadProvider implements CxDownloadProviderInterface {
   }
 
   async downloadById(extensionId: IExtension['id']) {
-    const tempDir = await dir();
+    const tempDir = await dir({ prefix: 'ecx-', unsafeCleanup: true });
     this.downloads.set(extensionId, tempDir);
     const path = await downloadById(extensionId, tempDir.path, extensionId);
     return {
@@ -29,9 +28,8 @@ class CxDownloadProvider implements CxDownloadProviderInterface {
 
   async cleanupById(extensionId: IExtension['id']) {
     const tmpDir = this.downloads.get(extensionId);
-    console.log('tmpDir : ', tmpDir);
     if (tmpDir) {
-      await remove(tmpDir.path);
+      await tmpDir.cleanup();
     }
   }
 

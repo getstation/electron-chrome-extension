@@ -1,7 +1,7 @@
-// import { app } from 'electron';
+import { app } from 'electron';
 import { sync } from 'glob';
 import { join, resolve } from 'path';
-import { move, readJson } from 'fs-extra';
+import { move, readJson, ensureDir } from 'fs-extra';
 // @ts-ignore
 import unzip from 'unzip-crx';
 import Location from './Location';
@@ -16,13 +16,13 @@ import {
 // Default configuration
 const defaultConfig = {
   // TODO : Default folder should be in Station "cache"
-  extensionsFolder:  new Location(join(__dirname, 'ChromeExtensions')),
-  sortingFolder: new Location(join(__dirname, 'ChromeExtensions-cache')),
+  extensionsFolder:  new Location(join(app.getPath('userData'), 'ChromeExtensions')),
+  cacheFolder: new Location(join(app.getPath('userData'), 'ChromeExtensions-cache')),
 };
 
 class CxStorageProvider implements CxStorageProviderInterface {
   public extensionsFolder: ILocation;
-  public sortingFolder: ILocation;
+  public cacheFolder: ILocation;
 
   // Constructor ! (@captainObvious)
   constructor(customConfiguration: Partial<CxStorageProviderConfig> = {}) {
@@ -30,7 +30,7 @@ class CxStorageProvider implements CxStorageProviderInterface {
     const configuration = { ...defaultConfig, ...customConfiguration };
 
     this.extensionsFolder = configuration.extensionsFolder;
-    this.sortingFolder = configuration.sortingFolder;
+    this.cacheFolder = configuration.cacheFolder;
   }
 
   /**
@@ -39,20 +39,20 @@ class CxStorageProvider implements CxStorageProviderInterface {
    * @param crxPath       Path of the CRX archive, as a string
    */
   async installExtension(crxDownload: IDownload) {
-    // TODO : ensureDir at some point
-
     // Extract temporarily in a sub temporary folder
     // TODO : Improve how is created the temporary folder
-    const tempDestination = resolve(this.extensionsFolder.path, this.sortingFolder.path, crxDownload.id);
+    const tempDestination = resolve(this.extensionsFolder.path, this.cacheFolder.path, crxDownload.id);
+    await ensureDir(tempDestination);
     await this.unzipCrx(crxDownload.location, new Location(tempDestination));
 
     // Find version in manifest and create a new destination subfolder
     const manifest = await this.readManifest(new Location(join(tempDestination, 'manifest.json')));
     const versionDestination = resolve(this.extensionsFolder.path, crxDownload.id, manifest.version);
+    await ensureDir(versionDestination);
 
-    // TODO : check if the destination already exists and fall back (with cleanup)
+    // TODO : overwrite the destination for now, maybe check instead if the destination already exists and fall back (with cleanup)
     // Move the extracted file to the final versionned folder
-    await move(tempDestination, versionDestination);
+    await move(tempDestination, versionDestination, { overwrite: true });
 
     // Return Installation Infos
     return {
@@ -97,7 +97,7 @@ class CxStorageProvider implements CxStorageProviderInterface {
   // Unzip archive to the given path
   async unzipCrx(crxPath: ILocation, destination: ILocation): Promise<boolean> {
     try {
-      await unzip(crxPath, destination);
+      await unzip(crxPath.path, destination.path);
       return true;
     } catch (err) {
       return false;

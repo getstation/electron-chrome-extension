@@ -59,13 +59,13 @@ export type InstalledVersions = Map<IVersion['number'], IInstall>;
 
 export interface CxStorageProviderConfig {
   extensionsFolder: ILocation,
-  sortingFolder: ILocation,
+  cacheFolder: ILocation,
 }
 
 export interface CxStorageProviderInterface {
   // Parameters
   extensionsFolder: ILocation;
-  sortingFolder: ILocation;
+  cacheFolder: ILocation;
 
   // Methods
   installExtension(crxDownload: IDownload): Promise<IInstall>;

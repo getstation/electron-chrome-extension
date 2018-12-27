@@ -30,16 +30,14 @@ const isWindowOrWebView = function (webContents) {
 }
 
 // Create or get manifest object from |srcDirectory|.
-const getManifestFromPath = function (srcDirectory) {
+const getManifestFromPath = function (chromeStoreExtensionId, srcDirectory) {
   let manifest
   let manifestContent
-  let chromeStoreExtensionId
 
   try {
     manifestContent = fs.readFileSync(path.join(srcDirectory, 'manifest.json'))
-    chromeStoreExtensionId = fs.readFileSync(path.join(srcDirectory, 'chromeStoreExtensionId'))
   } catch (readError) {
-    console.warn(`Reading ${path.join(srcDirectory, 'manifest.json')} or ${path.join(srcDirectory, 'chromeStoreExtensionId')} failed.`)
+    console.warn(`Reading ${path.join(srcDirectory, 'manifest.json')} failed.`)
     console.warn(readError.stack || readError)
     throw readError
   }
@@ -56,7 +54,7 @@ const getManifestFromPath = function (srcDirectory) {
     manifestMap[extensionId] = manifestNameMap[manifest.name] = manifestWSMap[chromeStoreExtensionId] = manifest
     Object.assign(manifest, {
       srcDirectory: srcDirectory,
-      chromeStoreExtensionId: chromeStoreExtensionId.toString(),
+      chromeStoreExtensionId,
       extensionId: extensionId,
       // We can not use 'file://' directly because all resources in the extension
       // will be treated as relative to the root in Chrome.
@@ -390,8 +388,8 @@ app.on('session-created', function (ses) {
 
 module.exports = {
   // The public API to add/remove extensions.
-  addExtension: function (srcDirectory) {
-    const manifest = getManifestFromPath(srcDirectory)
+  addExtension: function (extensionId, srcDirectory) {
+    const manifest = getManifestFromPath(extensionId, srcDirectory)
     if (manifest) {
       loadExtension(manifest)
       for (const webContents of getAllWebContents()) {
