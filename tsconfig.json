@@ -28,7 +28,7 @@
     ]
   },
   "include": [
-    "types/**/*",
+    "index.d.ts",
     "src/**/*",
     "test/**/*",
   ],
