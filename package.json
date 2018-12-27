@@ -31,7 +31,6 @@
     "electron-mocha": "^6.0.4",
     "electron-process-manager": "^0.6.0",
     "mocha": "^5.2.0",
-    "tmp": "0.0.33",
     "ts-mocha": "^2.0.0",
     "tslint": "^5.11.0",
     "tslint-config-station": "^0.5.1",

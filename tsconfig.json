@@ -27,6 +27,10 @@
       "dom"
     ]
   },
+  "filesGlob": [
+    "src/**/*",
+    "test/",
+  ],
   "include": [
     "index.d.ts",
     "src/**/*",

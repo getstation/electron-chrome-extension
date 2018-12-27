@@ -1,8 +1,7 @@
 import * as assert from 'assert';
-const path = require('path');
+const { join } = require('path');
 const fse = require('fs-extra');
-// import { ipcRenderer } from 'electron';
-import StorageProvider from '../../src/browser/cx-fetcher/cx-storage-provider';
+import StorageProvider from '../../src/browser/cx-fetcher/storage-provider';
 import {
   EXAMPLE_EXTENSION_VERSION,
   TEST_PATH_EXTENSIONS,
@@ -14,7 +13,9 @@ import {
 describe('Default Storage Provider', () => {
   it('has a default installation folder', () => {
     const storager = new StorageProvider();
-    const expected = path.join(__dirname, '..', '..', 'src', 'browser', 'cx-fetcher', 'extensions');
+    const expected = join(
+      __dirname, '..', '..', 'src', 'browser', 'cx-fetcher', 'extensions'
+    );
     assert.equal(storager.extensionsFolder, expected);
   });
 
@@ -35,7 +36,7 @@ describe('Default Storage Provider', () => {
       const actual = await storager.installExtension(FAKE_DL_DESCRIPTOR);
 
       const expected = {
-        path: path.join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION),
+        path: join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION),
         manifest: EXAMPLE_ARCHIVE_MANIFEST,
       };
 
@@ -50,8 +51,8 @@ describe('Default Storage Provider', () => {
       const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
 
       await storager.installExtension(FAKE_DL_DESCRIPTOR);
-      const expectedFolder = path.join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION);
-      const expectedManifest = path.join(expectedFolder, 'manifest.json');
+      const expectedFolder = join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION);
+      const expectedManifest = join(expectedFolder, 'manifest.json');
 
       assert.ok(await fse.pathExists(expectedFolder), 'Folder does not exists at the expected location');
       assert.ok(await fse.pathExists(expectedManifest), 'Manifest file is not at the expected location');
@@ -61,7 +62,7 @@ describe('Default Storage Provider', () => {
       const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
       storager.unzipCrx = () => Promise.reject('Cannot unzip archive');
 
-      // TODO : someday, use assert.rejects (availabe in node 10)
+      // todo: someday, use assert.rejects (availabe in node 10)
       try {
         await storager.installExtension(FAKE_DL_DESCRIPTOR);
       } catch (err) {
@@ -76,7 +77,7 @@ describe('Default Storage Provider', () => {
       storager.unzipCrx = () => Promise.resolve(true);
       storager.readManifest = () => Promise.reject('Cannot read manifest');
 
-      // TODO : someday, use assert.rejects (availabe in node 10)
+      // todo: someday, use assert.rejects (availabe in node 10)
       try {
         await storager.installExtension(FAKE_DL_DESCRIPTOR);
       } catch (err) {
@@ -87,25 +88,15 @@ describe('Default Storage Provider', () => {
     });
 
     it('fails if destination already exists', () => {
-      assert.ok(true);
+      assert.ok(true); // todo
     });
 
     it('cleans up sorting artifacts', () => {
-      assert.ok(true);
+      assert.ok(true); // todo
     });
 
     it('cleans up sorting artifacts on error', () => {
-      assert.ok(true);
-    });
-  });
-
-  describe('gathering installed extensions', () => {
-    it('returns an array of InstallDescriptor from an installation folder', () => {
-
-    });
-
-    it('fails gracefully if manifest cannot be read', () => {
-
+      assert.ok(true); // todo
     });
   });
 });

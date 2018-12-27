@@ -3,7 +3,7 @@ const { join } = require('path');
 const { format } = require('url');
 
 const { addExtension } = require('../lib/src/browser/chrome-extension.js');
-const CxFetcher = require('../lib/src/browser/cx-fetcher/cx-fetcher.js');
+const CxFetcher = require('../lib/src/browser/cx-fetcher/fetcher.js').default;
 
 let mainWindow;
 
@@ -24,25 +24,18 @@ app.on('ready', async () => {
 
   require('electron-process-manager').openProcessManager();
 
-  const cxFetcher = new CxFetcher.default();
-  
-  await cxFetcher.fetch('dheionainndbbpoacpnopgmnihkcmnkl');
-  await cxFetcher.scanInstalledExtensions();
-  console.log('AVAILABLE : ', cxFetcher.availableCx());
-  const gmelius = cxFetcher.getCx('dheionainndbbpoacpnopgmnihkcmnkl');
-  addExtension(gmelius.id, gmelius.location.path);
+  // Mixmax: ocpljaamllnldhepankaeljmeeeghnid
+  // Gmelius: dheionainndbbpoacpnopgmnihkcmnkl
+  // Mailtracker: pgbdljpkijehgoacbjpolaomhkoffhnl
+  // Boomerang: mdanidgdpmkimeiiojknlnekblgmpdll
+  // Clearbit Connect: pmnhcgfcafcnkbengdcanjablaabjplo
+  // 1Password X: aeblfdkhhhdcdjpifhhbdiojplfjncoa
+  // Dashlane: fdjamakpfbbddfjaooikfcpapjohcfmg
+  // Lastpass: hdokiejnpimakedhajhdlcegeplioahd
 
-  // Check for update
-  const update = await cxFetcher.checkForUpdate(gmelius.id);
-  console.log('CHECK UPDATE (gmelius) : ', update);
-
-  // Try an update anyway
-  const didUpdate = await cxFetcher.update(gmelius.id);
-  console.log('DID UPDATE (gmelius) : ', didUpdate);
-
-  // Auto Update loop
-  const wasUpdated = await cxFetcher.autoUpdate();
-  console.log('AUTO UPDATE (all) : ', wasUpdated);
+  const cxFetcher = new CxFetcher();
+  const ext = await cxFetcher.fetch('ocpljaamllnldhepankaeljmeeeghnid');
+  addExtension(ext.id, ext.location.path);
 });
 
 app.on('window-all-closed', () => {

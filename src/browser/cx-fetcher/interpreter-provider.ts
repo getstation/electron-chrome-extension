@@ -1,25 +1,24 @@
 import { xml2js } from 'xml-js';
 import {
-  CxInterpreterProviderInterface,
+  IInterpreterProvider,
   IVersion,
   IExtension,
   IInstall,
   IUpdate,
 } from './types';
 
-class CxInterpreterProvider implements CxInterpreterProviderInterface {
-  // Create an IVersion from a version represented in a string
-  public static parseVersion(version:string) {
+export default class InterpreterProvider implements IInterpreterProvider {
+  public static parseVersion(version: string) {
     const split = version.split('.');
     const parsed = split.map((elem: string) => parseInt(elem, 10));
+
     return {
       number: version,
       parsed,
     };
   }
 
-  // Transform an Installation (from the CxStorage) into a registerable IExtension
-  interpret(installedCx: IInstall) {
+  interpret(installed: IInstall) {
     const {
       id,
       location,
@@ -27,8 +26,9 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
         update_url,
         version,
       },
-    } = installedCx;
-    const parsedVersion = CxInterpreterProvider.parseVersion(version);
+    } = installed;
+
+    const parsedVersion = InterpreterProvider.parseVersion(version);
 
     return {
       id,
@@ -38,26 +38,28 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
     };
   }
 
-  // Check against update data if a given extension should be updated
   shouldUpdate(extension: IExtension, updateInfos: IUpdate) {
     const parsedUpdates = this.readUpdateManifest(updateInfos.xml);
-    const cxUpdateCheck = this.findCxUpdate(extension.id, parsedUpdates);
+    const updateCheck = this.findUpdate(extension.id, parsedUpdates);
 
-    if (!cxUpdateCheck) {
+    if (!updateCheck) {
       return false;
     }
 
-    const newVersion = this.getNewVersion(cxUpdateCheck);
+    const newVersion = this.getNewVersion(updateCheck);
+
     return this.greaterThan(newVersion, extension.version);
   }
 
-  // Sort the highest IVersion in an array of IVersion
   sortLastVersion(versions: IVersion[]) {
     const noVersion = { number: '', parsed: [] };
-    const highest = versions.reduce((previous, value) => {
-      const greater = this.greaterThan(value, previous);
-      return (greater) ? value : previous;
-    }, noVersion);
+    const highest = versions.reduce(
+      (previous, value) => {
+        const greater = this.greaterThan(value, previous);
+        return (greater) ? value : previous;
+      },
+      noVersion
+    );
 
     if (highest === noVersion) {
       throw new Error('No versions could be read and found');
@@ -66,15 +68,12 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
     return highest;
   }
 
-  // Parse the xml manifest and return a json object
   private readUpdateManifest(xml: string): object {
     return xml2js(xml, { compact: false });
   }
 
-  // TODO : Improve the "any"
-  // Find the extensionId related update data (a manifest can reference many different extension updates)
-  private findCxUpdate(extensionId: IExtension['id'], parsedUpdates: any): any {
-    // was this before : parsedUpdates.elements[0].elements;
+  // todo: Improve the "any"
+  private findUpdate(extensionId: IExtension['id'], parsedUpdates: any): any {
     const updates = this.getNested(parsedUpdates, ['elements', '0', 'elements']);
     if (!updates) return undefined;
 
@@ -87,17 +86,18 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
     return undefined;
   }
 
-  // Extract version from an extension update data
-  private getNewVersion(cxUpdateCheck: any): IVersion {
-    // was this before : cxUpdateCheck.elements[0].attributes.version;
-    const version = this.getNested(cxUpdateCheck, ['elements', '0', 'attributes', 'version']);
+  private getNewVersion(updateCheck: any): IVersion {
+    const version = this.getNested(
+      updateCheck, ['elements', '0', 'attributes', 'version']
+    );
+
     if (!version) {
       throw new Error('No version found in the update manifest');
     }
-    return CxInterpreterProvider.parseVersion(version);
+
+    return InterpreterProvider.parseVersion(version);
   }
 
-  // Compare if the first argument is greater than the second
   private greaterThan(a: IVersion, b: IVersion) {
     const x = a.parsed;
     const y = b.parsed;
@@ -114,11 +114,11 @@ class CxInterpreterProvider implements CxInterpreterProviderInterface {
   }
 
   private getNested(nestedObj: object, pathArr: string[]) {
-    return pathArr.reduce((obj, key) =>
-      (obj && obj[key]) ? obj[key] : undefined,
+    return pathArr.reduce(
+      (obj, key) => {
+        return (obj && obj[key]) ? obj[key] : undefined;
+      },
       nestedObj
     );
   }
 }
-
-export default CxInterpreterProvider;

@@ -1,7 +1,6 @@
 const { ipcRenderer, webFrame } = require('electron')
 const { runInThisContext } = require('vm')
 const constants = require('../../common/constants')
-const RecursiveOverride = require('../utils');
 
 webFrame.registerURLSchemeAsPrivileged(constants.EXTENSION_PROTOCOL, { corsEnabled: false })
 

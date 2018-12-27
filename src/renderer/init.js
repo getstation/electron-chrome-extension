@@ -1,6 +1,5 @@
 const url = require('url');
 const constants = require('../common/constants');
-const RecursiveOverride = require('./utils');
 const isBackgroundPage = process.argv.indexOf('--electron-chrome-extension-background-page') !== -1;
 
 // Mixmax detect the navigator user agent for his own desktop app

@@ -1,6 +1,5 @@
 import assert = require('assert');
-// import { ipcRenderer } from 'electron';
-import InterpreterProvider from '../../src/browser/cx-fetcher/cx-interpreter-provider';
+import InterpreterProvider from '../../src/browser/cx-fetcher/interpreter-provider';
 import {
   FAKE_CX_INFOS,
   FAKE_INSTALL_DESCRIPTOR,
@@ -24,7 +23,8 @@ describe('Default Interpreter Provider', () => {
   describe('detecting updated version', () => {
     it('is true when update version is higher than the current', () => {
       const interpreter = new InterpreterProvider();
-      // Represents the current version (the fake update version is 1.2.0)
+
+      // fake update version is 1.2.0
       FAKE_CX_INFOS.version = { number: '1.0.0.0', parsed: [1, 0, 0, 0] };
       const actual = interpreter.shouldUpdate(FAKE_CX_INFOS, FAKE_UPDATE_DESCRIPTOR);
 

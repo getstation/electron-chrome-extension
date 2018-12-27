@@ -1,18 +1,14 @@
 export enum MutexStatus {
-  Installing = 'installing',
-  Updating = 'updating',
+  Installing = 'chrome-extension-installing',
+  Updating = 'chrome-extension-updating',
 }
 
-export enum CxStatus {
+export enum ExtensionStatus {
   Installed = 'chrome-extension-installed',
   Updated = 'chrome-extension-updated',
   Removed = 'chrome-extension-removed',
   Discovered = 'chrome-extension-discoverd',
 }
-
-/**
- * TRANSITIONING DATA
- */
 
 export interface IExtension {
   id: string;
@@ -38,90 +34,68 @@ export interface IDownload {
 export interface IInstall {
   id: IExtension['id']
   location: ILocation;
-  manifest: ICxManifest;
+  manifest: IManifest;
 }
 
 export interface IUpdate {
   xml: string;
 }
 
-export interface ICxManifest {
+export interface IManifest {
   version: string;
   update_url: string;
 }
 
-/**
- *  STORAGE PROVIDER
- */
-
 export type InstalledExtensions = Map<IExtension['id'], InstalledVersions>;
 export type InstalledVersions = Map<IVersion['number'], IInstall>;
 
-export interface CxStorageProviderConfig {
+export interface IStorageProviderConfig {
   extensionsFolder: ILocation,
   cacheFolder: ILocation,
 }
 
-export interface CxStorageProviderInterface {
-  // Parameters
+export interface IStorageProvider {
   extensionsFolder: ILocation;
   cacheFolder: ILocation;
 
-  // Methods
   installExtension(crxDownload: IDownload): Promise<IInstall>;
   getInstalledExtension(): Promise<InstalledExtensions>;
-  readManifest(cxFolderPath: ILocation): Promise<ICxManifest>;
+  readManifest(folderPath: ILocation): Promise<IManifest>;
   unzipCrx(crxPath: ILocation, destination: ILocation): Promise<boolean>
 }
 
-/**
- * DOWNLOAD PROVIDER
- */
-
-export interface CxDownloadProviderInterface {
+export interface IDownloadProvider {
   downloadById(extensionId: IExtension['id']): Promise<IDownload>;
   cleanupById(extensionId: IExtension['id']): void;
   getUpdateInfo(extension: IExtension): Promise<IUpdate>;
 }
 
-/**
- * INTERPRETER PROVIDER
- */
-
-export interface CxInterpreterProviderInterface {
-  interpret(installedCx: IInstall): IExtension;
+export interface IInterpreterProvider {
+  interpret(installed: IInstall): IExtension;
   shouldUpdate(extension: IExtension, updateInfos: IUpdate): boolean;
   sortLastVersion(versions: IVersion[]): IVersion;
 }
 
-/**
- * CX FETCHER
- */
-
-export interface CxFetcherConfig {
-  cxDownloader: CxDownloadProviderInterface;
-  cxStorager: CxStorageProviderInterface;
-  cxInterpreter: CxInterpreterProviderInterface;
+export interface IFetcherConfig {
+  downloader: IDownloadProvider;
+  storager: IStorageProvider;
+  interpreter: IInterpreterProvider;
   autoUpdateInterval: number;
   autoUpdate: boolean;
 }
 
-export interface CxFetcherInterface {
-  // Injected dependencies
-  cxDownloader: CxDownloadProviderInterface;
-  cxStorager: CxStorageProviderInterface;
-  cxInterpreter: CxInterpreterProviderInterface;
+export interface IFetcher {
+  downloader: IDownloadProvider;
+  storager: IStorageProvider;
+  interpreter: IInterpreterProvider;
 
-  // Registered Cx
-  availableCx(): Map<IExtension['id'], IExtension>;
-  saveCx(extension: IExtension): void;
+  list(): Map<IExtension['id'], IExtension>;
+  save(extension: IExtension): void;
   scanInstalledExtensions(): void;
 
-  // Operations on Chrome extension (Cx)
   fetch(extensionId: IExtension['id']): Promise<IExtension>;
   update(extensionId: IExtension['id']): Promise<IExtension | boolean>;
 
-  // Handling updates
   checkForUpdate(extensionId: IExtension['id']): Promise<boolean>;
   autoUpdate(): Promise<(false | IExtension)[]>;
   stopAutoUpdate(): void;

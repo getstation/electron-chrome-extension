@@ -1,7 +1,7 @@
 import assert = require('assert');
 const fs = require('fs').promises;
-// import { ipcRenderer } from 'electron';
-import DownloadProvider from '../../src/browser/cx-fetcher/cx-download-provider';
+
+import DownloadProvider from '../../src/browser/cx-fetcher/download-provider';
 import {
   EXAMPLE_EXTENSION_ID,
 } from './constants';
@@ -13,7 +13,6 @@ describe('Default Download Provider', () => {
       const dlDescriptor = await downloader.downloadById(EXAMPLE_EXTENSION_ID);
       const crxInfo = await fs.stat(dlDescriptor.location.path);
 
-      // Check that the downloaded thing is actually a file
       assert.equal(crxInfo.isFile(), true);
       assert.notEqual(crxInfo.size, 0);
     });
@@ -21,25 +20,25 @@ describe('Default Download Provider', () => {
 
   describe('clean up', () => {
     it('remembers and removes a temp dir', () => {
-
+      // todo
     });
 
     it('fails graciously if extension doe not exists', () => {
-
+      // todo
     });
   });
 
   describe('get update infos', () => {
     it('fetches an update xml from a CxInfos', () => {
-
+      // todo
     });
 
     it('throws an error if no update url is present', () => {
-
+      // todo
     });
 
     it('throws an error if fetch fails', () => {
-
+      // todo
     });
   });
 });
