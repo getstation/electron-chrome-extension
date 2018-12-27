@@ -1,0 +1,4 @@
+# will be used to store the userData of the electron app used for payground
+.electron-user-data
+
+extensions

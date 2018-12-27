@@ -8,7 +8,6 @@
     "prestart": "rm -rf ./lib/ && tsc -p .",
     "start": "concurrently -k -r -s first \"npm:start:*\"",
     "start:watch": "tsc -p . -w",
-    "start:runner": "electron playground/main.js",
     "pretest": "tsc -p .",
     "test": "NODE_ENV=test concurrently -k -r -s first \"npm:test:*\"",
     "test:watch": "tsc -p . -w",
@@ -16,7 +15,9 @@
     "ci": "tslint -p . && xvfb-maybe electron-mocha --require-main test/main-loader.js --renderer test/loader.js",
     "prepublish": "rm -rf ./lib/ && tslint -p . && tsc -p tsconfig.build.json",
     "publish": " NPMInternalBucket=dev.getstation.com ./node_modules/.bin/npm-internal publish -f",
-    "reset:playground": "rm -rf ~/Library/Application\\ Support/Electron/"
+    "playground:start": "electron playground/main.js",
+    "playground:reset": "rm -rf playground/.electron-user-data",
+    "playground:setup": "node playground/dl-extensions.js"
   },
   "author": "Station <hello@getstation.com>",
   "license": "ISC",

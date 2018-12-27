@@ -60,5 +60,3 @@ typings/
 # dotenv environment variables file
 .env
 
-# Project
-playground/extensions
