@@ -1,4 +1,4 @@
-const { rpc } = require('electron-simple-rpc');
+const { RpcIpcManager, rpc } = require('electron-simple-rpc');
 const Event = require('./event');
 import {
   Window,
@@ -9,6 +9,7 @@ import {
 } from '../../common/apis/windows';
 import {
   CxApiHandler,
+  CxApiEvent,
   Callback,
   CxApiChannels,
 } from '../../common/apis';
@@ -17,14 +18,19 @@ class ChromeWindowsAPIClient {
   WINDOW_ID_NONE: number;
   WINDOW_ID_CURRENT: number;
 
-  scope: string;
+  handlerScope: string;
+  eventScope: string;
 
   onCreated: Event;
   onRemoved: Event;
   onFocusChanged: Event;
 
+  rpcIpcEventsManager: any;
+
   constructor(extensionId: string) {
-    this.scope = `${CxApiHandler}-${CxApiChannels.Windows}-${extensionId}`;
+    this.handlerScope = `${CxApiHandler}-${CxApiChannels.Windows}-${extensionId}`;
+
+    this.eventScope = `${CxApiEvent}-${CxApiChannels.Windows}`;
 
     this.WINDOW_ID_NONE = -1;
     this.WINDOW_ID_CURRENT = -2;
@@ -32,30 +38,38 @@ class ChromeWindowsAPIClient {
     this.onCreated = new Event();
     this.onRemoved = new Event();
     this.onFocusChanged = new Event();
+
+    const library = {
+      onCreated: this.onCreated,
+      onRemoved: this.onRemoved,
+      onFocusChanged: this.onFocusChanged,
+    };
+
+    this.rpcIpcEventsManager = new RpcIpcManager(library, this.eventScope);
   }
 
   get(windowId: Window['id'], getInfo: GetInfo, callback: Callback<Window>) {
-    rpc(this.scope, CxWindowsApi.Get)(windowId, getInfo).then(callback);
+    rpc(this.handlerScope, CxWindowsApi.Get)(windowId, getInfo).then(callback);
   }
 
   getCurrent(getInfo: GetInfo, callback: Callback<Window>) {
-    rpc(this.scope, CxWindowsApi.GetCurrent)(getInfo).then(callback);
+    rpc(this.handlerScope, CxWindowsApi.GetCurrent)(getInfo).then(callback);
   }
 
   getLastFocused(getInfo: GetInfo, callback: Callback<Window>) {
-    rpc(this.scope, CxWindowsApi.GetLastFocused)(getInfo).then(callback);
+    rpc(this.handlerScope, CxWindowsApi.GetLastFocused)(getInfo).then(callback);
   }
 
   getAll(getInfo: GetInfo, callback: Callback<Window>) {
-    rpc(this.scope, CxWindowsApi.GetAll)(getInfo).then(callback);
+    rpc(this.handlerScope, CxWindowsApi.GetAll)(getInfo).then(callback);
   }
 
   create(createData: CreateData, callback?: Callback<Window>) {
     if (callback) {
-      return rpc(this.scope, CxWindowsApi.Create)(createData).then(callback);
+      return rpc(this.handlerScope, CxWindowsApi.Create)(createData).then(callback);
     }
 
-    rpc(this.scope, CxWindowsApi.Create)(createData);
+    rpc(this.handlerScope, CxWindowsApi.Create)(createData);
   }
 
   update(
@@ -64,18 +78,18 @@ class ChromeWindowsAPIClient {
     callback?: Callback<Window>
   ) {
     if (callback) {
-      return rpc(this.scope, CxWindowsApi.Update)(windowId).then(callback);
+      return rpc(this.handlerScope, CxWindowsApi.Update)(windowId).then(callback);
     }
 
-    rpc(this.scope, CxWindowsApi.Update)(windowId, updateInfo);
+    rpc(this.handlerScope, CxWindowsApi.Update)(windowId, updateInfo);
   }
 
   remove(windowId: Window['id'], callback?: Callback<Window>) {
     if (callback) {
-      return rpc(this.scope, CxWindowsApi.GetCurrent)(windowId).then(callback);
+      return rpc(this.handlerScope, CxWindowsApi.GetCurrent)(windowId).then(callback);
     }
 
-    rpc(this.scope, CxWindowsApi.GetCurrent)(windowId);
+    rpc(this.handlerScope, CxWindowsApi.GetCurrent)(windowId);
   }
 }
 

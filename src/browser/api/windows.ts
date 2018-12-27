@@ -6,12 +6,13 @@ import {
   GetInfo,
   UpdateInfo,
 } from '../../common/apis/windows';
-import { CxApiChannels, CxApiHandler } from '../../common/apis';
-const { RpcIpcManager } = require('electron-simple-rpc');
+import { CxApiChannels, CxApiHandler, CxApiEvent } from '../../common/apis';
+const { RpcIpcManager, rpc } = require('electron-simple-rpc');
 
 class ChromeWindowsAPIHandler {
   protected rpcIpcManager: any;
-  protected scope: string;
+  protected handlerScope: string;
+  protected eventScope: string;
   protected extensionWebContents: Map<
     Electron.WebContents['id'],
     Electron.WebContents
@@ -33,9 +34,10 @@ class ChromeWindowsAPIHandler {
         {}
       );
 
-    this.scope = `${CxApiHandler}-${CxApiChannels.Windows}-${extensionId}`;
+    this.eventScope = `${CxApiEvent}-${CxApiChannels.Windows}`;
+    this.handlerScope = `${CxApiHandler}-${CxApiChannels.Windows}-${extensionId};`;
 
-    this.rpcIpcManager = new RpcIpcManager(rpcLibraries, this.scope);
+    this.rpcIpcManager = new RpcIpcManager(rpcLibraries, this.handlerScope);
   }
 
   handleGet(windowId: Window['id'], _getInfo: GetInfo) {
@@ -117,12 +119,16 @@ class ChromeWindowsAPIHandler {
 
     this.extensionWebContents.set(window.webContents.id, window.webContents);
 
-    return {
+    const response = {
       id: window.webContents.id,
       focused: window.isFocused(),
       incognito: false,
       alwaysOnTop: false,
     };
+
+    rpc(this.eventScope, 'onCreated', response);
+
+    return response;
   }
 
   handleUpdate(windowId: Window['id'], updateInfo: UpdateInfo) {
@@ -163,6 +169,7 @@ class ChromeWindowsAPIHandler {
     if (window && this.extensionWebContents.has(window.webContents.id)) {
       window.close();
       this.extensionWebContents.delete(window.webContents.id);
+      rpc(this.eventScope, 'onRemoved', windowId);
     }
 
     return;
