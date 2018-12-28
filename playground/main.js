@@ -12,6 +12,7 @@ if (!app.isPackaged) {
 }
 
 const { addExtension } = require('../lib/src/browser/chrome-extension.js');
+const CxFetcher = require('../lib/src/browser/cx-fetcher/fetcher.js').default;
 
 let mainWindow;
 
@@ -27,11 +28,23 @@ function createWindow() {
   mainWindow.on('closed', () => mainWindow = null)
 }
 
-app.on('ready', () => {
+app.on('ready', async () => {
   createWindow();
 
   require('electron-process-manager').openProcessManager();
-  addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
+
+  // Mixmax: ocpljaamllnldhepankaeljmeeeghnid
+  // Gmelius: dheionainndbbpoacpnopgmnihkcmnkl
+  // Mailtracker: pgbdljpkijehgoacbjpolaomhkoffhnl
+  // Boomerang: mdanidgdpmkimeiiojknlnekblgmpdll
+  // Clearbit Connect: pmnhcgfcafcnkbengdcanjablaabjplo
+  // 1Password X: aeblfdkhhhdcdjpifhhbdiojplfjncoa
+  // Dashlane: fdjamakpfbbddfjaooikfcpapjohcfmg
+  // Lastpass: hdokiejnpimakedhajhdlcegeplioahd
+
+  const cxFetcher = new CxFetcher();
+  const { id, location: { path } } = await cxFetcher.fetch('ocpljaamllnldhepankaeljmeeeghnid');
+  addExtension(id, path);
 });
 
 app.on('window-all-closed', () => {
