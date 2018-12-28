@@ -1,6 +1,11 @@
 // @ts-ignore
 import { downloadById } from 'download-crx';
 import { dir, DirectoryResult } from 'tmp-promise';
+import Location from './location';
+import {
+  IDownloadProvider,
+  IExtension,
+} from './types';
 
 let fetch: Promise<Response>;
 if (process.env.NODE_ENV === 'test') {
@@ -9,12 +14,6 @@ if (process.env.NODE_ENV === 'test') {
 } else {
   fetch = require('electron-fetch');
 }
-
-import Location from './location';
-import {
-  IDownloadProvider,
-  IExtension,
-} from './types';
 
 export default class DownloadProvider implements IDownloadProvider {
   private downloads: Map<IExtension['id'], DirectoryResult>;

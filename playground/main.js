@@ -34,8 +34,8 @@ app.on('ready', async () => {
   // Lastpass: hdokiejnpimakedhajhdlcegeplioahd
 
   const cxFetcher = new CxFetcher();
-  const ext = await cxFetcher.fetch('ocpljaamllnldhepankaeljmeeeghnid');
-  addExtension(ext.id, ext.location.path);
+  const { id, location: { path } } = await cxFetcher.fetch('ocpljaamllnldhepankaeljmeeeghnid');
+  addExtension(id, path);
 });
 
 app.on('window-all-closed', () => {
