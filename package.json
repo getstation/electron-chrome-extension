@@ -9,7 +9,7 @@
     "start": "concurrently -k -r -s first \"npm:start:*\"",
     "start:watch": "tsc -p . -w",
     "start:runner": "electron playground/main.js",
-    "pretest": "tsc -p . && cp -R test/assets lib/test/assets",
+    "pretest": "rm -rf ./lib/ && tsc -p . && cp -R test/assets lib/test/assets",
     "test": "NODE_ENV=test concurrently -k -r -s first \"npm:test:*\"",
     "test:watch": "tsc -p . -w",
     "test:runner": "xvfb-maybe electron-mocha --debug --interactive --require-main test/main-loader.js --renderer test/loader.js",
