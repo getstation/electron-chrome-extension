@@ -38,7 +38,7 @@ if (protocol === `${constants.EXTENSION_PROTOCOL}:`) {
 
   // Any URL that shouldn't be loaded as `nativeWindowOpen` as a popup
   // should appear here if parent window uses `nativeWindowOpen`
-  const overrideNativeWindowOpenList = [];
+  const overrideNativeWindowOpenList = ['app.mixmax.com/_oauth/google'];
 
   require('./window-setup')(window, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesNativeWindowOpen, overrideNativeWindowOpenList);
   // end workaround

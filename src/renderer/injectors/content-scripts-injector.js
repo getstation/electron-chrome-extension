@@ -98,7 +98,7 @@ Object.keys(contentScripts).forEach(key => {
 
       // Any URL that shouldn't be loaded as `nativeWindowOpen` as a popup
       // should appear here if parent window uses `nativeWindowOpen`
-      const overrideNativeWindowOpenList = [];
+      const overrideNativeWindowOpenList = ['app.mixmax.com/_oauth/google'];
 
       require('../window-setup')(isolatedWorldWindow, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesNativeWindowOpen, overrideNativeWindowOpenList);
       // end workaround
