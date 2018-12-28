@@ -114,9 +114,10 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesN
     event = new MessageEvent('message', { data: message, origin: sourceOrigin });
     event.source = getOrCreateProxy(ipcRenderer, sourceId);
 
-    // This crappy code block fix an ugly behaviour from Mixmax who open
-    // a window from an iframe and catch message in the extension content
-    // script. Event references are lost between contexts.
+    // This next code block polyfill Mixmax event forward
+    // between the opened window and the iframe event listener.
+    // Eectron lost event references between the contents scripts
+    // and the iframe.
     // We manually trigger the intented effect.
     if (event.data && event.data.method === 'loginFinished') {
       win.location.reload();
