@@ -130,7 +130,10 @@ describe('Chrome Extension Fetcher', () => {
       const installedCx = afterScan.get(EXAMPLE_EXTENSION_ID);
       assert.ok(installedCx);
       if (installedCx) {
-        assert.equal(installedCx.version, EXAMPLE_EXTENSION_VERSION);
+        assert.equal(
+          installedCx.version.number,
+          EXAMPLE_EXTENSION_VERSION.number
+        );
         assert.equal(installedCx.location.path, expectedFolder);
       }
     });
@@ -148,7 +151,7 @@ describe('Chrome Extension Fetcher', () => {
 
       // @ts-ignore
       const cxFetcher = new CxFetcher({ downloader: mockDownloader });
-      cxFetcher.saveCx(FAKE_CX_INFOS);
+      cxFetcher.save(FAKE_CX_INFOS);
       const actual = await cxFetcher.checkForUpdate(FAKE_EXTENSION_ID);
       assert.equal(actual, true);
     });

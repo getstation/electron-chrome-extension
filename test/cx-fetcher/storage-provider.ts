@@ -14,9 +14,10 @@ describe('Default Storage Provider', () => {
   it('has a default installation folder', () => {
     const storager = new StorageProvider();
     const expected = join(
-      __dirname, '..', '..', 'src', 'browser', 'cx-fetcher', 'extensions'
+      __dirname, '..', '..', 'test', 'assets', 'extensions'
     );
-    assert.equal(storager.extensionsFolder, expected);
+
+    assert.equal(storager.extensionsFolder.path, expected);
   });
 
   it('accepts custom installation folder', () => {
@@ -36,7 +37,7 @@ describe('Default Storage Provider', () => {
       const actual = await storager.installExtension(FAKE_DL_DESCRIPTOR);
 
       const expected = {
-        path: join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION),
+        path: join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION.number),
         manifest: EXAMPLE_ARCHIVE_MANIFEST,
       };
 
@@ -51,7 +52,7 @@ describe('Default Storage Provider', () => {
       const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
 
       await storager.installExtension(FAKE_DL_DESCRIPTOR);
-      const expectedFolder = join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION);
+      const expectedFolder = join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION.number);
       const expectedManifest = join(expectedFolder, 'manifest.json');
 
       assert.ok(await fse.pathExists(expectedFolder), 'Folder does not exists at the expected location');
