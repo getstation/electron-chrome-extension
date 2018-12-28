@@ -1,6 +1,15 @@
 const { app, BrowserWindow } = require('electron');
 const { join } = require('path');
 const { format } = require('url');
+const { mkdirSync, existsSync } = require('fs');
+
+// for convenience, we'll store electron userData
+// in the nearby .electron-user-data directory 
+if (!app.isPackaged) {
+  const userDataPath = join(__dirname, '.electron-user-data');
+  if (!existsSync(userDataPath)) mkdirSync(userDataPath);
+  app.setPath('userData', userDataPath);
+}
 
 const { addExtension } = require('../lib/src/browser/chrome-extension.js');
 const CxFetcher = require('../lib/src/browser/cx-fetcher/fetcher.js').default;

@@ -16,7 +16,7 @@
     "ci": "tslint -p . && xvfb-maybe electron-mocha --require-main test/main-loader.js --renderer test/loader.js",
     "prepublish": "rm -rf ./lib/ && tslint -p . && tsc -p tsconfig.build.json",
     "publish": " NPMInternalBucket=dev.getstation.com ./node_modules/.bin/npm-internal publish -f",
-    "reset:playground": "rm -rf ~/Library/Application\\ Support/Electron/"
+    "playground:reset": "rm -rf playground/.electron-user-data",
   },
   "author": "Station <hello@getstation.com>",
   "license": "ISC",
