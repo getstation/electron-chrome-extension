@@ -1,6 +1,6 @@
 # Electron Chrome Extension
 
-[![Build Status](https://travis-ci.com/getstation/electron-chrome-extension.svg?token=NLebjoCo6B1MogiwMcNq&branch=master]
+[![Build Status](https://travis-ci.com/getstation/electron-chrome-extension.svg?token=NLebjoCo6B1MogiwMcNq&branch=master)](https://travis-ci.com/getstation/electron-chrome-extension)
 
 ## Environment
 Tested with `Electron v3.0.4` - `Node v8.9.0` - `NPM v5.5.1`
