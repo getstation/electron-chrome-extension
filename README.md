@@ -1,6 +1,6 @@
 # Electron Chrome Extension
 
-[![Build Status](https://travis-ci.com/getstation/electron-chrome-extension.svg?token=NLebjoCo6B1MogiwMcNq&branch=master](https://travis-ci.com/getstation/electron-chrome-extension)
+[![Build Status](https://travis-ci.com/getstation/electron-chrome-extension.svg?token=NLebjoCo6B1MogiwMcNq&branch=master]
 
 ## Environment
 Tested with `Electron v3.0.4` - `Node v8.9.0` - `NPM v5.5.1`
@@ -31,7 +31,7 @@ addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
 $ npm start
 ```
 
-You can tweak the playground files at your convenience and extensions would automatically downloaded and clean app data with `$ npm run clean:playground`
+You can tweak the playground files at your convenience and extensions would automatically downloaded and clean app data with `$ npm run playground:reset`
 
 - Test
 ```sh

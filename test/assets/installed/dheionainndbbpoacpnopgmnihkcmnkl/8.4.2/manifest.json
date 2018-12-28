@@ -1,0 +1,66 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "name": "__MSG_extName__",
+	"short_name": "Gmelius",
+	"author": "Gmelius Ltd",
+	"description": "__MSG_extDescription__",
+  "default_locale": "en",
+	"version": "8.4.2",
+	"manifest_version": 2,
+	"homepage_url": "https://gmelius.com",
+  "permissions": [
+    "activeTab",
+		"storage",
+		"webRequest",
+		"webRequestBlocking",
+		"https://*.googleusercontent.com/*"
+  ],
+	"optional_permissions": [ "https://gml.email/*" ],
+  "background": {
+    "scripts": [
+      "background.bundle.js"
+    ],
+		"persistent": true
+  },
+  "content_scripts": [{
+			"js": [
+				"loader.bundle.js"
+				],
+			"matches": [
+				"https://mail.google.com/*",
+				"https://inbox.google.com/*"
+				],
+			"exclude_matches": [
+				"*://mail.google.com/*/?mui=ca",
+				"*://mail.google.com/tasks/*"
+				],
+			"run_at": "document_end"
+		},{
+			"all_frames": true,
+			"js": [
+				"print.bundle.js"
+				],
+			"matches": [ "https://mail.google.com/*&view=pt*" ],
+			"run_at": "document_start"
+		}
+  ],
+	"icons": {
+		"16": "icons/icon16.png",
+		"48": "icons/icon48.png",
+		"128":"icons/icon128.png"
+	},
+	"browser_action": {
+		"default_icon": "icons/icon32.png",
+		"default_title": "Gmelius Dashboard",
+		"default_popup": "html/dashboard.html"
+	},
+	"web_accessible_resources": [
+		"icons/*",
+		"html/*"
+	],
+  "omnibox": { "keyword" : "gml" },
+  "content_security_policy": "script-src 'self' https://gmelius.io https://inboxsdk.com https://cdn.firebase.com  https://*.firebaseio.com; object-src 'self'; worker-src 'self' https://gmelius.io",
+  "incognito": "split",
+  "options_page": "html/dashboard.html"
+}
