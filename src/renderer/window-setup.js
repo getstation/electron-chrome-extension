@@ -114,9 +114,9 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesN
     event = new MessageEvent('message', { data: message, origin: sourceOrigin });
     event.source = getOrCreateProxy(ipcRenderer, sourceId);
 
-    // This next code block polyfill Mixmax event forward
-    // between the opened window and the iframe event listener.
-    // Eectron lost event references between the contents scripts
+    // This next code block polyfills Mixmax event forwarding
+    // between the opened window and the iframe's event listener.
+    // Electron loses event references between the content-scripts
     // and the iframe.
     // We manually trigger the intented effect.
     if (event.data && event.data.method === 'loginFinished') {
