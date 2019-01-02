@@ -31,16 +31,9 @@ if (protocol === `${constants.EXTENSION_PROTOCOL}:`) {
 } else {
   // native window open workaround
   const { ipcRenderer } = require('electron');
-
   const { guestInstanceId, openerId } = process;
-  const hiddenPage = process.argv.includes('--hidden-page');
-  const usesNativeWindowOpen = process.argv.includes('--native-window-open');
 
-  // Any URL that shouldn't be loaded as `nativeWindowOpen` as a popup
-  // should appear here if parent window uses `nativeWindowOpen`
-  const overrideNativeWindowOpenList = ['app.mixmax.com/_oauth/google'];
-
-  require('./window-setup')(window, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesNativeWindowOpen, overrideNativeWindowOpenList);
+  require('./window-setup')(window, ipcRenderer, guestInstanceId, openerId);
   // end workaround
 
   require('./injectors/content-scripts-injector')

@@ -17,19 +17,17 @@ const resolveURL = url => {
 // converting values to strings are thrown in this process.
 const toString = value => value != null ? `${value}` : value;
 
-const windowProxies = {};
+const windowProxies = new Map();
 
 const getOrCreateProxy = (ipcRenderer, guestId) => {
-  let proxy = windowProxies[guestId];
-  if (proxy == null) {
-    proxy = new BrowserWindowProxy(ipcRenderer, guestId);
-    windowProxies[guestId] = proxy;
+  if (windowProxies.has(guestId)) {
+    return windowProxies.get(guestId);
   }
-  return proxy;
-};
 
-const removeProxy = (guestId) => {
-  delete windowProxies[guestId];
+  const proxy = new BrowserWindowProxy(ipcRenderer, guestId);
+  windowProxies.set(guestId, proxy);
+
+  return proxy;
 };
 
 function BrowserWindowProxy(ipcRenderer, guestId) {
@@ -47,7 +45,7 @@ function BrowserWindowProxy(ipcRenderer, guestId) {
   });
 
   ipcRenderer.once(`ELECTRON_GUEST_WINDOW_MANAGER_WINDOW_CLOSED_${guestId}`, () => {
-    removeProxy(guestId);
+    windowProxies.delete(guestId);
     this.closed = true;
   });
 
@@ -76,39 +74,11 @@ function BrowserWindowProxy(ipcRenderer, guestId) {
   };
 }
 
-function useNativeWindowOpen(usesNativeWindowOpen, nativeWindowOverrideList, url) {
-  if (!usesNativeWindowOpen) return false;
-  if (!Array.isArray(nativeWindowOverrideList)) return nativeWindowOverrideList;
-  if (!url) return usesNativeWindowOpen;
-  return !nativeWindowOverrideList.some(elUrl => url.includes(elUrl));
-}
-
-module.exports = (win, ipcRenderer, guestInstanceId, openerId, hiddenPage, usesNativeWindowOpen, nativeWindowOverrideList) => {
-  const originalWindowOpen = win.open;
-
-  // Make the browser window or guest view emit "new-window" event.
-  win.open = (url, frameName, features) => {
-    if (url != null && url !== '') {
-      url = resolveURL(url);
-    }
-    // console.log('url', url);
-    if (useNativeWindowOpen(usesNativeWindowOpen, nativeWindowOverrideList, url)) {
-      // console.log('using native window.open');
-      return originalWindowOpen.apply(win, [url, frameName, features]);
-    }
-    // console.log('using overriden window.open');
-    const guestId = ipcRenderer.sendSync('ELECTRON_GUEST_WINDOW_MANAGER_WINDOW_OPEN', url, toString(frameName), toString(features));
-    if (guestId != null) {
-      return getOrCreateProxy(ipcRenderer, guestId);
-    }
-    return null;
-  };
-
+module.exports = (win, ipcRenderer, guestInstanceId, openerId) => {
   if (openerId != null && win.opener == null) {
     win.opener = getOrCreateProxy(ipcRenderer, openerId);
   }
 
-  // todo warn: diff with electron
   ipcRenderer.removeAllListeners('ELECTRON_GUEST_WINDOW_POSTMESSAGE');
   ipcRenderer.on('ELECTRON_GUEST_WINDOW_POSTMESSAGE', (event, sourceId, message, sourceOrigin) => {
     event = new MessageEvent('message', { data: message, origin: sourceOrigin });
