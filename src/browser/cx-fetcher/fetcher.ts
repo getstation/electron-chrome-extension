@@ -68,7 +68,10 @@ export default class Fetcher extends EventEmitter implements IFetcher {
   }
 
   public static reset() {
-    delete Fetcher.instance;
+    if (Fetcher.instance) {
+      Fetcher.instance.stopAutoUpdate();
+      delete Fetcher.instance;
+    }
   }
 
   list() {

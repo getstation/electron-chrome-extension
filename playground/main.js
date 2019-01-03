@@ -4,15 +4,14 @@ const { format } = require('url');
 const { mkdirSync, existsSync } = require('fs');
 
 // for convenience, we'll store electron userData
-// in the nearby .electron-user-data directory 
+// in the nearby .electron-user-data directory
 if (!app.isPackaged) {
   const userDataPath = join(__dirname, '.electron-user-data');
   if (!existsSync(userDataPath)) mkdirSync(userDataPath);
   app.setPath('userData', userDataPath);
 }
 
-const { addExtension } = require('../lib/src/browser/chrome-extension.js');
-const CxFetcher = require('../lib/src/browser/cx-fetcher/fetcher.js').default;
+const ECx = require('../lib/src/browser/').default;
 
 let mainWindow;
 
@@ -42,9 +41,7 @@ app.on('ready', async () => {
   // Dashlane: fdjamakpfbbddfjaooikfcpapjohcfmg
   // Lastpass: hdokiejnpimakedhajhdlcegeplioahd
 
-  const cxFetcher = new CxFetcher();
-  const { id, location: { path } } = await cxFetcher.fetch('ocpljaamllnldhepankaeljmeeeghnid');
-  addExtension(id, path);
+  await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
 });
 
 app.on('window-all-closed', () => {
