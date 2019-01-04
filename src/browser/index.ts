@@ -12,7 +12,10 @@ class ECx {
   private fetcher: Fetcher;
   private onExtensionUpdateListener: Callback<IExtension> | undefined;
 
-  constructor() { this.configuration = {}; }
+  constructor() {
+    this.loaded = new Map();
+    this.configuration = {};
+  }
 
   set configuration(configuration: ManagerConfiguration) {
     const { fetcher, onUpdate } = configuration;
@@ -32,6 +35,10 @@ class ECx {
   }
 
   async load(extensionId: IExtension['id']): Promise<IExtension> {
+    if (this.loaded.has(extensionId)) {
+      return this.loaded.get(extensionId)!;
+    }
+
     const extension = await this.get(extensionId);
     const { location: { path } } = extension;
 

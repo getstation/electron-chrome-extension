@@ -1,1 +1,1 @@
-module.exports = require('./lib/browser/chrome-extension')
+module.exports = require('./lib/browser/')

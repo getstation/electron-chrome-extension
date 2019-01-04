@@ -2,6 +2,7 @@ import * as assert from 'assert';
 const { join } = require('path');
 const fse = require('fs-extra');
 import StorageProvider from '../../src/browser/cx-fetcher/storage-provider';
+import Location from '../../src/browser/cx-fetcher/location';
 import {
   EXAMPLE_EXTENSION_VERSION,
   TEST_PATH_EXTENSIONS,
@@ -12,7 +13,14 @@ import {
 
 describe('Default Storage Provider', () => {
   it('has a default installation folder', () => {
-    const storager = new StorageProvider();
+    const storager = new StorageProvider({
+      extensionsFolder: new Location(
+        TEST_PATH_EXTENSIONS
+      ),
+      cacheFolder: new Location(
+        `${TEST_PATH_EXTENSIONS}-cache`
+      ),
+    });
     const expected = join(
       __dirname, '..', '..', 'test', 'assets', 'extensions'
     );
@@ -21,7 +29,12 @@ describe('Default Storage Provider', () => {
   });
 
   it('accepts custom installation folder', () => {
-    const storager = new StorageProvider({ extensionsFolder: { path: 'path/to/files' } });
+    const storager = new StorageProvider({
+      extensionsFolder: { path: 'path/to/files' },
+      cacheFolder: new Location(
+        `${TEST_PATH_EXTENSIONS}-cache`
+      ),
+    });
     const expected = 'path/to/files';
     assert.equal(storager.extensionsFolder.path, expected);
   });
@@ -33,7 +46,12 @@ describe('Default Storage Provider', () => {
     });
 
     it('returns a correct IInstall from a IDownload', async () => {
-      const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
+      const storager = new StorageProvider({
+        extensionsFolder: { path: TEST_PATH_EXTENSIONS },
+        cacheFolder: new Location(
+          `${TEST_PATH_EXTENSIONS}-cache`
+        ),
+      });
       const actual = await storager.installExtension(FAKE_DL_DESCRIPTOR);
 
       const expected = {
@@ -49,7 +67,12 @@ describe('Default Storage Provider', () => {
     });
 
     it('extracts files in correct folder tree', async () => {
-      const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
+      const storager = new StorageProvider({
+        extensionsFolder: { path: TEST_PATH_EXTENSIONS },
+        cacheFolder: new Location(
+          `${TEST_PATH_EXTENSIONS}-cache`
+        ),
+      });
 
       await storager.installExtension(FAKE_DL_DESCRIPTOR);
       const expectedFolder = join(TEST_PATH_EXTENSIONS, FAKE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION.number);
@@ -60,7 +83,12 @@ describe('Default Storage Provider', () => {
     });
 
     it('fails if the archive cannot be unzipped', async () => {
-      const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
+      const storager = new StorageProvider({
+        extensionsFolder: { path: TEST_PATH_EXTENSIONS },
+        cacheFolder: new Location(
+          `${TEST_PATH_EXTENSIONS}-cache`
+        ),
+      });
       storager.unzipCrx = () => Promise.reject('Cannot unzip archive');
 
       // todo: someday, use assert.rejects (availabe in node 10)
@@ -74,7 +102,12 @@ describe('Default Storage Provider', () => {
     });
 
     it('fails if the manifest cannot be read', async () => {
-      const storager = new StorageProvider({ extensionsFolder: { path: TEST_PATH_EXTENSIONS } });
+      const storager = new StorageProvider({
+        extensionsFolder: { path: TEST_PATH_EXTENSIONS },
+        cacheFolder: new Location(
+          `${TEST_PATH_EXTENSIONS}-cache`
+        ),
+      });
       storager.unzipCrx = () => Promise.resolve(true);
       storager.readManifest = () => Promise.reject('Cannot read manifest');
 
