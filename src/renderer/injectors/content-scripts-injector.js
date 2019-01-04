@@ -89,6 +89,13 @@ Object.keys(contentScripts).forEach(key => {
 
   if (cs.contentScripts) {
     setupContentScript(cs.extensionId, worldId, function (isolatedWorldWindow) {
+      // native window open workaround
+      const { ipcRenderer } = require('electron');
+      const { guestInstanceId, openerId } = process;
+
+      require('../window-setup')(isolatedWorldWindow, ipcRenderer, guestInstanceId, openerId);
+      // end workaround
+
       for (const script of cs.contentScripts) {
         addContentScript(cs.extensionId, script)
       }

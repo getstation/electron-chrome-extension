@@ -29,5 +29,12 @@ if (protocol === `${constants.EXTENSION_PROTOCOL}:`) {
     delete global.global
   })
 } else {
+  // native window open workaround
+  const { ipcRenderer } = require('electron');
+  const { guestInstanceId, openerId } = process;
+
+  require('./window-setup')(window, ipcRenderer, guestInstanceId, openerId);
+  // end workaround
+
   require('./injectors/content-scripts-injector')
 }
