@@ -1,4 +1,10 @@
 import { EventEmitter } from 'events';
+
+import {
+  IExtension,
+  ExtensionStatus,
+} from '../../common/types';
+
 import StorageProvider from './storage-provider';
 import DownloadProvider from './download-provider';
 import InterpreterProvider from './interpreter-provider';
@@ -8,9 +14,7 @@ import {
   IDownloadProvider,
   IStorageProvider,
   IInterpreterProvider,
-  IExtension,
   MutexStatus,
-  ExtensionStatus,
 } from './types';
 
 const defaultConfig: IFetcherConfig = {

@@ -4,12 +4,16 @@ import { join, resolve } from 'path';
 import { move, readJson, ensureDir } from 'fs-extra';
 // @ts-ignore
 import unzip from 'unzip-crx';
+
+import {
+  ILocation,
+} from '../../common/types';
+
 import Location from './location';
 import {
   IStorageProvider,
   IManifest,
   IDownload,
-  ILocation,
   IStorageProviderConfig,
 } from './types';
 

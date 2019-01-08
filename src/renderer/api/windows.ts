@@ -8,11 +8,12 @@ import {
   UpdateInfo,
 } from '../../common/apis/windows';
 import {
-  CxApiHandler,
-  CxApiEvent,
-  Callback,
-  CxApiChannels,
+  ApiHandler,
+  ApiEvent,
+  ApiChannels,
 } from '../../common/apis';
+
+import { Callback } from '../../common/types';
 
 class ChromeWindowsAPIClient {
   WINDOW_ID_NONE: number;
@@ -28,9 +29,9 @@ class ChromeWindowsAPIClient {
   rpcIpcEventsManager: any;
 
   constructor(extensionId: string) {
-    this.handlerScope = `${CxApiHandler}-${CxApiChannels.Windows}-${extensionId}`;
+    this.handlerScope = `${ApiHandler}-${ApiChannels.Windows}-${extensionId}`;
 
-    this.eventScope = `${CxApiEvent}-${CxApiChannels.Windows}`;
+    this.eventScope = `${ApiEvent}-${ApiChannels.Windows}`;
 
     this.WINDOW_ID_NONE = -1;
     this.WINDOW_ID_CURRENT = -2;

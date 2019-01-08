@@ -32,4 +32,7 @@
     "src/**/*",
     "test/**/*",
   ],
+  "exclude": [
+    "src/browser/chrome-extension.ts",
+  ],
 }

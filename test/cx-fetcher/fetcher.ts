@@ -1,7 +1,7 @@
 import assert = require('assert');
 import * as path from 'path';
 // import { ipcRenderer } from 'electron';
-import CxFetcher from '../../src/browser/cx-fetcher/fetcher';
+import CxFetcher from '../../src/browser/fetcher';
 import {
   EXAMPLE_EXTENSION_ID,
   EXAMPLE_EXTENSION_VERSION,
@@ -15,11 +15,11 @@ import {
   FAKE_DL_DESCRIPTOR,
   TEST_PATH_EXTENSIONS,
 } from './constants';
-import CxStorageProvider from '../../src/browser/cx-fetcher/storage-provider';
-import CxDownloadProvider from '../../src/browser/cx-fetcher/download-provider';
-import CxInterpreterProvider from '../../src/browser/cx-fetcher/interpreter-provider';
-import { MutexStatus } from '../../src/browser/cx-fetcher/types';
-import Location from '../../src/browser/cx-fetcher/location';
+import CxStorageProvider from '../../src/browser/fetcher/storage-provider';
+import CxDownloadProvider from '../../src/browser/fetcher/download-provider';
+import CxInterpreterProvider from '../../src/browser/fetcher/interpreter-provider';
+import { MutexStatus } from '../../src/browser/fetcher/types';
+import Location from '../../src/browser/fetcher/location';
 
 describe('Chrome Extension Fetcher', () => {
 

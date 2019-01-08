@@ -1,7 +1,12 @@
-import { IExtension } from './cx-fetcher/types';
-import { ExtensionMap, ManagerConfiguration } from 'src/common/types';
-import Fetcher from './cx-fetcher/fetcher';
-import { Callback } from 'src/common/apis';
+import {
+  IExtension,
+  ExtensionMap,
+  ExtensionStatus,
+  Callback,
+  Configuration,
+} from '../common/types';
+
+import Fetcher from './fetcher';
 import {
   addExtension as startExtension,
   removeExtension as stopExtension,
@@ -12,12 +17,12 @@ class ECx {
   private fetcher: Fetcher;
   private onExtensionUpdateListener: Callback<IExtension> | undefined;
 
-  constructor() {
+  constructor(configuration: Configuration = {}) {
     this.loaded = new Map();
-    this.configuration = {};
+    this.configuration = configuration;
   }
 
-  set configuration(configuration: ManagerConfiguration) {
+  set configuration(configuration: Configuration) {
     const { fetcher, onUpdate } = configuration;
 
     this.stop();
@@ -73,7 +78,7 @@ class ECx {
     this.onExtensionUpdateListener = callback;
 
     this.fetcher.addListener(
-      'chrome-extension-updated',
+      ExtensionStatus.Updated,
       this.onExtensionUpdateListener
     );
   }
@@ -81,7 +86,7 @@ class ECx {
   private unregisterExtensionUpdateListener(): void {
     if (this.onExtensionUpdateListener) {
       this.fetcher.removeListener(
-        'chrome-extension-updated',
+        ExtensionStatus.Updated,
         this.onExtensionUpdateListener
       );
     }

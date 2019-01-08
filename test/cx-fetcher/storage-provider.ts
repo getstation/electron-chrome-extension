@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 const { join } = require('path');
 const fse = require('fs-extra');
-import StorageProvider from '../../src/browser/cx-fetcher/storage-provider';
-import Location from '../../src/browser/cx-fetcher/location';
+import StorageProvider from '../../src/browser/fetcher/storage-provider';
+import Location from '../../src/browser/fetcher/location';
 import {
   EXAMPLE_EXTENSION_VERSION,
   TEST_PATH_EXTENSIONS,

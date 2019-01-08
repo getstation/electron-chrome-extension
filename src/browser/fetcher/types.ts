@@ -1,29 +1,8 @@
+import { IExtension, ILocation, IVersion } from '../../common/types';
+
 export enum MutexStatus {
   Installing = 'chrome-extension-installing',
   Updating = 'chrome-extension-updating',
-}
-
-export enum ExtensionStatus {
-  Installed = 'chrome-extension-installed',
-  Updated = 'chrome-extension-updated',
-  Removed = 'chrome-extension-removed',
-  Discovered = 'chrome-extension-discoverd',
-}
-
-export interface IExtension {
-  id: string;
-  version: IVersion;
-  location: ILocation;
-  updateUrl: string;
-}
-
-export interface IVersion {
-  number: string;
-  parsed: number[];
-}
-
-export interface ILocation {
-  path: string;
 }
 
 export interface IDownload {

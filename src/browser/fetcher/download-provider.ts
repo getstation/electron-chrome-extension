@@ -1,10 +1,12 @@
 // @ts-ignore
 import { downloadById } from 'download-crx';
 import { dir, DirectoryResult } from 'tmp-promise';
+
+import { IExtension } from '../../common/types';
+
 import Location from './location';
 import {
   IDownloadProvider,
-  IExtension,
 } from './types';
 
 let fetch: Promise<Response>;

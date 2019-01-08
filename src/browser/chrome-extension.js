@@ -1,6 +1,6 @@
 const { app, ipcMain, webContents, BrowserWindow, protocol } = require('electron')
 const { getAllWebContents } = process.atomBinding('web_contents')
-const ChromeAPIHandler = require('./api');
+const ChromeAPIHandler = require('./handlers');
 
 const { Buffer } = require('buffer')
 const fs = require('fs')
@@ -401,8 +401,9 @@ module.exports = {
     }
   },
 
-  removeExtension: function (name) {
-    const manifest = manifestNameMap[name]
+  removeExtension: function (id) {
+    const manifest = manifestWSMap[id];
+    console.log(manifest);
     if (!manifest) return
     const { extensionId } = manifest;
 
@@ -413,14 +414,6 @@ module.exports = {
     removeContentScripts(manifest)
     delete manifestMap[manifest.extensionId]
     delete manifestNameMap[name]
+    delete manifestWSMap[id];
   },
-
-  getExtensions: function () {
-    const extensions = {}
-    Object.keys(manifestNameMap).forEach(function (name) {
-      const manifest = manifestNameMap[name]
-      extensions[name] = { name: manifest.name, version: manifest.version }
-    })
-    return extensions
-  }
 }

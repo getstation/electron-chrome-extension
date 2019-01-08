@@ -1,8 +1,12 @@
 import { xml2js } from 'xml-js';
+
+import {
+  IExtension,
+  IVersion,
+} from '../../common/types';
+
 import {
   IInterpreterProvider,
-  IVersion,
-  IExtension,
   IInstall,
   IUpdate,
 } from './types';
