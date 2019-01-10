@@ -52,7 +52,11 @@ export default class InterpreterProvider implements IInterpreterProvider {
 
     const newVersion = this.getNewVersion(updateCheck);
 
-    return this.greaterThan(newVersion, extension.version);
+    if (newVersion) {
+      return this.greaterThan(newVersion, extension.version);
+    }
+
+    return false;
   }
 
   sortLastVersion(versions: IVersion[]) {
@@ -90,13 +94,13 @@ export default class InterpreterProvider implements IInterpreterProvider {
     return undefined;
   }
 
-  private getNewVersion(updateCheck: any): IVersion {
+  private getNewVersion(updateCheck: any): IVersion | undefined {
     const version = this.getNested(
       updateCheck, ['elements', '0', 'attributes', 'version']
     );
 
     if (!version) {
-      throw new Error('No version found in the update manifest');
+      return; // no update available
     }
 
     return InterpreterProvider.parseVersion(version);

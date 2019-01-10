@@ -32,6 +32,8 @@ class ECx {
     if (onUpdate) {
       this.registerExtensionUpdateListener(onUpdate);
     }
+
+    this.fetcher.scanInstalledExtensions();
   }
 
   stop() {

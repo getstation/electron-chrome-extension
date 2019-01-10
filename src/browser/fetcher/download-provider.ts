@@ -1,6 +1,7 @@
 // @ts-ignore
 import { downloadById } from 'download-crx';
 import { dir, DirectoryResult } from 'tmp-promise';
+import { stringify } from 'querystring';
 
 import { IExtension } from '../../common/types';
 
@@ -10,11 +11,9 @@ import {
 } from './types';
 
 let fetch: Promise<Response>;
-if (process.env.NODE_ENV === 'test') {
-  // @ts-ignore
-  fetch = window.fetch;
-} else {
-  fetch = require('electron-fetch');
+
+if (process.env.NODE_ENV !== 'test') {
+  fetch = require('got');
 }
 
 export default class DownloadProvider implements IDownloadProvider {
@@ -46,17 +45,30 @@ export default class DownloadProvider implements IDownloadProvider {
   }
 
   async getUpdateInfo(extension: IExtension) {
-    // @ts-ignore
-    const { ok, status, statusText, text } = await fetch(extension.updateUrl);
+    const { id, version, updateUrl } = extension;
 
-    if (!ok) {
-      throw new Error(`Http Status not ok: ${status} ${statusText}`);
+    const extQuery = stringify({
+      id,
+      v: version.number,
+      installsource: 'ondemand',
+      uc: '',
+    });
+
+    const checkQuery = stringify({
+      response: 'updatecheck',
+      prodversion: '',
+      x: [extQuery],
+    });
+
+    // @ts-ignore
+    const { body } = await fetch(`${updateUrl}?${checkQuery}`);
+
+    if (!body) {
+      throw new Error(`Http error for ${updateUrl}`);
     }
 
-    const xml = await text();
-
     return {
-      xml,
+      xml: body,
     };
   }
 }
