@@ -8,7 +8,7 @@
     "prestart": "rm -rf ./lib/ && tsc -p .",
     "start": "concurrently -k -r -s first \"npm:start:*\"",
     "start:watch": "tsc -p . -w",
-    "start:runner": "electron playground/main.js",
+    "start:runner": "electron playground/main.js --inspect=9222",
     "pretest": "rm -rf ./lib/ && tsc -p . && cp -R test/assets lib/test/assets",
     "test": "NODE_ENV=test concurrently -k -r -s first \"npm:test:*\"",
     "test:watch": "tsc -p . -w",

@@ -22,7 +22,7 @@ const defaultConfig: IFetcherConfig = {
   storager: new StorageProvider(),
   interpreter: new InterpreterProvider(),
   autoUpdateInterval: 300000,
-  autoUpdate: false,
+  autoUpdate: true,
 };
 
 export default class Fetcher extends EventEmitter implements IFetcher {
@@ -65,7 +65,10 @@ export default class Fetcher extends EventEmitter implements IFetcher {
     this.mutex = new Map();
 
     if (autoUpdate) {
-      this.autoUpdateLoop = setInterval(this.autoUpdate, this.autoUpdateInterval);
+      this.autoUpdateLoop = setInterval(
+        this.autoUpdate.bind(this),
+        this.autoUpdateInterval
+      );
     }
 
     Fetcher.instance = this;
@@ -170,6 +173,7 @@ export default class Fetcher extends EventEmitter implements IFetcher {
 
   public async autoUpdate() {
     const updates = [];
+
     for (const extensionId of this.available.keys()) {
       updates.push(this.update(extensionId));
     }
