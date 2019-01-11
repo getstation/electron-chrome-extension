@@ -22,7 +22,7 @@ const defaultConfig: IFetcherConfig = {
   storager: new StorageProvider(),
   interpreter: new InterpreterProvider(),
   autoUpdateInterval: 300000,
-  autoUpdate: true,
+  autoUpdate: false,
 };
 
 export default class Fetcher extends EventEmitter implements IFetcher {

@@ -41,11 +41,14 @@ app.on('ready', async () => {
   // Dashlane: fdjamakpfbbddfjaooikfcpapjohcfmg
   // Lastpass: hdokiejnpimakedhajhdlcegeplioahd
 
-  await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
-
   const onUpdate = (update) => console.log('Extension updated: ', update);
 
-  ECx.configuration = { onUpdate }
+  await ECx.setConfiguration({
+    onUpdate,
+    fetcher: { autoUpdate: true, autoUpdateInterval: 5000 },
+  });
+
+  await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
 });
 
 app.on('window-all-closed', () => {

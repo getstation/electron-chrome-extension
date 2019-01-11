@@ -14,15 +14,21 @@ import {
 
 class ECx {
   public loaded: ExtensionMap;
+  private needFirstScan: boolean;
   private fetcher: Fetcher;
   private onExtensionUpdateListener: Callback<IExtension> | undefined;
 
-  constructor(configuration: Configuration = {}) {
+  constructor() {
     this.loaded = new Map();
-    this.configuration = configuration;
+    this.needFirstScan = true;
   }
 
-  set configuration(configuration: Configuration) {
+  stop() {
+    Fetcher.reset();
+    this.unregisterExtensionUpdateListener();
+  }
+
+  async setConfiguration(configuration: Configuration = {}): Promise<ECx> {
     const { fetcher, onUpdate } = configuration;
 
     this.stop();
@@ -33,15 +39,15 @@ class ECx {
       this.registerExtensionUpdateListener(onUpdate);
     }
 
-    this.fetcher.scanInstalledExtensions();
-  }
-
-  stop() {
-    Fetcher.reset();
-    this.unregisterExtensionUpdateListener();
+    return this;
   }
 
   async load(extensionId: IExtension['id']): Promise<IExtension> {
+    if (this.needFirstScan) {
+      await this.fetcher.scanInstalledExtensions();
+      this.needFirstScan = false;
+    }
+
     if (this.loaded.has(extensionId)) {
       return this.loaded.get(extensionId)!;
     }

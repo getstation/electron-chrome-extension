@@ -12,9 +12,12 @@ import {
 
 let fetch: Promise<Response>;
 
+// require electron main context
 if (process.env.NODE_ENV !== 'test') {
-  fetch = require('got');
+  fetch = require('electron-fetch').default;
 }
+
+const chromeWebStoreVersion = process.versions.chrome.split('.').slice(0, 2).join('.');
 
 export default class DownloadProvider implements IDownloadProvider {
   private downloads: Map<IExtension['id'], DirectoryResult>;
@@ -56,19 +59,21 @@ export default class DownloadProvider implements IDownloadProvider {
 
     const checkQuery = stringify({
       response: 'updatecheck',
-      prodversion: '',
+      prodversion: chromeWebStoreVersion,
       x: [extQuery],
     });
 
     // @ts-ignore
-    const { body } = await fetch(`${updateUrl}?${checkQuery}`);
+    const response = await fetch(`${updateUrl}?${checkQuery}`);
 
-    if (!body) {
-      throw new Error(`Http error for ${updateUrl}`);
+    if (!response.ok) {
+      throw new Error(`Http Status not ok: ${status} ${response.statusText}`);
     }
 
+    const xml = await response.text();
+
     return {
-      xml: body,
+      xml,
     };
   }
 }
