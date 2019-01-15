@@ -403,7 +403,7 @@ module.exports = {
 
   removeExtension: function (id) {
     const manifest = manifestWSMap[id];
-    console.log(manifest);
+
     if (!manifest) return
     const { extensionId } = manifest;
 
@@ -413,7 +413,7 @@ module.exports = {
     removeBackgroundPages(manifest)
     removeContentScripts(manifest)
     delete manifestMap[manifest.extensionId]
-    delete manifestNameMap[name]
+    delete manifestNameMap[manifest.name]
     delete manifestWSMap[id];
   },
 }

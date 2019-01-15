@@ -78,6 +78,22 @@ class ECx {
     return !(await this.fetcher.checkForUpdate(extensionId));
   }
 
+  async get(extensionId: IExtension['id']): Promise<IExtension> {
+    const installedExtension = this.fetcher.get(extensionId);
+
+    if (installedExtension) {
+      const isUpToDate = await this.isUpToDate(extensionId);
+
+      if (isUpToDate) {
+        return installedExtension;
+      }
+
+      return await this.fetcher.update(extensionId) as IExtension;
+    }
+
+    return await this.fetcher.fetch(extensionId);
+  }
+
   private registerExtensionUpdateListener(
     callback: Callback<IExtension>
   ): void {
@@ -98,22 +114,6 @@ class ECx {
         this.onExtensionUpdateListener
       );
     }
-  }
-
-  private async get(extensionId: IExtension['id']): Promise<IExtension> {
-    const installedExtension = this.fetcher.get(extensionId);
-
-    if (installedExtension) {
-      const isUpToDate = await this.isUpToDate(extensionId);
-
-      if (isUpToDate) {
-        return installedExtension;
-      }
-
-      return await this.fetcher.update(extensionId) as IExtension;
-    }
-
-    return await this.fetcher.fetch(extensionId);
   }
 }
 
