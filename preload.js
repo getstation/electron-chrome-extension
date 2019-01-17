@@ -1,1 +1,1 @@
-require('./lib/renderer/init');
+require('./lib/renderer/');

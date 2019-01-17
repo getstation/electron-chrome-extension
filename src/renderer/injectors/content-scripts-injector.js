@@ -96,6 +96,8 @@ Object.keys(contentScripts).forEach(key => {
       require('../window-setup')(isolatedWorldWindow, ipcRenderer, guestInstanceId, openerId);
       // end workaround
 
+      require('../xhr').default(isolatedWorldWindow);
+
       for (const script of cs.contentScripts) {
         addContentScript(cs.extensionId, script)
       }

@@ -95,11 +95,11 @@ const startBackgroundPages = function (manifest) {
     isBackgroundPage: true,
     commandLineSwitches: [
       '--electron-chrome-extension-background-page',
-      `--preload=${path.join(__dirname, '../renderer/init.js')}`
+      `--preload=${path.join(__dirname, '../renderer/index.js')}`
     ]
   });
 
-  backgroundPages[manifest.extensionId] = { html: html, webContents: contents, name: name }
+  backgroundPages[manifest.extensionId] = { html: html, webContents: contents, name: name, src: manifest.srcDirectory }
 
   contents.loadURL(url.format({
     protocol: constants.EXTENSION_PROTOCOL,
@@ -342,51 +342,36 @@ app.on('web-contents-created', function (event, webContents) {
   })
 })
 
-// The chrome-extension: can map a extension URL request to real file path.
-const chromeExtensionHandler = function (request, callback) {
-  const parsed = url.parse(request.url)
-  if (!parsed.hostname || !parsed.path) return callback()
-
-  const manifest = manifestMap[parsed.hostname] || manifestWSMap[parsed.hostname];
-  if (!manifest) return callback()
-
-  const page = backgroundPages[parsed.hostname]
-  if (page && parsed.path === `/${page.name}`) {
-    return callback({
-      mimeType: 'text/html',
-      data: page.html
-    })
-  }
-
-  fs.readFile(path.join(manifest.srcDirectory, parsed.pathname), function (err, content) {
-    if (err) {
-      return callback(-6)  // FILE_NOT_FOUND
-    } else {
-      if (parsed.pathname.endsWith('.html')) {
-        return callback({
-          mimeType: 'text/html',
-          data: content,
-        })
-      }
-      return callback(content)
-    }
-  })
-}
-
-protocol.registerStandardSchemes([constants.EXTENSION_PROTOCOL], { secure: true });
-
-app.on('session-created', function (ses) {
-  if (constants.EXTENSION_PROTOCOL === constants.DEFAULT_EXTENSION_PROTOCOL) {
-    ses.protocol.unregisterProtocol(constants.DEFAULT_EXTENSION_PROTOCOL);
-  }
-  ses.protocol.registerBufferProtocol(constants.EXTENSION_PROTOCOL, chromeExtensionHandler, function (error) {
-    if (error) {
-      console.error(`Unable to register ${constants.EXTENSION_PROTOCOL} protocol: ${error}`)
-    }
-  })
-})
-
 module.exports = {
+  // should be removed when we have a typed extensions memory store
+  getExtensionById: function (extensionId) {
+    const bgExt = backgroundPages[extensionId]
+
+    if (bgExt) {
+      return {
+        src: bgExt.src,
+        backgroundPage: {
+          name: bgExt.name,
+          html: bgExt.html,
+        },
+      };
+    }
+
+    const manifest = manifestWSMap[extensionId];
+    const ext = backgroundPages[manifest.extensionId]
+
+    if (ext) {
+      return {
+        src: ext.src,
+        backgroundPage: {
+          name: ext.name,
+          html: ext.html,
+        },
+      };
+    }
+
+    return undefined;
+  },
   // The public API to add/remove extensions.
   addExtension: function (extensionId, srcDirectory) {
     const manifest = getManifestFromPath(extensionId, srcDirectory)
