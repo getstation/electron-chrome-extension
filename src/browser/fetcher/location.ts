@@ -1,4 +1,4 @@
-import { ILocation } from './types';
+import { ILocation } from '../../common/types';
 
 export default class Location implements ILocation {
   public path: string;

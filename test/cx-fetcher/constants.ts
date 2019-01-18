@@ -1,4 +1,4 @@
-import CxInterpreterProvider from '../../src/browser/cx-fetcher/interpreter-provider';
+import CxInterpreterProvider from '../../src/browser/fetcher/interpreter-provider';
 
 const path = require('path');
 

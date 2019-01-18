@@ -1,4 +1,10 @@
 import { EventEmitter } from 'events';
+
+import {
+  IExtension,
+  ExtensionStatus,
+} from '../../common/types';
+
 import StorageProvider from './storage-provider';
 import DownloadProvider from './download-provider';
 import InterpreterProvider from './interpreter-provider';
@@ -8,9 +14,7 @@ import {
   IDownloadProvider,
   IStorageProvider,
   IInterpreterProvider,
-  IExtension,
   MutexStatus,
-  ExtensionStatus,
 } from './types';
 
 const defaultConfig: IFetcherConfig = {
@@ -61,14 +65,20 @@ export default class Fetcher extends EventEmitter implements IFetcher {
     this.mutex = new Map();
 
     if (autoUpdate) {
-      this.autoUpdateLoop = setInterval(this.autoUpdate, this.autoUpdateInterval);
+      this.autoUpdateLoop = setInterval(
+        this.autoUpdate.bind(this),
+        this.autoUpdateInterval
+      );
     }
 
     Fetcher.instance = this;
   }
 
   public static reset() {
-    delete Fetcher.instance;
+    if (Fetcher.instance) {
+      Fetcher.instance.stopAutoUpdate();
+      delete Fetcher.instance;
+    }
   }
 
   list() {
@@ -163,6 +173,7 @@ export default class Fetcher extends EventEmitter implements IFetcher {
 
   public async autoUpdate() {
     const updates = [];
+
     for (const extensionId of this.available.keys()) {
       updates.push(this.update(extensionId));
     }

@@ -1,7 +1,7 @@
 import assert = require('assert');
 import * as path from 'path';
 // import { ipcRenderer } from 'electron';
-import CxFetcher from '../../src/browser/cx-fetcher/fetcher';
+import CxFetcher from '../../src/browser/fetcher';
 import {
   EXAMPLE_EXTENSION_ID,
   EXAMPLE_EXTENSION_VERSION,
@@ -13,11 +13,13 @@ import {
   FAKE_EXTENSION_UPDATE_URL,
   FAKE_INSTALL_DESCRIPTOR,
   FAKE_DL_DESCRIPTOR,
+  TEST_PATH_EXTENSIONS,
 } from './constants';
-import CxStorageProvider from '../../src/browser/cx-fetcher/storage-provider';
-import CxDownloadProvider from '../../src/browser/cx-fetcher/download-provider';
-import CxInterpreterProvider from '../../src/browser/cx-fetcher/interpreter-provider';
-import { MutexStatus } from '../../src/browser/cx-fetcher/types';
+import CxStorageProvider from '../../src/browser/fetcher/storage-provider';
+import CxDownloadProvider from '../../src/browser/fetcher/download-provider';
+import CxInterpreterProvider from '../../src/browser/fetcher/interpreter-provider';
+import { MutexStatus } from '../../src/browser/fetcher/types';
+import Location from '../../src/browser/fetcher/location';
 
 describe('Chrome Extension Fetcher', () => {
 
@@ -55,7 +57,14 @@ describe('Chrome Extension Fetcher', () => {
   describe('fetching chrome extension', () => {
     beforeEach(() => {
       const downloader = new CxDownloadProvider();
-      const storager = new CxStorageProvider();
+      const storager = new CxStorageProvider({
+        extensionsFolder: new Location(
+          TEST_PATH_EXTENSIONS
+        ),
+        cacheFolder: new Location(
+          `${TEST_PATH_EXTENSIONS}-cache`
+        ),
+      });
       const interpreter = new CxInterpreterProvider();
       downloader.downloadById = () => Promise.resolve(FAKE_DL_DESCRIPTOR);
       downloader.cleanupById = () => Promise.resolve();
@@ -113,7 +122,12 @@ describe('Chrome Extension Fetcher', () => {
 
   describe('discovering already installed extension', () => {
     it('registers installed Cx', async () => {
-      const storager = new CxStorageProvider({ extensionsFolder: { path: TEST_PATH_INSTALLED } });
+      const storager = new CxStorageProvider({
+        extensionsFolder: { path: TEST_PATH_INSTALLED },
+        cacheFolder: new Location(
+          `${TEST_PATH_EXTENSIONS}-cache`
+        ),
+      });
       const cxFetcher = new CxFetcher({ storager });
 
       const expectedFolder = path.join(TEST_PATH_INSTALLED, EXAMPLE_EXTENSION_ID, EXAMPLE_EXTENSION_VERSION.number);

@@ -1,9 +1,6 @@
+export const ApiHandler = 'cx-handler';
+export const ApiEvent = 'cx-event';
 
-export const CxApiHandler = 'cx-handler';
-export const CxApiEvent = 'cx-event';
-
-export enum CxApiChannels {
+export enum ApiChannels {
   Windows = 'channel-windows',
 }
-
-export type Callback<T> = (payload: T) => void;

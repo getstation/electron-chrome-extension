@@ -4,15 +4,18 @@ import { join, resolve } from 'path';
 import { move, readJson, ensureDir } from 'fs-extra';
 // @ts-ignore
 import unzip from 'unzip-crx';
+
+import {
+  ILocation,
+} from '../../common/types';
+
 import Location from './location';
 import {
   IStorageProvider,
   IManifest,
   IDownload,
-  ILocation,
   IStorageProviderConfig,
 } from './types';
-import { TEST_PATH_EXTENSIONS } from '../../../test/cx-fetcher/constants';
 
 const defaultConfiguration = process.env.NODE_ENV !== 'test'
   ? {
@@ -24,12 +27,8 @@ const defaultConfiguration = process.env.NODE_ENV !== 'test'
     ),
   }
   : {
-    extensionsFolder: new Location(
-      TEST_PATH_EXTENSIONS
-    ),
-    cacheFolder: new Location(
-      `${TEST_PATH_EXTENSIONS}-cache`
-    ),
+    extensionsFolder: new Location(''),
+    cacheFolder: new Location(''),
   };
 
 export default class StorageProvider implements IStorageProvider {
@@ -37,10 +36,16 @@ export default class StorageProvider implements IStorageProvider {
   public cacheFolder: ILocation;
 
   constructor(customConfiguration: Partial<IStorageProviderConfig> = {}) {
-    const configuration = { ...defaultConfiguration, ...customConfiguration };
+    const {
+      extensionsFolder,
+      cacheFolder,
+    } = {
+      ...defaultConfiguration,
+      ...customConfiguration,
+    };
 
-    this.extensionsFolder = configuration.extensionsFolder;
-    this.cacheFolder = configuration.cacheFolder;
+    this.extensionsFolder = extensionsFolder;
+    this.cacheFolder = cacheFolder;
   }
 
   async installExtension(crxDownload: IDownload) {

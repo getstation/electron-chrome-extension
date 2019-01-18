@@ -6,7 +6,7 @@ import {
   GetInfo,
   UpdateInfo,
 } from '../../common/apis/windows';
-import { CxApiChannels, CxApiHandler, CxApiEvent } from '../../common/apis';
+import { ApiChannels, ApiHandler, ApiEvent } from '../../common/apis';
 const { RpcIpcManager, rpc } = require('electron-simple-rpc');
 
 class ChromeWindowsAPIHandler {
@@ -34,8 +34,8 @@ class ChromeWindowsAPIHandler {
         {}
       );
 
-    this.eventScope = `${CxApiEvent}-${CxApiChannels.Windows}`;
-    this.handlerScope = `${CxApiHandler}-${CxApiChannels.Windows}-${extensionId};`;
+    this.eventScope = `${ApiEvent}-${ApiChannels.Windows}`;
+    this.handlerScope = `${ApiHandler}-${ApiChannels.Windows}-${extensionId};`;
 
     this.rpcIpcManager = new RpcIpcManager(rpcLibraries, this.handlerScope);
   }

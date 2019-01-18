@@ -4,15 +4,14 @@ const { format } = require('url');
 const { mkdirSync, existsSync } = require('fs');
 
 // for convenience, we'll store electron userData
-// in the nearby .electron-user-data directory 
+// in the nearby .electron-user-data directory
 if (!app.isPackaged) {
   const userDataPath = join(__dirname, '.electron-user-data');
   if (!existsSync(userDataPath)) mkdirSync(userDataPath);
   app.setPath('userData', userDataPath);
 }
 
-const { addExtension } = require('../lib/src/browser/chrome-extension.js');
-const CxFetcher = require('../lib/src/browser/cx-fetcher/fetcher.js').default;
+const ECx = require('../lib/src/browser/').default;
 
 let mainWindow;
 
@@ -25,7 +24,7 @@ function createWindow() {
     slashes: true,
   }));
 
-  mainWindow.on('closed', () => mainWindow = null)
+  mainWindow.on('closed', () => mainWindow = null);
 }
 
 app.on('ready', async () => {
@@ -42,24 +41,29 @@ app.on('ready', async () => {
   // Dashlane: fdjamakpfbbddfjaooikfcpapjohcfmg
   // Lastpass: hdokiejnpimakedhajhdlcegeplioahd
 
-  const cxFetcher = new CxFetcher();
-  const { id, location: { path } } = await cxFetcher.fetch('ocpljaamllnldhepankaeljmeeeghnid');
-  addExtension(id, path);
+  const onUpdate = (update) => console.log('Extension updated: ', update);
+
+  await ECx.setConfiguration({
+    onUpdate,
+    fetcher: { autoUpdate: true, autoUpdateInterval: 5000 },
+  });
+
+  await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
 });
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
 });
 
 app.on('activate', () => {
   if (mainWindow === null) {
-    createWindow()
+    createWindow();
   }
 });
 
 app.on('session-created', session => {
   const userAgent = session.getUserAgent();
-  session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''))
+  session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''));
 });

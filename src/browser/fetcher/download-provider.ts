@@ -1,19 +1,23 @@
 // @ts-ignore
 import { downloadById } from 'download-crx';
 import { dir, DirectoryResult } from 'tmp-promise';
+import { stringify } from 'querystring';
+
+import { IExtension } from '../../common/types';
+
 import Location from './location';
 import {
   IDownloadProvider,
-  IExtension,
 } from './types';
 
 let fetch: Promise<Response>;
-if (process.env.NODE_ENV === 'test') {
-  // @ts-ignore
-  fetch = window.fetch;
-} else {
-  fetch = require('electron-fetch');
+
+// require electron main context
+if (process.env.NODE_ENV !== 'test') {
+  fetch = require('electron-fetch').default;
 }
+
+const chromeWebStoreVersion = process.versions.chrome.split('.').slice(0, 2).join('.');
 
 export default class DownloadProvider implements IDownloadProvider {
   private downloads: Map<IExtension['id'], DirectoryResult>;
@@ -44,14 +48,29 @@ export default class DownloadProvider implements IDownloadProvider {
   }
 
   async getUpdateInfo(extension: IExtension) {
-    // @ts-ignore
-    const { ok, status, statusText, text } = await fetch(extension.updateUrl);
+    const { id, version, updateUrl } = extension;
 
-    if (!ok) {
-      throw new Error(`Http Status not ok: ${status} ${statusText}`);
+    const extQuery = stringify({
+      id,
+      v: version.number,
+      installsource: 'ondemand',
+      uc: '',
+    });
+
+    const checkQuery = stringify({
+      response: 'updatecheck',
+      prodversion: chromeWebStoreVersion,
+      x: [extQuery],
+    });
+
+    // @ts-ignore
+    const response = await fetch(`${updateUrl}?${checkQuery}`);
+
+    if (!response.ok) {
+      throw new Error(`Http Status not ok: ${response.status} ${response.statusText}`);
     }
 
-    const xml = await text();
+    const xml = await response.text();
 
     return {
       xml,
