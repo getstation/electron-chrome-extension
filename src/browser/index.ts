@@ -13,14 +13,22 @@ import {
 } from './chrome-extension';
 
 class ECx {
+  private static runtime: ECx;
   public loaded: ExtensionMap;
-  private needFirstScan: boolean;
+  private configuration: Configuration;
   private fetcher: Fetcher;
   private onExtensionUpdateListener: Callback<IExtension> | undefined;
 
   constructor() {
     this.loaded = new Map();
-    this.needFirstScan = true;
+  }
+
+  static run() {
+    if (this.runtime) {
+      return this.runtime;
+    }
+
+    return this.runtime = new this();
   }
 
   stop() {
@@ -29,11 +37,15 @@ class ECx {
   }
 
   async setConfiguration(configuration: Configuration = {}): Promise<ECx> {
+    this.configuration = configuration;
+
     const { fetcher, onUpdate } = configuration;
 
     this.stop();
 
     this.fetcher = new Fetcher(fetcher);
+
+    await this.fetcher.scanInstalledExtensions();
 
     if (onUpdate) {
       this.registerExtensionUpdateListener(onUpdate);
@@ -43,10 +55,7 @@ class ECx {
   }
 
   async load(extensionId: IExtension['id']): Promise<IExtension> {
-    if (this.needFirstScan) {
-      await this.fetcher.scanInstalledExtensions();
-      this.needFirstScan = false;
-    }
+    await this.ensureConfiguredInstance();
 
     if (this.loaded.has(extensionId)) {
       return this.loaded.get(extensionId)!;
@@ -82,13 +91,13 @@ class ECx {
     const installedExtension = this.fetcher.get(extensionId);
 
     if (installedExtension) {
-      const isUpToDate = await this.isUpToDate(extensionId);
+      const updatedExtension = await this.fetcher.update(extensionId);
 
-      if (isUpToDate) {
-        return installedExtension;
+      if (updatedExtension) {
+        return updatedExtension;
       }
 
-      return await this.fetcher.update(extensionId) as IExtension;
+      return installedExtension;
     }
 
     return await this.fetcher.fetch(extensionId);
@@ -115,6 +124,14 @@ class ECx {
       );
     }
   }
+
+  private async ensureConfiguredInstance(): Promise<void> {
+    if (this.configuration) {
+      return;
+    }
+
+    await this.setConfiguration();
+  }
 }
 
-export default new ECx();
+export default ECx.run();
