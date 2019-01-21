@@ -358,16 +358,19 @@ module.exports = {
     }
 
     const manifest = manifestWSMap[extensionId];
-    const ext = backgroundPages[manifest.extensionId]
 
-    if (ext) {
-      return {
-        src: ext.src,
-        backgroundPage: {
-          name: ext.name,
-          html: ext.html,
-        },
-      };
+    if (manifest) {
+      const ext = backgroundPages[manifest.extensionId]
+
+      if (ext) {
+        return {
+          src: ext.src,
+          backgroundPage: {
+            name: ext.name,
+            html: ext.html,
+          },
+        };
+      }
     }
 
     return undefined;
