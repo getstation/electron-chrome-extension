@@ -77,6 +77,8 @@ class ECx {
     }
 
     stopExtension(extensionId);
+
+    this.loaded.delete(extensionId);
   }
 
   isLoaded(extensionId: IExtension['id']): boolean {
