@@ -38,6 +38,7 @@ app.on('ready', async () => {
   // Boomerang: mdanidgdpmkimeiiojknlnekblgmpdll
   // Clearbit Connect: pmnhcgfcafcnkbengdcanjablaabjplo
   // 1Password X: aeblfdkhhhdcdjpifhhbdiojplfjncoa
+  // Grammarly: kbfnbcaeplbcioakkpcpgfkobkghlhen
   // Dashlane: fdjamakpfbbddfjaooikfcpapjohcfmg
   // Lastpass: hdokiejnpimakedhajhdlcegeplioahd
 
@@ -45,7 +46,7 @@ app.on('ready', async () => {
 
   await ECx.setConfiguration({
     onUpdate,
-    fetcher: { autoUpdate: true, autoUpdateInterval: 5000 },
+    fetcher: { autoUpdate: true, autoUpdateInterval: 1000000 },
   });
 
   await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
