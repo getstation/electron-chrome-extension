@@ -1,4 +1,5 @@
 const { session, ipcMain } = require('electron');
+const enhanceWebRequest = require('electron-better-web-request').default;
 const RCEventController = require('../rc-event-controller');
 const helpers = require('../helpers');
 const constants = require('../../common/constants');
@@ -20,14 +21,14 @@ const fromElectronHeadersToChromeHeaders = (cbReturn) => {
 const fromChromeHeadersToElectronHeaders = (details) => {
   if (details.responseHeaders)
     details.responseHeaders = Object.keys(details.responseHeaders).map((k) =>
-      ({ name: k, value: details.responseHeaders[k][0]}));
+      ({ name: k, value: details.responseHeaders[k][0] }));
 
   return details;
 };
 
 class ChromeWebRequestAPIHandler {
   constructor(extensionId) {
-    this.electronWebRequestApi = session.defaultSession.webRequest;
+    this.electronWebRequestApi = enhanceWebRequest(session.defaultSession).webRequest;
     this.rcEventControllers = [];
 
     WEBREQUEST_EVENTS.forEach(methodName => {
@@ -39,15 +40,21 @@ class ChromeWebRequestAPIHandler {
         // https://cs.chromium.org/chromium/src/extensions/browser/api/web_request/web_request_api.cc?type=cs&l=2267
         helpers.clearCacheOnNavigation();
 
-        this.electronWebRequestApi[methodName](filter, (details, callback) => {
-          if (callback)
-            remoteCallListener(fromChromeHeadersToElectronHeaders(details))
-              .then(returnedDetails => {
-                if (!returnedDetails) return callback(details);
-                return callback(fromElectronHeadersToChromeHeaders(returnedDetails))
-              })
-              .catch(e => console.error(e))
-        })
+        this.electronWebRequestApi[methodName](
+          filter,
+          (details, callback) => {
+            if (callback)
+              remoteCallListener(fromChromeHeadersToElectronHeaders(details))
+                .then(returnedDetails => {
+                  if (!returnedDetails) return callback(details);
+                  return callback(fromElectronHeadersToChromeHeaders(returnedDetails))
+                })
+                .catch(e => console.error(e))
+          },
+          {
+            origin: 'ecx-api-handler',
+          }
+        );
       })
     });
 
@@ -59,7 +66,7 @@ class ChromeWebRequestAPIHandler {
     helpers.clearCacheOnNavigation();
   }
 
-  release () {
+  release() {
     this.rcEventControllers.forEach(c => c.release())
     ipcMain.removeListener(constants.WEBREQUEST_ASK_CLEAR_CACHE, this._handleAskToClearCache);
   }

@@ -1,4 +1,5 @@
 import { app } from 'electron';
+import enhanceWebRequest from 'electron-better-web-request';
 import { Protocol } from '../../common';
 
 const requestIsXhrOrSubframe = (details: any) => {
@@ -31,7 +32,10 @@ const requestsOrigins = new Map<string, string>();
 app.on(
   'session-created',
   (session: Electron.Session) => {
+    enhanceWebRequest(session);
+
     session.webRequest.onBeforeSendHeaders(
+      // @ts-ignore
       (details: any, callback: Function) => {
         const { id, headers: { Origin } } = details;
 
@@ -55,10 +59,14 @@ app.on(
             ...details.requestHeaders,
           },
         });
+      },
+      {
+        origin: 'ecx-cors',
       }
     );
 
     session.webRequest.onHeadersReceived(
+      // @ts-ignore
       (details: any, callback: Function) => {
         const { id, responseHeaders } = details;
 
@@ -95,20 +103,10 @@ app.on(
         requestsOrigins.delete(id);
 
         callback({ cancel: false, responseHeaders });
+      },
+      {
+        origin: 'ecx-cors',
       }
     );
-
-    session.webRequest.onErrorOccurred(
-      (details: any) => {
-        const missable = [
-          'net::ERR_CACHE_MISS',
-        ];
-
-        const warnable = !missable.includes(details.error);
-
-        if (warnable) {
-          // console.error('WebRequest error occured: ', details);
-        }
-      });
   }
 );
