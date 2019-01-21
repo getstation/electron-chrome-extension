@@ -67,7 +67,7 @@ export default class DownloadProvider implements IDownloadProvider {
     const response = await fetch(`${updateUrl}?${checkQuery}`);
 
     if (!response.ok) {
-      throw new Error(`Http Status not ok: ${status} ${response.statusText}`);
+      throw new Error(`Http Status not ok: ${response.status} ${response.statusText}`);
     }
 
     const xml = await response.text();
