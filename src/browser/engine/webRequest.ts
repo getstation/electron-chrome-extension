@@ -1,21 +1,23 @@
 import { app } from 'electron';
 import enhanceWebRequest from 'electron-better-web-request';
+// @ts-ignore
+import recursivelyLowercaseJSONKeys from 'recursive-lowercase-json';
 import { Protocol } from '../../common';
 
 const requestIsXhrOrSubframe = (details: any) => {
-  const { resourceType } = details;
+  const { resourcetype } = details;
 
-  const isXhr = resourceType === 'xhr';
-  const isSubframe = resourceType === 'subFrame';
+  const isXhr = resourcetype === 'xhr';
+  const isSubframe = resourcetype === 'subFrame';
 
   return isXhr || isSubframe;
 };
 
 const requestHasExtensionOrigin = (details: any) => {
-  const { headers: { Origin } } = details;
+  const { headers: { origin } } = details;
 
-  if (Origin) {
-    return Origin.startsWith(Protocol.Extension);
+  if (origin) {
+    return origin.startsWith(Protocol.Extension);
   }
 
   return false;
@@ -27,6 +29,9 @@ const requestIsOption = (details: any) => {
   return method === 'OPTIONS';
 };
 
+const requestIsForExtension = (details: any) =>
+  requestHasExtensionOrigin(details) && requestIsXhrOrSubframe(details);
+
 const requestsOrigins = new Map<string, string>();
 
 app.on(
@@ -37,27 +42,25 @@ app.on(
     session.webRequest.onBeforeSendHeaders(
       // @ts-ignore
       (details: any, callback: Function) => {
-        const { id, headers: { Origin } } = details;
+        const formattedDetails = recursivelyLowercaseJSONKeys(details);
+        const { id, headers: { origin } } = formattedDetails;
 
-        requestsOrigins.set(id, Origin);
+        requestsOrigins.set(id, origin);
 
-        if (requestIsXhrOrSubframe(details)
-          && requestHasExtensionOrigin(details)
-          && !requestIsOption(details)) {
+        if (requestIsForExtension(formattedDetails)
+          && !requestIsOption(formattedDetails)) {
           return callback({
             cancel: false,
             requestHeaders: {
-              ...details.requestHeaders,
-              Origin: ['null'],
+              ...formattedDetails.requestheaders,
+              origin: ['null'],
             },
           });
         }
 
         callback({
           cancel: false,
-          requestHeaders: {
-            ...details.requestHeaders,
-          },
+          requestHeaders: formattedDetails.requestheaders,
         });
       },
       {
@@ -68,41 +71,32 @@ app.on(
     session.webRequest.onHeadersReceived(
       // @ts-ignore
       (details: any, callback: Function) => {
-        const { id, responseHeaders } = details;
+        const formattedDetails = recursivelyLowercaseJSONKeys(details);
+        const { id, responseheaders } = formattedDetails;
 
-        if (requestIsXhrOrSubframe(details) &&
-          requestHasExtensionOrigin(details)) {
+        const accessControlAllowOrigin = responseheaders['access-control-allow-origin'] || [];
+        const allowedOriginIsWildcard = accessControlAllowOrigin.includes('*');
 
+        if (requestIsForExtension(formattedDetails)
+          || allowedOriginIsWildcard) {
           const modifiedHeaders = {
             'access-control-allow-credentials': ['true'],
             'access-control-allow-origin': [requestsOrigins.get(id)],
           };
+          requestsOrigins.delete(id);
 
           return callback({
             cancel: false,
             responseHeaders: {
-              ...responseHeaders,
+              ...responseheaders,
               ...modifiedHeaders,
-            },
-          });
-        }
-
-        if (responseHeaders['access-control-allow-origin'] &&
-          responseHeaders['access-control-allow-origin'].includes('*')) {
-
-          return callback({
-            cancel: false,
-            responseHeaders: {
-              ...responseHeaders,
-              'access-control-allow-credentials': ['true'],
-              'access-control-allow-origin': [requestsOrigins.get(id)],
             },
           });
         }
 
         requestsOrigins.delete(id);
 
-        callback({ cancel: false, responseHeaders });
+        callback({ cancel: false, responseHeaders: responseheaders });
       },
       {
         origin: 'ecx-cors',

@@ -48,6 +48,7 @@
     "npm-internal": "^1.4.0",
     "p-queue": "^3.0.0",
     "querystring": "^0.2.0",
+    "recursive-lowercase-json": "^0.2.0",
     "tmp-promise": "^1.0.5",
     "unzip-crx": "^0.2.0",
     "uuid": "^3.2.1",
