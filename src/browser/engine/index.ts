@@ -1,5 +1,5 @@
 import('./webRequest');
 import('./protocol');
-import gateway from './gateway';
+import api from './api';
 
-export default gateway;
+export default api;

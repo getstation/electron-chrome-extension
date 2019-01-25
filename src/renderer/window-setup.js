@@ -6,7 +6,7 @@
 const { defineProperty } = Object;
 
 // Helper function to resolve relative url.
-const a = window.top.document.createElement('a');
+const a = document.createElement('a');
 const resolveURL = url => {
   a.href = url;
   return a.href;
