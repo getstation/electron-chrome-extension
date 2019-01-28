@@ -96,7 +96,13 @@ app.on(
 
         requestsOrigins.delete(id);
 
-        callback({ cancel: false, responseHeaders: responseheaders });
+        callback({
+          cancel: false,
+          responseHeaders: {
+            ...responseheaders,
+            'access-control-allow-credentials': ['true'],
+          },
+        });
       },
       {
         origin: 'ecx-cors',
