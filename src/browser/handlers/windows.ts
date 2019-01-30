@@ -2,11 +2,11 @@ import { BrowserWindow } from 'electron';
 import {
   Window,
   CreateData,
-  CxWindowsApi,
+  Methods,
   GetInfo,
   UpdateInfo,
 } from '../../common/apis/windows';
-import { ApiChannels, ApiHandler, ApiEvent } from '../../common/apis';
+import { Channel, Api, scope, extensionScope } from '../../common/';
 const { RpcIpcManager, rpc } = require('electron-simple-rpc');
 
 class ChromeWindowsAPIHandler {
@@ -22,11 +22,11 @@ class ChromeWindowsAPIHandler {
     this.extensionWebContents = new Map();
 
     const rpcLibraries = Object
-      .keys(CxWindowsApi)
+      .keys(Methods)
       .reduce(
         (library, method) => {
           const handler = this[`handle${method}`];
-          library[CxWindowsApi[method]] = (...args: any[]) => {
+          library[Methods[method]] = (...args: any[]) => {
             return handler.apply(this, args);
           };
           return library;
@@ -34,9 +34,8 @@ class ChromeWindowsAPIHandler {
         {}
       );
 
-    this.eventScope = `${ApiEvent}-${ApiChannels.Windows}`;
-    this.handlerScope = `${ApiHandler}-${ApiChannels.Windows}-${extensionId};`;
-
+    this.eventScope = scope(Channel.Event, Api.Windows);
+    this.handlerScope = extensionScope(Channel.Handler, Api.Windows, extensionId);
     this.rpcIpcManager = new RpcIpcManager(rpcLibraries, this.handlerScope);
   }
 

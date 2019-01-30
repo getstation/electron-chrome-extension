@@ -64,7 +64,22 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
       chrome.runtime.incrementOriginResultID()
     },
 
-    query() { },
+    get() {
+      console.log('get')
+    },
+
+    getCurrent() {
+      console.log('getCurrent')
+    },
+
+    create() {
+      console.log('create')
+    },
+
+    query() {
+      console.log('query')
+    },
+
     onUpdated: new Event(),
     onCreated: new Event(),
     onRemoved: new Event(),
@@ -80,6 +95,16 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     setPopup() { },
     getPopup() { }
   };
+
+  chrome.cookies = require('./api/cookies').default(extensionId);
+
+  const { RpcIpcManager } = require('electron-simple-rpc');
+
+  const library = {
+    onChanged: (arg) => chrome.cookies.onChanged.emit(arg),
+  };
+
+  const manager = new RpcIpcManager(library, 'cx-event-cookies');
 
   ipcRenderer.on(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, (event, tabId, portId, connectInfo) => {
     chrome.runtime.onConnect.emit(Port.get(tabId, portId, extensionId, connectInfo.name))
@@ -100,6 +125,17 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   });
 
   chrome.runtime.onInstalled.emit({ reason: 'install' });
+
+  const handler = {
+    get: (target, prop, receiver) => {
+
+      // console.log(prop);
+
+      return target[prop];
+    }
+  };
+
+  chrome = new Proxy(context.chrome, handler)
 
   return chrome;
 };

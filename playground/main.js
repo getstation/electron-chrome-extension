@@ -49,7 +49,7 @@ app.on('ready', async () => {
     fetcher: { autoUpdate: true, autoUpdateInterval: 1000000 },
   });
 
-  await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
+  await ECx.load('kbfnbcaeplbcioakkpcpgfkobkghlhen');
 });
 
 app.on('window-all-closed', () => {

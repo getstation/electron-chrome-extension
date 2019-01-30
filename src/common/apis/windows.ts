@@ -1,7 +1,7 @@
 // chrome.windows
 // See https://developer.chrome.com/extensions/windows
 
-export enum CxWindowsApi {
+export enum Methods {
   Get = 'get',
   GetCurrent = 'get-current',
   GetLastFocused = 'get-last-focused',
