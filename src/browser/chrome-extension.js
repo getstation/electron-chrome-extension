@@ -326,6 +326,9 @@ const loadDevToolsExtensions = function (win, manifests) {
   manifests.forEach(loadExtension)
 
   const extensionInfoArray = manifests.map(manifestToExtensionInfo)
+  extensionInfoArray.forEach((extension) => {
+    win.devToolsWebContents._grantOriginAccess(extension.startPage)
+  })
   // Calling setTimeout allows us to bypass the following issue:
   // https://bugs.chromium.org/p/chromium/issues/detail?id=822966
   setTimeout(() => {
