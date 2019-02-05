@@ -41,6 +41,8 @@ app.on('ready', async () => {
   // Grammarly: kbfnbcaeplbcioakkpcpgfkobkghlhen
   // Dashlane: fdjamakpfbbddfjaooikfcpapjohcfmg
   // Lastpass: hdokiejnpimakedhajhdlcegeplioahd
+  // React Developers Tools: fmkadmapgofadopljbjfkapdkoienihi
+  // Redux DevTools: lmhkpmbekcpmknklioeibfkpmmfibljd
 
   const onUpdate = (update) => console.log('Extension updated: ', update);
 
