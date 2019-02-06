@@ -7,6 +7,7 @@
         "name": "Playground: Main",
         "protocol": "inspector",
         "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+        "preLaunchTask": "prestart",
         "runtimeArgs": [
           "${workspaceRoot}/playground/main.js",
           "--remote-debugging-port=9223",
