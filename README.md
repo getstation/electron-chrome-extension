@@ -24,6 +24,26 @@ import { addExtension } from 'electron-chrome-extension';
 addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
 ```
 
+### Usage with DevTools extension
+
+⚠️ `electron-chrome-extension` will break [Electron's support for Devtools extensions](https://electronjs.org/docs/tutorial/devtools-extension).
+
+If you wish to use devtools extensions, make sure to load the prelaod on the session itelf:
+```js
+app.on('session-created', session => {
+  session.setPreloads([path.join(__dirname, 'node_modules/electron-chrome-extension/preload')]
+});
+```
+
+Then install Chrome DevTools extensions with `electron-chrome-extension`:
+
+```js
+import ECx from 'electron-chrome-extension';
+// load React Dev Tools
+ECx.load('jdkknkkbebbapilgoeccciglkfbmbnfm');
+
+```
+
 ## Tools
 
 - Start Playground
