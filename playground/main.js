@@ -41,6 +41,8 @@ app.on('ready', async () => {
   // Grammarly: kbfnbcaeplbcioakkpcpgfkobkghlhen
   // Dashlane: fdjamakpfbbddfjaooikfcpapjohcfmg
   // Lastpass: hdokiejnpimakedhajhdlcegeplioahd
+  // React Developers Tools: fmkadmapgofadopljbjfkapdkoienihi
+  // Redux DevTools: lmhkpmbekcpmknklioeibfkpmmfibljd
 
   const onUpdate = (update) => console.log('Extension updated: ', update);
 
@@ -49,7 +51,8 @@ app.on('ready', async () => {
     fetcher: { autoUpdate: true, autoUpdateInterval: 1000000 },
   });
 
-  await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
+  // load React for the fun
+  await ECx.load('fmkadmapgofadopljbjfkapdkoienihi');
 });
 
 app.on('window-all-closed', () => {
@@ -67,4 +70,7 @@ app.on('activate', () => {
 app.on('session-created', session => {
   const userAgent = session.getUserAgent();
   session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''));
+
+  // to make devtools work, we need this
+  session.setPreloads([join(__dirname, '../lib/src/renderer/init.js')]);
 });
