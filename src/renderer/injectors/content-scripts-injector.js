@@ -64,7 +64,8 @@ const addContentScript = function (extensionId, script) {
 
 // Handle the request of chrome.tabs.executeJavaScript.
 ipcRenderer.on(constants.TABS_EXECUTESCRIPT, function (event, senderWebContentsId, requestId, extensionId, url, code) {
-  const result = injectContentScript(worldId, url, code)
+  const worldId = require('../isolated-worlds').getIsolatedWorldId(extensionId)
+  const result = injectContentScript(worldId, [{ url, code }])
   ipcRenderer.sendToAll(senderWebContentsId, `${constants.TABS_EXECUTESCRIPT_RESULT_}${requestId}`, result)
 })
 
