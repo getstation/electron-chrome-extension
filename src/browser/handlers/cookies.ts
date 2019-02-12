@@ -38,7 +38,7 @@ export default class Cookies extends Handler {
     );
   }
 
-  handleGet(details: { url: string } & Partial<Cookie>) {
+  async handleGet(details: { url: string } & Partial<Cookie>) {
     const { url, name } = details; // warning(hugo) ignore storeId
 
     return new Promise((resolve) => {
@@ -56,7 +56,7 @@ export default class Cookies extends Handler {
     });
   }
 
-  handleGetAll(details: { url: string } & Partial<Cookie>) {
+  async handleGetAll(details: { url: string } & Partial<Cookie>) {
     const { url, name, domain, path, secure, session } = details;
     // warning(hugo) ignore storeId
 
@@ -138,10 +138,10 @@ export default class Cookies extends Handler {
       path: path!,
       secure: secure!,
       httpOnly: httpOnly!,
-      sameSite: SameSiteStatus.Lax,
+      sameSite: SameSiteStatus.NoRestriction,
       session: session!,
       expirationDate,
-      storeId: '',
+      storeId: '0',
     };
   }
 }

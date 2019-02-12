@@ -331,6 +331,7 @@ const loadDevToolsExtensions = function (win, manifests) {
   })
   // Calling setTimeout allows us to bypass the following issue:
   // https://bugs.chromium.org/p/chromium/issues/detail?id=822966
+  // fix will be only available in Chrome version 67 or later
   setTimeout(() => {
     win.devToolsWebContents.executeJavaScript(`DevToolsAPI.addExtensions(${JSON.stringify(extensionInfoArray)})`)
   }, 1000)

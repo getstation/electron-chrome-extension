@@ -126,16 +126,5 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
 
   chrome.runtime.onInstalled.emit({ reason: 'install' });
 
-  const handler = {
-    get: (target, prop, receiver) => {
-
-      // console.log(prop);
-
-      return target[prop];
-    }
-  };
-
-  chrome = new Proxy(context.chrome, handler)
-
   return chrome;
 };
