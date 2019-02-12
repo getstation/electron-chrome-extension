@@ -52,7 +52,7 @@ app.on('ready', async () => {
   });
 
   // load React for the fun
-  await ECx.load('jdkknkkbebbapilgoeccciglkfbmbnfm');
+  await ECx.load('fmkadmapgofadopljbjfkapdkoienihi');
 });
 
 app.on('window-all-closed', () => {
