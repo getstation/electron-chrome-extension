@@ -1,6 +1,6 @@
 {
   "name": "electron-chrome-extension",
-  "version": "2.0.0-rc.26",
+  "version": "2.0.0-rc.27",
   "description": "Chrome Extensions Engine for Electron",
   "main": "index.js",
   "private": true,
@@ -26,7 +26,7 @@
     "@types/mocha": "^5.2.5",
     "@types/tmp": "0.0.33",
     "concurrently": "^4.1.0",
-    "electron": "^3.0.5",
+    "electron": "^4.0.4",
     "electron-mocha": "^6.0.4",
     "electron-process-manager": "^0.6.0",
     "mocha": "^5.2.0",

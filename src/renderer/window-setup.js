@@ -75,6 +75,12 @@ function BrowserWindowProxy(ipcRenderer, guestId) {
 }
 
 module.exports = (win, ipcRenderer, guestInstanceId, openerId) => {
+  Object.defineProperty(win.navigator, 'userAgent', {
+    value: win.navigator.userAgent.replace(/Electron\/\S*\s/, ''),
+    configurable: false,
+    writable: false,
+  });
+
   if (openerId != null && win.opener == null) {
     win.opener = getOrCreateProxy(ipcRenderer, openerId);
   }
