@@ -13,11 +13,13 @@
     "test:runner": "xvfb-maybe electron-mocha --debug --interactive --require-main test/main-loader.js --renderer test/loader.js",
     "ci": "npm run pretest && tslint -p . && NODE_ENV=test xvfb-maybe electron-mocha --require-main test/main-loader.js --renderer test/loader.js",
     "prepublishOnly": "npm run ci && rm -rf ./lib/ && tslint -p . && tsc -p tsconfig.build.json",
-    "publish": "npm run prepublishOnly && NPMInternalBucket=dev.getstation.com ./node_modules/.bin/npm-internal publish -f",
     "playground:reset": "rm -rf playground/.electron-user-data"
   },
   "author": "Station <hello@getstation.com>",
   "license": "ISC",
+  "peerDependencies": {
+    "electron": ">=4.0.0"
+  },
   "devDependencies": {
     "@types/mime-types": "^2.1.0",
     "@types/fs-extra": "^5.0.4",
