@@ -10,6 +10,10 @@ Tested with `Electron v4.0.4` - `Node v8.9.0` - `NPM v5.5.1`
 - **Renderer - preload**
 
 ```ts
+// todo: @hugo update
+```
+
+```ts
 require('electron-chrome-extension/preload');
 ```
 
@@ -19,9 +23,7 @@ to redefine the user agent via the `Object.defineProperty` method after the impo
 - **Main**
 
 ```ts
-import { addExtension } from 'electron-chrome-extension';
-
-addExtension(join(__dirname, './extensions/ocpljaamllnldhepankaeljmeeeghnid'))
+// todo: @hugo update
 ```
 
 ### Usage with DevTools extension
