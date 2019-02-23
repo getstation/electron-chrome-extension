@@ -74,7 +74,31 @@ function BrowserWindowProxy(ipcRenderer, guestId) {
   };
 }
 
-module.exports = (win, ipcRenderer, guestInstanceId, openerId) => {
+module.exports = (win, ipcRenderer, guestInstanceId, openerId, nonNativeWinOpenForEmptyUrl = false) => {
+  Object.defineProperty(win.navigator, 'userAgent', {
+    value: win.navigator.userAgent.replace(/Electron\/\S*\s/, ''),
+    configurable: false,
+    writable: false,
+  });
+
+  const originalWinOpen = win.open;
+
+  if (nonNativeWinOpenForEmptyUrl) {
+    win.open = (url, frameName, features) => {
+      if (url !== '') {
+        return originalWinOpen.apply(window, [url]);
+      }
+
+      const guestId = ipcRenderer.sendSync('ELECTRON_GUEST_WINDOW_MANAGER_WINDOW_OPEN', url, toString(frameName), toString(features));
+
+      if (guestId !== null) {
+        return getOrCreateProxy(ipcRenderer, guestId);
+      }
+
+      return null;
+    };
+  }
+
   if (openerId != null && win.opener == null) {
     win.opener = getOrCreateProxy(ipcRenderer, openerId);
   }

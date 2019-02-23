@@ -91,10 +91,13 @@ Object.keys(contentScripts).forEach(key => {
   if (cs.contentScripts) {
     setupContentScript(cs.extensionId, worldId, function (isolatedWorldWindow) {
       // native window open workaround
-      const { ipcRenderer } = require('electron');
+      const ipcRenderer = require('@electron/internal/renderer/ipc-renderer-internal');
       const { guestInstanceId, openerId } = process;
 
-      require('../window-setup')(isolatedWorldWindow, ipcRenderer, guestInstanceId, openerId);
+      // hardcoded gmelius extension id
+      const shouldUseNonNativeWinOpen = cs.chromeStoreExtensionId === 'dheionainndbbpoacpnopgmnihkcmnkl';
+
+      require('../window-setup')(isolatedWorldWindow, ipcRenderer, guestInstanceId, openerId, shouldUseNonNativeWinOpen);
       // end workaround
 
       require('../xhr').default(isolatedWorldWindow);
