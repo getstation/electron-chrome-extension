@@ -38,7 +38,7 @@ export default class Cookies extends Handler {
     );
   }
 
-  async handleGet(details: { url: string } & Partial<Cookie>) {
+  async handleGet(details: { url: string } & Partial<Cookie>): Promise<Cookie | null> {
     const { url, name } = details; // warning(hugo) ignore storeId
 
     return new Promise((resolve) => {
@@ -50,7 +50,9 @@ export default class Cookies extends Handler {
             resolve(this.electronCookieToCxCookie(cookie));
           }
 
-          return (undefined);
+          // "This parameter is null if no such cookie was found"
+          // https://developer.chrome.com/extensions/cookies#property-get-callback
+          resolve(null);
         }
       );
     });
