@@ -1,7 +1,8 @@
-import { app } from 'electron';
+import { app, webContents } from 'electron';
 import enhanceWebRequest from 'electron-better-web-request';
 // @ts-ignore
 import recursivelyLowercaseJSONKeys from 'recursive-lowercase-json';
+
 import { Protocol } from '../../common';
 
 const requestIsXhrOrSubframe = (details: any) => {
@@ -18,6 +19,22 @@ const requestHasExtensionOrigin = (details: any) => {
 
   if (origin) {
     return origin.startsWith(Protocol.Extension);
+  }
+
+  return false;
+};
+
+const requestIsFromBackgroundPage = (details: any): boolean => {
+  const { webcontentsid } = details;
+
+  if (webcontentsid) {
+    const wc = webContents.fromId(webcontentsid);
+
+    if (wc) {
+      return wc.getURL().startsWith(Protocol.Extension);
+    }
+
+    return false;
   }
 
   return false;
@@ -47,7 +64,7 @@ app.on(
 
         requestsOrigins.set(id, origin);
 
-        if (requestIsForExtension(formattedDetails)
+        if (!requestIsFromBackgroundPage(formattedDetails) && requestIsForExtension(formattedDetails)
           && !requestIsOption(formattedDetails)) {
           return callback({
             cancel: false,

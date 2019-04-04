@@ -51,7 +51,8 @@ app.on('ready', async () => {
     fetcher: { autoUpdate: true, autoUpdateInterval: 1000000 },
   });
 
-  // load React for the fun
+  // load React and Gmelius for the fun
+  await ECx.load('dheionainndbbpoacpnopgmnihkcmnkl');
   await ECx.load('fmkadmapgofadopljbjfkapdkoienihi');
 });
 

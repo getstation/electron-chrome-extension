@@ -104,7 +104,7 @@ const startBackgroundPages = function (manifest) {
   contents.loadURL(url.format({
     protocol: constants.EXTENSION_PROTOCOL,
     slashes: true,
-    hostname: manifest.extensionId,
+    hostname: manifest.chromeStoreExtensionId,
     pathname: name
   }))
 }
