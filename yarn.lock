@@ -67,10 +67,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.14.tgz#c03b6380c5c301be0499ecd143b99b76ebe45678"
   integrity sha512-0rVcFRhM93kRGAU88ASCjX9Y3FWDCh+33G5Z5evpKOea4xcpLqDGwmo64+DjgaSezTN5j9KdnUzvxhOw7fNciQ==
 
-"@types/node@^8.0.24":
-  version "8.10.38"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.38.tgz#e05c201a668492e534b48102aca0294898f449f6"
-  integrity sha512-EibsnbJerd0hBFaDjJStFrVbVBAtOy4dgL8zZFw0uOvPqzBAX59Ci8cgjg3+RgJIWhsB5A4c+pi+D4P9tQQh/A==
+"@types/node@^10.12.18":
+  version "10.14.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.4.tgz#1c586b991457cbb58fef51bc4e0cfcfa347714b5"
+  integrity sha512-DT25xX/YgyPKiHFOpNuANIQIVvYEwCWXgK2jYYwqgaMrYE6+tq+DtmMwlD3drl6DJbUwtlIDnn0d7tIn/EbXBg==
 
 "@types/tmp@0.0.33":
   version "0.0.33"
@@ -710,10 +710,10 @@ editor@~1.0.0:
   resolved "https://registry.yarnpkg.com/editor/-/editor-1.0.0.tgz#60c7f87bd62bcc6a894fa8ccd6afb7823a24f742"
   integrity sha1-YMf4e9YrzGqJT6jM1q+3gjok90I=
 
-electron-better-web-request@^1.0.0-rc5:
-  version "1.0.0-rc5"
-  resolved "https://registry.yarnpkg.com/electron-better-web-request/-/electron-better-web-request-1.0.0-rc5.tgz#782c35d2ed21cda4ae28b0185db435a119810435"
-  integrity sha512-TWi2bflz0iR6vzkRZmpYpFjVJFb8586G3ENm1SItY1D5bsG3JfoWCjtVp5XqZ+XgA3659TP9gvYyl83zRruaVw==
+electron-better-web-request@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/electron-better-web-request/-/electron-better-web-request-1.0.1.tgz#9c7ccf88499cc8b17f9bffd3f33a01fc1e70282a"
+  integrity sha512-euwLeL82k6fbVODfH5Uz9c4BN047/XyYKfsZcaFhdWfqx05JPu2J0xE7nciJ/1Bb0sTClU1FDLW5H2zQWBB5Gw==
   dependencies:
     url-match-patterns "^0.2.0"
     uuid "^3.3.2"
@@ -763,10 +763,10 @@ electron-platform@^1.2.0:
   resolved "https://registry.yarnpkg.com/electron-platform/-/electron-platform-1.2.0.tgz#2fc70bce53fb732ec81769bd6c48e10c40a551aa"
   integrity sha1-L8cLzlP7cy7IF2m9bEjhDEClUao=
 
-electron-process-manager@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/electron-process-manager/-/electron-process-manager-0.6.0.tgz#56438818bdbdd2c5413df7caac53f116844ae3fb"
-  integrity sha512-RulHKnDXPLlwGIuGGOjVTT8ChxWbL1q0rh2LCuuhw5qM/xktp2dpyhN2VgxWFxqf4Nc6ZgUuZDtmGAmkDP0IWQ==
+electron-process-manager@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/electron-process-manager/-/electron-process-manager-0.7.0.tgz#954e9a12036446c8834f33313a0f16bf1610a229"
+  integrity sha512-hRP0D08rXmS00h9z7S4mhP6537nAr9Lh+gqDZE9izp8v0ZfTRVVPzMIyR5xzsRp980h7MSifIB2LnQgvsnqy1Q==
   dependencies:
     electron-process-reporter "^1.2.1"
 
@@ -780,16 +780,21 @@ electron-process-reporter@^1.2.1:
     pidusage "2.0.16"
     rxjs "^5.5.6"
 
-"electron-simple-ipc@github:alexstrat/electron-simple-ipc#32943d9d442436922aab3d5b3c14ebb46c4ea41d":
-  version "1.1.0"
-  resolved "https://codeload.github.com/alexstrat/electron-simple-ipc/tar.gz/32943d9d442436922aab3d5b3c14ebb46c4ea41d"
+electron-simple-ipc@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/electron-simple-ipc/-/electron-simple-ipc-1.0.2.tgz#8c875119922a5231b60e0aaedb793c069bdaa78a"
+  integrity sha1-jIdRGZIqUjG2Dgqu23k8Bpvap4o=
 
-"electron-simple-rpc@github:alexstrat/electron-simple-rpc":
+"electron-simple-ipc@github:alexstrat/electron-simple-ipc#85b6336dd229c7971609f6f371b624059f594745":
   version "1.1.1"
-  resolved "https://codeload.github.com/alexstrat/electron-simple-rpc/tar.gz/54240bcc5f0454d6e46bc0d3e6c80b219b71939c"
+  resolved "https://codeload.github.com/alexstrat/electron-simple-ipc/tar.gz/85b6336dd229c7971609f6f371b624059f594745"
+
+"electron-simple-rpc@github:alexstrat/electron-simple-rpc#a5195677a2c8a4a9bd67ae5120ee4d7037f88db3":
+  version "1.1.2"
+  resolved "https://codeload.github.com/alexstrat/electron-simple-rpc/tar.gz/a5195677a2c8a4a9bd67ae5120ee4d7037f88db3"
   dependencies:
     bluebird "^3.5.0"
-    electron-simple-ipc "github:alexstrat/electron-simple-ipc#32943d9d442436922aab3d5b3c14ebb46c4ea41d"
+    electron-simple-ipc "github:alexstrat/electron-simple-ipc#85b6336dd229c7971609f6f371b624059f594745"
     lodash "^4.17.4"
     uuid "^3.0.1"
 
@@ -800,12 +805,12 @@ electron-window@^0.8.0:
   dependencies:
     is-electron-renderer "^2.0.0"
 
-electron@^3.0.5:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-3.1.1.tgz#983492f0eb25740d1ba1da47712b16139ebc6d17"
-  integrity sha512-ZamfKY9xp8P6/prtBbhOoOsdCaqyArr7GOmgJuBgWY95ZW5nJVP5aA5lLTh8IeVSW1/IM1KyKYPTrTS/RGercQ==
+electron@^4.0.4:
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-4.1.4.tgz#41ba9e041f38c25c62a7db806884410654df058f"
+  integrity sha512-MelOjntJvd33izEjR6H4N/Uii7y535z/b2BuYXJGLNSHL6o1IlyhUQmfiT87kWABayERgeuYERgvsyf956OOFw==
   dependencies:
-    "@types/node" "^8.0.24"
+    "@types/node" "^10.12.18"
     electron-download "^4.1.0"
     extract-zip "^1.0.3"
 
@@ -2610,6 +2615,11 @@ realize-package-specifier@~3.0.1:
   dependencies:
     dezalgo "^1.0.1"
     npm-package-arg "^4.1.1"
+
+recursive-lowercase-json@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/recursive-lowercase-json/-/recursive-lowercase-json-0.2.0.tgz#b5d8cd9723a9eec23a8ec7bcafbdba033dc340c0"
+  integrity sha1-tdjNlyOp7sI6jse8r726Az3DQMA=
 
 redent@^1.0.0:
   version "1.0.0"

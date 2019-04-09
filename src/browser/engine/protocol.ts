@@ -8,10 +8,16 @@ import { Protocol } from '../../common';
 import { protocolAsScheme } from '../../common/utils';
 import { getExtensionById } from '../chrome-extension';
 
-protocol.registerStandardSchemes(
-  [protocolAsScheme(Protocol.Extension)],
-  { secure: true }
-);
+if (protocol.registerStandardSchemes) { // electron <= 4
+  protocol.registerStandardSchemes(
+    [protocolAsScheme(Protocol.Extension)],
+    { secure: true }
+  );
+} else { // electron >= 5
+  (protocol as any).registerSchemesAsPrivileged([
+    { scheme: protocolAsScheme(Protocol.Extension), privileges: { standard: true, secure: true } },
+  ])
+}
 
 const protocolHandler = (
   { url }: Electron.RegisterBufferProtocolRequest,
