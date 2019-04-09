@@ -16,7 +16,7 @@ if (protocol.registerStandardSchemes) { // electron <= 4
 } else { // electron >= 5
   (protocol as any).registerSchemesAsPrivileged([
     { scheme: protocolAsScheme(Protocol.Extension), privileges: { standard: true, secure: true } },
-  ])
+  ]);
 }
 
 const protocolHandler = (
