@@ -1,8 +1,13 @@
-const { ipcRenderer, webFrame } = require('electron')
-const { runInThisContext } = require('vm')
-const constants = require('../../common/constants')
+const { ipcRenderer, protocol, webFrame } = require('electron');
+const constants = require('../../common/constants');
 
-webFrame.registerURLSchemeAsPrivileged(constants.EXTENSION_PROTOCOL, { corsEnabled: false })
+if (webFrame.registerURLSchemeAsPrivileged) { // electron <= 4
+  webFrame.registerURLSchemeAsPrivileged(constants.EXTENSION_PROTOCOL, { corsEnabled: false });
+} else { // electron >= 5
+  (protocol as any).registerSchemesAsPrivileged([
+    { scheme: constants.EXTENSION_PROTOCOL, privileges: { standard: true, corsEnabled: false } },
+  ]);
+}
 
 process.setMaxListeners(100);
 
@@ -71,22 +76,33 @@ ipcRenderer.on(constants.TABS_EXECUTESCRIPT, function (event, senderWebContentsI
 
 // Read the renderer process preferences.
 const getContentScripts = () => ipcRenderer.sendSync('GET_CONTENTSCRIPTS_SYNC');
+const getContentSecurityPolicy = () => ipcRenderer.sendSync('GET_CONTENTSECURITYPOLICY_SYNC');
 const contentScripts = getContentScripts();
+
+const setIsolatedWorldInfo = (worldId, humanReadableName, securityOrigin, csp) => {
+  if (webFrame.setIsolatedWorldInfo) { // electron >= 5
+    webFrame.setIsolatedWorldInfo(
+      worldId,
+      {
+        securityOrigin,
+        name: humanReadableName,
+        csp,
+      });
+  } else { // electron <= 4
+    webFrame.setIsolatedWorldHumanReadableName(worldId, humanReadableName);
+    webFrame.setIsolatedWorldSecurityOrigin(worldId, securityOrigin);
+    webFrame.setIsolatedWorldContentSecurityPolicy(worldId, csp);
+  }
+};
 
 Object.keys(contentScripts).forEach(key => {
   const cs = contentScripts[key];
   const worldId = require('../isolated-worlds').getIsolatedWorldId(cs.extensionId)
 
-  webFrame.setIsolatedWorldHumanReadableName(worldId, cs.extensionName)
-  webFrame.setIsolatedWorldSecurityOrigin(worldId, `chrome-extension://${cs.chromeStoreExtensionId}`)
-
-  const getContentSecurityPolicy = () => ipcRenderer.sendSync('GET_CONTENTSECURITYPOLICY_SYNC');
   const contentSecurityPolicy = getContentSecurityPolicy();
-  if (contentSecurityPolicy.policy) {
-    webFrame.setIsolatedWorldContentSecurityPolicy(worldId, contentSecurityPolicy.policy);
-  } else {
-    webFrame.setIsolatedWorldContentSecurityPolicy(worldId, "script-src 'self'; object-src 'self'");
-  }
+  const csp = contentSecurityPolicy.policy || "script-src 'self'; object-src 'self'";
+
+  setIsolatedWorldInfo(worldId, cs.extensionName, `chrome-extension://${cs.chromeStoreExtensionId}`, csp);
 
   if (cs.contentScripts) {
     setupContentScript(cs.extensionId, worldId, function (isolatedWorldWindow) {
