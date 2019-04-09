@@ -3,7 +3,7 @@ import { sync } from 'glob';
 import { join, resolve } from 'path';
 import { move, readJson, ensureDir } from 'fs-extra';
 // @ts-ignore
-import unzip from 'unzip-crx';
+import unzip from 'unzip-crx-3';
 
 import {
   ILocation,
