@@ -5,10 +5,11 @@ import { lookup } from 'mime-types';
 import { join } from 'path';
 import { parse } from 'url';
 
-import ECx from './api';
 import { Protocol } from '../../common';
-import { protocolAsScheme } from '../../common/utils';
 import { getExtensionById } from '../chrome-extension';
+import { protocolAsScheme } from '../../common/utils';
+
+import ECx from './api';
 
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';

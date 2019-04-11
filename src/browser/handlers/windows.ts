@@ -1,4 +1,5 @@
 import { BrowserWindow } from 'electron';
+
 import {
   Window,
   CreateData,

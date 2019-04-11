@@ -1,3 +1,8 @@
+import Fetcher from '../fetcher';
+import {
+  addExtension as startExtension,
+  removeExtension as stopExtension,
+} from '../chrome-extension';
 import {
   IExtension,
   ExtensionMap,
@@ -5,12 +10,6 @@ import {
   Callback,
   Configuration,
 } from '../../common/types';
-
-import Fetcher from '../fetcher';
-import {
-  addExtension as startExtension,
-  removeExtension as stopExtension,
-} from '../chrome-extension';
 
 class ECx {
   public loaded: ExtensionMap;
