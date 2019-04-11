@@ -4,8 +4,8 @@ import stream from 'stream';
 import { lookup } from 'mime-types';
 import { join } from 'path';
 import { parse } from 'url';
-import ECx from './api';
 
+import ECx from './api';
 import { Protocol } from '../../common';
 import { protocolAsScheme } from '../../common/utils';
 import { getExtensionById } from '../chrome-extension';
@@ -31,15 +31,14 @@ const protocolHandler = async (
   const { src, backgroundPage: { name, html } } = extension;
   const headers = {};
 
-  // Hack to get extension ID
+  // Todo : Hack to get extension ID,
+  // revert to hostname when this (https://github.com/getstation/electron-chrome-extension/commit/8f8d37e13c47611ce9c8b184775a68fa52fc883d) is reverted too
   const splitted = src.split('/');
   const ecxId = splitted[splitted.length - 2];
 
-  // Set Content Security Policy
+  // Set Content Security Policy for Chrome Extensions
   if (ECx.isLoaded(ecxId)) {
-    const { location: { path } } = await ECx.get(ecxId);
-
-    const manifestPath = join(path, 'manifest.json');
+    const manifestPath = join(src, 'manifest.json');
     const manifest = await readFileSync(manifestPath, 'utf-8');
 
     const manifestContentSecurityPolicy = JSON.parse(manifest).content_security_policy;
@@ -48,9 +47,11 @@ const protocolHandler = async (
     headers['content-security-policy'] = contentSecurityPolicy;
   }
 
-  // ?
+  // Check if it's the background page (html)
   if (`/${name}` === pathname) {
     headers['content-type'] = 'text/html';
+
+    // Transform a Buffer into a Stream (expected in callback)
     const dataStream = new stream.PassThrough();
     dataStream.end(html);
 
@@ -63,7 +64,7 @@ const protocolHandler = async (
 
   // todo(hugo) check extension permissions
 
-  // Create stream
+  // Create file stream
   const uri = join(src, pathname);
   const data = createReadStream(uri);
 
