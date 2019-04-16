@@ -78,7 +78,7 @@ Object.keys(contentScripts).forEach(key => {
   const worldId = require('../isolated-worlds').getIsolatedWorldId(cs.extensionId)
 
   webFrame.setIsolatedWorldHumanReadableName(worldId, cs.extensionName)
-  webFrame.setIsolatedWorldSecurityOrigin(worldId, `chrome-extension://${cs.chromeStoreExtensionId}`)
+  webFrame.setIsolatedWorldSecurityOrigin(worldId, `${constants.EXTENSION_PROTOCOL}://${cs.extensionId}`)
 
   const getContentSecurityPolicy = () => ipcRenderer.sendSync('GET_CONTENTSECURITYPOLICY_SYNC');
   const contentSecurityPolicy = getContentSecurityPolicy();
@@ -95,7 +95,7 @@ Object.keys(contentScripts).forEach(key => {
       const { guestInstanceId, openerId } = process;
 
       // hardcoded gmelius extension id
-      const shouldUseNonNativeWinOpen = cs.chromeStoreExtensionId === 'dheionainndbbpoacpnopgmnihkcmnkl';
+      const shouldUseNonNativeWinOpen = cs.extensionId === 'dheionainndbbpoacpnopgmnihkcmnkl';
 
       require('../window-setup')(isolatedWorldWindow, ipcRenderer, guestInstanceId, openerId, shouldUseNonNativeWinOpen);
       // end workaround
