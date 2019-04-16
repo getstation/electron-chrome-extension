@@ -11,6 +11,8 @@ import { protocolAsScheme } from '../../common/utils';
 
 import ECx from './api';
 
+// match Chromium kDefaultContentSecurityPolicy
+// https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=31
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
 
@@ -30,7 +32,10 @@ const protocolHandler = async (
   if (!extension) return callback();
 
   const { src, backgroundPage: { name, html } } = extension;
+
   const headers = {};
+
+  headers['access-control-allow-origin'] = '*';
 
   // Todo : Hack to get extension ID,
   // revert to hostname when this (https://github.com/getstation/electron-chrome-extension/commit/8f8d37e13c47611ce9c8b184775a68fa52fc883d) is reverted too
