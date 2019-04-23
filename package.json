@@ -47,7 +47,6 @@
     "electron-simple-rpc": "github:alexstrat/electron-simple-rpc#a5195677a2c8a4a9bd67ae5120ee4d7037f88db3",
     "fs-extra": "^7.0.1",
     "mime-types": "^2.1.21",
-    "npm-internal": "^1.4.0",
     "p-queue": "^3.0.0",
     "querystring": "^0.2.0",
     "recursive-lowercase-json": "^0.2.0",
