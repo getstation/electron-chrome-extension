@@ -30,7 +30,7 @@ const isWindowOrWebView = function (webContents) {
 }
 
 // Create or get manifest object from |srcDirectory|.
-const getManifestFromPath = function (chromeStoreExtensionId, srcDirectory) {
+const getManifestFromPath = function (extensionId, srcDirectory) {
   let manifest
   let manifestContent
 
@@ -50,12 +50,10 @@ const getManifestFromPath = function (chromeStoreExtensionId, srcDirectory) {
     throw parseError
   }
   if (!manifestNameMap[manifest.name]) {
-    const extensionId = generateExtensionIdFromName(manifest.name)
-    manifestMap[extensionId] = manifestNameMap[manifest.name] = manifestWSMap[chromeStoreExtensionId] = manifest
+    manifestMap[extensionId] = manifestNameMap[manifest.name] = manifestWSMap[extensionId] = manifest
     Object.assign(manifest, {
       srcDirectory: srcDirectory,
-      chromeStoreExtensionId,
-      extensionId: extensionId,
+      extensionId,
       // We can not use 'file://' directly because all resources in the extension
       // will be treated as relative to the root in Chrome.
       startPage: url.format({
@@ -104,7 +102,7 @@ const startBackgroundPages = function (manifest) {
   contents.loadURL(url.format({
     protocol: constants.EXTENSION_PROTOCOL,
     slashes: true,
-    hostname: manifest.chromeStoreExtensionId,
+    hostname: manifest.extensionId,
     pathname: name
   }))
 }
@@ -259,7 +257,6 @@ const injectContentScripts = function (manifest) {
 
   try {
     const entry = {
-      chromeStoreExtensionId: manifest.chromeStoreExtensionId,
       extensionId: manifest.extensionId,
       extensionName: manifest.name,
       contentScripts: manifest.content_scripts.map(contentScriptToEntry)
