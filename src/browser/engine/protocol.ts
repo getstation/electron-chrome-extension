@@ -14,8 +14,8 @@ import ECx from './api';
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
 
-if (protocol.registerStandardSchemes) { // electron <= 4
-  protocol.registerStandardSchemes(
+if ((protocol as any).registerStandardSchemes) { // electron <= 4
+  (protocol as any).registerStandardSchemes(
     [protocolAsScheme(Protocol.Extension)],
     { secure: true }
   );
