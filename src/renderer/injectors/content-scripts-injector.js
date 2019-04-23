@@ -4,7 +4,7 @@ const constants = require('../../common/constants');
 if (webFrame.registerURLSchemeAsPrivileged) { // electron <= 4
   webFrame.registerURLSchemeAsPrivileged(constants.EXTENSION_PROTOCOL, { corsEnabled: false });
 } else { // electron >= 5
-  (protocol as any).registerSchemesAsPrivileged([
+  protocol.registerSchemesAsPrivileged([
     { scheme: constants.EXTENSION_PROTOCOL, privileges: { standard: true, corsEnabled: false } },
   ]);
 }
