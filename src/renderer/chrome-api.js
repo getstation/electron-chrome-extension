@@ -19,7 +19,10 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     chrome = {}
   }
 
-  chrome.runtime = require('./api/runtime').setup(extensionId, isBackgroundPage);
+  // Maintain ports references (prevent garbage collection)
+  context.__ports = new Map();
+
+  chrome.runtime = require('./api/runtime').setup(context, extensionId, isBackgroundPage);
   chrome.storage = require('./api/storage').setup(extensionId);
   chrome.browserAction = require('./api/browser-action').setup(extensionId);
   chrome.notifications = require('./api/notifications').setup(extensionId);
@@ -64,6 +67,12 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
       chrome.runtime.incrementOriginResultID()
     },
 
+    insertCSS(tabId, details, cb) {
+      console.log('insertCSS: ', tabId, details);
+
+      if (cb) cb();
+    },
+
     get() {
       console.log('get')
     },
@@ -72,12 +81,18 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
       console.log('getCurrent')
     },
 
-    create() {
-      console.log('create')
+    create(details, cb) {
+      console.log('create: ', details);
+      cb();
     },
 
-    query() {
-      console.log('query')
+    query(args, cb) {
+      const requestId = ++nextId;
+      ipcRenderer.once(`${constants.TABS_QUERY_RESULT_}${requestId}`, (event, result) => {
+        cb(result);
+      });
+
+      ipcRenderer.send(constants.TABS_QUERY, requestId, extensionId);
     },
 
     onUpdated: new Event(),
@@ -107,7 +122,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   const manager = new RpcIpcManager(library, 'cx-event-cookies');
 
   ipcRenderer.on(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, (event, tabId, portId, connectInfo) => {
-    chrome.runtime.onConnect.emit(Port.get(tabId, portId, extensionId, connectInfo.name))
+    chrome.runtime.onConnect.emit(Port.get(context, tabId, portId, extensionId, connectInfo.name))
   });
 
   ipcRenderer.on(`${constants.RUNTIME_ONMESSAGE_}${extensionId}`, (event, tabId, message, resultID) => {
@@ -125,6 +140,59 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   });
 
   chrome.runtime.onInstalled.emit({ reason: 'install' });
+
+  // API Calls Logger for debug purpose
+
+  const handler = {
+    get: (apis, prop) => {
+      if (!Boolean(apis.__path)) {
+        apis.__path = 'chrome';
+      }
+
+      if (apis[prop] && typeof apis[prop] === 'object') {
+        apis[prop].__path = `${apis.__path}.${prop}`;
+        return new Proxy(apis[prop], handler);
+      }
+
+      if (typeof apis[prop] === 'function') {
+        return (...args) => {
+          if (args.filter(String).length > 0) {
+            const result = apis[prop](...args);
+            if (typeof result === 'object') {
+              result.__path = result.constructor.name.toLowerCase();
+              return new Proxy(result, handler);
+            }
+
+            console.log(`${apis.__path}.${prop}`, ...args, result);
+
+            return result;
+          }
+
+          const result = apis[prop]();
+
+          if (result.constructor.name.toLowerCase() === 'object') {
+            result.__path = result.constructor.name.toLowerCase();
+            return new Proxy(result, handler);
+          }
+
+          console.log(`${apis.__path}.${prop}`, result);
+
+          return result;
+        }
+      }
+
+      if (['string', 'number'].includes(typeof apis[prop])) {
+        const result = apis[prop];
+        console.log(`${apis.__path}.${prop}`, result);
+
+        return result;
+      }
+
+      return apis[prop];
+    }
+  };
+
+  chrome = new Proxy(chrome, handler);
 
   return chrome;
 };

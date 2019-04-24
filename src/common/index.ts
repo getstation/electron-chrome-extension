@@ -23,6 +23,7 @@ export enum Channel {
 
 export enum Api {
   Windows = 'windows',
+  Tabs = 'tabs',
   Cookies = 'cookies',
 }
 

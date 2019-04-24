@@ -51,10 +51,8 @@ app.on('ready', async () => {
     fetcher: { autoUpdate: true, autoUpdateInterval: 1000000 },
   });
 
+  // Load Grammarly
   await ECx.load('kbfnbcaeplbcioakkpcpgfkobkghlhen');
-
-  // load React for the fun
-  await ECx.load('fmkadmapgofadopljbjfkapdkoienihi');
 });
 
 app.on('window-all-closed', () => {

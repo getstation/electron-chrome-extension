@@ -89,7 +89,6 @@ const startBackgroundPages = function (manifest) {
   }
 
   const contents = webContents.create({
-    partition: `persist:__chrome_extension:${manifest.extensionId}`,
     isBackgroundPage: true,
     commandLineSwitches: [
       '--electron-chrome-extension-background-page',
@@ -227,6 +226,30 @@ ipcMain.on(constants.TABS_EXECUTESCRIPT, function (event, requestId, tabId, exte
 
   contents.send(constants.TABS_EXECUTESCRIPT, event.sender.id, requestId, extensionId, url, code)
 })
+
+ipcMain.on(
+  constants.TABS_QUERY,
+  function (event, requestId, _extensionId) {
+    const tabs = webContents.getAllWebContents()
+      .filter(wc => wc.getType() === 'webview')
+      .map(wc => ({
+        id: wc.id,
+        index: wc.id,
+        windowId: 1,
+        highlighted: wc.isFocused(),
+        active: wc.isFocused(),
+        pined: false,
+        discarded: false,
+        autoDiscardable: false,
+        url: wc.getURL(),
+        title: wc.getTitle(),
+        incognito: false,
+      }))
+    // isFocused()
+
+    event.sender.send(`${constants.TABS_QUERY_RESULT_}${requestId}`, tabs);
+  }
+);
 
 ipcMain.on(constants.RUNTIME_GET_MANIFEST, (event, extensionId) => {
   event.returnValue = manifestMap[extensionId];

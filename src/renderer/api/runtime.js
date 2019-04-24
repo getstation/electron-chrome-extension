@@ -1,4 +1,4 @@
-const {ipcRenderer} = require('electron');
+const { ipcRenderer } = require('electron');
 const url = require('url');
 
 const Event = require('./event');
@@ -7,7 +7,8 @@ const Port = require('./runtime/port')
 
 class Runtime {
 
-  constructor(extensionId, isBackgroundPage) {
+  constructor(context, extensionId, isBackgroundPage) {
+    this.context = context;
     this.id = extensionId;
     this.isBackgroundPage = isBackgroundPage;
     this.originResultID = 1;
@@ -60,7 +61,7 @@ class Runtime {
     }
   }
 
-  connect (...args) {
+  connect(...args) {
     if (this.isBackgroundPage) {
       console.error('chrome.runtime.connect is not supported in background page')
       return
@@ -68,18 +69,18 @@ class Runtime {
 
     // Parse the optional args.
     let targetExtensionId = this.id
-    let connectInfo = {name: ''}
+    let connectInfo = { name: '' }
     if (args.length === 1) {
       connectInfo = args[0]
     } else if (args.length === 2) {
       [targetExtensionId, connectInfo] = args
     }
 
-    const {tabId, portId} = ipcRenderer.sendSync(constants.RUNTIME_CONNECT, targetExtensionId, connectInfo)
-    return Port.get(tabId, portId, this.id, connectInfo.name)
+    const { tabId, portId } = ipcRenderer.sendSync(constants.RUNTIME_CONNECT, targetExtensionId, connectInfo)
+    return Port.get(this.context, tabId, portId, this.id, connectInfo.name)
   }
 
-  sendMessage (...args) {
+  sendMessage(...args) {
     if (this.isBackgroundPage) {
       console.error('chrome.runtime.sendMessage is not supported in background page')
       return
@@ -124,7 +125,8 @@ class Runtime {
 const store = new Map();
 
 const getRuntime = (extensionId, isBackgroundPage) => {
-  const key = { extensionId: extensionId, isBackgroundPage: isBackgroundPage}
+  const key = `${extensionId}-${isBackgroundPage}`;
+
   if (store.has(key)) {
     return store.get(key)
   } else {
