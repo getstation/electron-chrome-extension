@@ -1,5 +1,7 @@
 import assert = require('assert');
+
 import InterpreterProvider from '../../src/browser/fetcher/interpreter-provider';
+
 import {
   FAKE_CX_INFOS,
   FAKE_INSTALL_DESCRIPTOR,

@@ -85,6 +85,8 @@ Object.keys(contentScripts).forEach(key => {
   if (contentSecurityPolicy.policy) {
     webFrame.setIsolatedWorldContentSecurityPolicy(worldId, contentSecurityPolicy.policy);
   } else {
+    // Match Chromium kDefaultIsolatedWorldCSP_Secure
+    // https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=36
     webFrame.setIsolatedWorldContentSecurityPolicy(worldId, "script-src 'self'; object-src 'self'");
   }
 

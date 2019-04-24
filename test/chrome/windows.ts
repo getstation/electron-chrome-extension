@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+
 import { Window } from '../../src/common/apis/windows';
 
 describe('chrome.windows', () => {

@@ -1,5 +1,6 @@
 const { RpcIpcManager, rpc } = require('electron-simple-rpc');
 const Event = require('./event');
+
 import {
   Window,
   CreateData,
@@ -13,7 +14,6 @@ import {
   scope,
   extensionScope,
 } from '../../common/';
-
 import { Callback } from '../../common/types';
 
 class ChromeWindowsAPIClient {

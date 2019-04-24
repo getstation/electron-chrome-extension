@@ -2,6 +2,7 @@ import assert = require('assert');
 const fs = require('fs').promises;
 
 import DownloadProvider from '../../src/browser/fetcher/download-provider';
+
 import {
   EXAMPLE_EXTENSION_ID,
 } from './constants';
