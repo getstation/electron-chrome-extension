@@ -545,14 +545,14 @@ electron-platform@^1.2.0:
   resolved "https://registry.yarnpkg.com/electron-platform/-/electron-platform-1.2.0.tgz#2fc70bce53fb732ec81769bd6c48e10c40a551aa"
   integrity sha1-L8cLzlP7cy7IF2m9bEjhDEClUao=
 
-electron-process-manager@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/electron-process-manager/-/electron-process-manager-0.7.0.tgz#954e9a12036446c8834f33313a0f16bf1610a229"
-  integrity sha512-hRP0D08rXmS00h9z7S4mhP6537nAr9Lh+gqDZE9izp8v0ZfTRVVPzMIyR5xzsRp980h7MSifIB2LnQgvsnqy1Q==
+electron-process-manager@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/electron-process-manager/-/electron-process-manager-0.7.1.tgz#fb53f6f80f1d0b10d32da758bc8bc9013751a5e0"
+  integrity sha512-GE7Sok7IfObhVPqx7n+wVBpdFxVvR/ySa56sLsTT4rnYKBFDWtdrVMiXgKjhHjxsxO59Y+piXT6QonamrQFWeA==
   dependencies:
-    electron-process-reporter "^1.2.1"
+    electron-process-reporter "^1.4.0"
 
-electron-process-reporter@^1.2.1:
+electron-process-reporter@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/electron-process-reporter/-/electron-process-reporter-1.4.0.tgz#74bfa7f0dd9791307ca9263ad7ce7bca5447f267"
   integrity sha512-zI5IV7zplV2eHznNbeYtMwATVqXO+g9i2ChpurvGTvExA/rpi7BdSrp38bsTz5tjJLLTz9LmzeSt85uIZ051Qw==

@@ -29,7 +29,7 @@
     "concurrently": "^4.1.0",
     "electron": "^4.1.4",
     "electron-mocha": "^8.0.1",
-    "electron-process-manager": "^0.7.0",
+    "electron-process-manager": "^0.7.1",
     "mocha": "^5.2.0",
     "ts-mocha": "^2.0.0",
     "tslint": "^5.11.0",
