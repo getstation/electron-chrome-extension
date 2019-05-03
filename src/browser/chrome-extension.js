@@ -92,6 +92,7 @@ const startBackgroundPages = function (manifest) {
     isBackgroundPage: true,
     commandLineSwitches: [
       '--electron-chrome-extension-background-page',
+      `--preload=${path.join(__dirname, '../renderer/index.js')}`
     ]
   });
 

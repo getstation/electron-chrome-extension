@@ -11,10 +11,12 @@ import { protocolAsScheme } from '../../common/utils';
 
 import ECx from './api';
 
+// Matching kDefaultContentSecurityPolicy
+// ref: https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=31
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
 
-(protocol as any).registerSchemesAsPrivileged([
+protocol.registerSchemesAsPrivileged([
   { scheme: protocolAsScheme(Protocol.Extension), privileges: { standard: true, secure: true, bypassCSP: true } },
 ]);
 
@@ -31,13 +33,8 @@ const protocolHandler = async (
   const { src, backgroundPage: { name, html } } = extension;
   const headers = {};
 
-  // Todo : Hack to get extension ID,
-  // revert to hostname when this (https://github.com/getstation/electron-chrome-extension/commit/8f8d37e13c47611ce9c8b184775a68fa52fc883d) is reverted too
-  const splitted = src.split('/');
-  const ecxId = splitted[splitted.length - 2];
-
   // Set Content Security Policy for Chrome Extensions
-  if (ECx.isLoaded(ecxId)) {
+  if (ECx.isLoaded(hostname)) {
     const manifestPath = join(src, 'manifest.json');
     const manifest = await readFileSync(manifestPath, 'utf-8');
 

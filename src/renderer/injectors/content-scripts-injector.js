@@ -72,19 +72,13 @@ const getContentSecurityPolicy = () => ipcRenderer.sendSync('GET_CONTENTSECURITY
 const contentScripts = getContentScripts();
 
 const setIsolatedWorldInfo = (worldId, humanReadableName, securityOrigin, csp) => {
-  if (webFrame.setIsolatedWorldInfo) { // electron >= 5
-    webFrame.setIsolatedWorldInfo(
-      worldId,
-      {
-        securityOrigin,
-        name: humanReadableName,
-        csp,
-      });
-  } else { // electron <= 4
-    webFrame.setIsolatedWorldHumanReadableName(worldId, humanReadableName);
-    webFrame.setIsolatedWorldSecurityOrigin(worldId, securityOrigin);
-    webFrame.setIsolatedWorldContentSecurityPolicy(worldId, csp);
-  }
+  webFrame.setIsolatedWorldInfo(
+    worldId,
+    {
+      securityOrigin,
+      name: humanReadableName,
+      csp,
+    });
 };
 
 Object.keys(contentScripts).forEach(key => {
