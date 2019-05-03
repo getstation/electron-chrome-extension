@@ -79,5 +79,6 @@ app.on('session-created', session => {
   const userAgent = session.getUserAgent();
   session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''));
 
+  // to make devtools work, we need this
   session.setPreloads([join(__dirname, '../lib/src/renderer/index.js')]);
 });
