@@ -1,14 +1,6 @@
 const { ipcRenderer, webFrame } = require('electron');
 const constants = require('../../common/constants');
 
-if (webFrame.registerURLSchemeAsPrivileged) { // electron <= 4
-  webFrame.registerURLSchemeAsPrivileged(constants.EXTENSION_PROTOCOL, { corsEnabled: false });
-} else { // electron >= 5
-  // We can't call `protocol.registerSchemesAsPrivileged` after app 'ready' event has been triggered.
-  // (so we can't call it inside any renderer process)
-  // The doc is not very clear on this, but I think we just don't need to do anything inside renderers.
-}
-
 process.setMaxListeners(100);
 
 // Check whether pattern matches.

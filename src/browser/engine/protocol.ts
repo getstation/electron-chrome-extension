@@ -14,16 +14,9 @@ import ECx from './api';
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
 
-if ((protocol as any).registerStandardSchemes) { // electron <= 4
-  (protocol as any).registerStandardSchemes(
-    [protocolAsScheme(Protocol.Extension)],
-    { secure: true }
-  );
-} else { // electron >= 5
-  (protocol as any).registerSchemesAsPrivileged([
-    { scheme: protocolAsScheme(Protocol.Extension), privileges: { standard: true, secure: true } },
-  ]);
-}
+(protocol as any).registerSchemesAsPrivileged([
+  { scheme: protocolAsScheme(Protocol.Extension), privileges: { standard: true, secure: true, bypassCSP: true } },
+]);
 
 const protocolHandler = async (
   { url }: Electron.RegisterBufferProtocolRequest,

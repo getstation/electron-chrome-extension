@@ -16,7 +16,15 @@ const ECx = require('../lib/src/browser/').default;
 let mainWindow;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({ width: 800, height: 600 });
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+      webviewTag: true,
+      contextIsolation: false,
+    }
+  });
 
   mainWindow.loadURL(format({
     pathname: join(__dirname, 'app.html'),
@@ -51,9 +59,8 @@ app.on('ready', async () => {
     fetcher: { autoUpdate: true, autoUpdateInterval: 1000000 },
   });
 
-  // load React and Gmelius for the fun
-  await ECx.load('dheionainndbbpoacpnopgmnihkcmnkl');
-  await ECx.load('fmkadmapgofadopljbjfkapdkoienihi');
+  // load Mixmax for the fun
+  await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
 });
 
 app.on('window-all-closed', () => {
@@ -72,6 +79,5 @@ app.on('session-created', session => {
   const userAgent = session.getUserAgent();
   session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''));
 
-  // to make devtools work, we need this
-  session.setPreloads([join(__dirname, '../lib/src/renderer/init.js')]);
+  session.setPreloads([join(__dirname, '../lib/src/renderer/index.js')]);
 });
