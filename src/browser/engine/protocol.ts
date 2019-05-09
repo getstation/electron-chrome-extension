@@ -16,7 +16,7 @@ import ECx from './api';
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
 
-protocol.registerSchemesAsPrivileged([
+(protocol as any).registerSchemesAsPrivileged([
   { scheme: protocolAsScheme(Protocol.Extension), privileges: { standard: true, secure: true, bypassCSP: true } },
 ]);
 
@@ -43,6 +43,9 @@ const protocolHandler = async (
 
     headers['content-security-policy'] = contentSecurityPolicy;
   }
+
+  // ref: https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=1017
+  headers['access-control-allow-origin'] = '*';
 
   // Check if it's the background page (html)
   if (`/${name}` === pathname) {
