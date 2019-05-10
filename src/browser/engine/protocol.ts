@@ -9,14 +9,12 @@ import { Protocol } from '../../common';
 import { getExtensionById } from '../chrome-extension';
 import { protocolAsScheme } from '../../common/utils';
 
-import ECx from './api';
-
-// match Chromium kDefaultContentSecurityPolicy
+// Match Chromium kDefaultContentSecurityPolicy
 // https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=31
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
 
-protocol.registerStandardSchemes(
+(protocol as any).registerStandardSchemes(
   [protocolAsScheme(Protocol.Extension)],
   { secure: true }
 );
@@ -35,40 +33,36 @@ const protocolHandler = async (
 
   const headers = {};
 
+  // Always send CORS
+  // refs:
+  // https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=524
+  // https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=330
+  // https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=1017
   headers['access-control-allow-origin'] = '*';
 
-  // Todo : Hack to get extension ID,
-  // revert to hostname when this (https://github.com/getstation/electron-chrome-extension/commit/8f8d37e13c47611ce9c8b184775a68fa52fc883d) is reverted too
-  const splitted = src.split('/');
-  const ecxId = splitted[splitted.length - 2];
-
   // Set Content Security Policy for Chrome Extensions
-  if (ECx.isLoaded(ecxId)) {
-    const manifestPath = join(src, 'manifest.json');
-    const manifest = await readFileSync(manifestPath, 'utf-8');
+  const manifestPath = join(src, 'manifest.json');
+  const manifest = await readFileSync(manifestPath, 'utf-8');
 
-    const manifestContentSecurityPolicy = JSON.parse(manifest).content_security_policy;
-    const contentSecurityPolicy = manifestContentSecurityPolicy ? manifestContentSecurityPolicy : defaultContentSecurityPolicy;
+  const manifestContentSecurityPolicy = JSON.parse(manifest).content_security_policy;
+  const contentSecurityPolicy = manifestContentSecurityPolicy ? manifestContentSecurityPolicy : defaultContentSecurityPolicy;
 
-    headers['content-security-policy'] = contentSecurityPolicy;
-  }
+  headers['content-security-policy'] = contentSecurityPolicy;
 
-  // Check if it's the background page (html)
+  // Check if we serve the background page (html)
   if (`/${name}` === pathname) {
     headers['content-type'] = 'text/html';
 
     // Transform a Buffer into a Stream (expected in callback)
-    const dataStream = new stream.PassThrough();
-    dataStream.end(html);
-
+    // Stream callback allow custom headers
     return callback({
       statusCode: 200,
       headers,
-      data: dataStream,
+      data: (new stream.PassThrough()).end(html),
     });
   }
 
-  // todo(hugo) check extension permissions
+  // todo(hugo) check extension permissions (web_accessible_resources)
 
   // Create file stream
   const uri = join(src, pathname);
