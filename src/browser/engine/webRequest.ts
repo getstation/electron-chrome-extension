@@ -102,7 +102,6 @@ app.on(
         //
         // ref: https://bugs.chromium.org/p/chromium/issues/detail?id=408932#c35
         //
-        // -- Flow
         //
         // * Protocol `chrome-extension://` is considered trustworthy
         // ref: https://w3c.github.io/webappsec-secure-contexts/#is-origin-trustworthy
@@ -124,17 +123,17 @@ app.on(
         // https://cs.chromium.org/chromium/src/extensions/common/csp_validator.cc?l=256
 
         const cspHeaderKey = 'content-security-policy';
-        const cspDirectiveKey = 'frame-src';
+        const cspPolicyKey = 'frame-src';
         const cspPolicyDelimiter = ';';
-        const cspDirective: string | undefined = (responseheaders[cspDirectiveKey] || [])[0];
+        const cspDirective: string | undefined = (responseheaders[cspHeaderKey] || [])[0];
 
         if (cspDirective) {
           const policies = cspDirective.split(cspPolicyDelimiter);
 
-          const unmodifiedPolicies = policies.filter((p: string) => !p.includes(cspDirectiveKey));
+          const unmodifiedPolicies = policies.filter((p: string) => !p.includes(cspPolicyKey));
 
           const modifiedFrameSrcPolicies = policies
-            .filter((p: string) => p.includes(cspDirectiveKey))
+            .filter((p: string) => p.includes(cspPolicyKey))
             .map((p: string) => `${p} ${Protocol.Extension}`);
 
           const newPolicies = unmodifiedPolicies.concat(modifiedFrameSrcPolicies).join(`${cspPolicyDelimiter} `);

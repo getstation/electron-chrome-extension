@@ -31,6 +31,10 @@ const protocolHandler = async (
 
   const { src, backgroundPage: { name, html } } = extension;
 
+  const manifestPath = join(src, 'manifest.json');
+  const manifestFile = await readFileSync(manifestPath, 'utf-8');
+  const manifest = JSON.parse(manifestFile);
+
   const headers = {};
 
   // Always send CORS
@@ -41,10 +45,7 @@ const protocolHandler = async (
   headers['access-control-allow-origin'] = '*';
 
   // Set Content Security Policy for Chrome Extensions
-  const manifestPath = join(src, 'manifest.json');
-  const manifest = await readFileSync(manifestPath, 'utf-8');
-
-  const manifestContentSecurityPolicy = JSON.parse(manifest).content_security_policy;
+  const manifestContentSecurityPolicy = manifest.content_security_policy;
   const contentSecurityPolicy = manifestContentSecurityPolicy ? manifestContentSecurityPolicy : defaultContentSecurityPolicy;
 
   headers['content-security-policy'] = contentSecurityPolicy;
@@ -62,7 +63,15 @@ const protocolHandler = async (
     });
   }
 
-  // todo(hugo) check extension permissions (web_accessible_resources)
+  const accessibleResources = manifest.web_accessible_resources;
+  const isResourceAccessible = accessibleResources.includes(pathname.replace(/^\/+/g, '')); // remove leading slash for relative url
+
+  if (!isResourceAccessible) {
+    return callback({
+      statusCode: 403,
+      headers,
+    });
+  }
 
   // Create file stream
   const uri = join(src, pathname);
