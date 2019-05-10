@@ -63,15 +63,15 @@ const protocolHandler = async (
     });
   }
 
-  const accessibleResources = manifest.web_accessible_resources;
-  const isResourceAccessible = accessibleResources.includes(pathname.replace(/^\/+/g, '')); // remove leading slash for relative url
+  // const accessibleResources = manifest.web_accessible_resources;
+  // const isResourceAccessible = accessibleResources.includes(pathname.replace(/^\/+/g, '')); // remove leading slash for relative url
 
-  if (!isResourceAccessible) {
-    return callback({
-      statusCode: 403,
-      headers,
-    });
-  }
+  // if (!isResourceAccessible) {
+  //   return callback({
+  //     statusCode: 403,
+  //     headers,
+  //   });
+  // }
 
   // Create file stream
   const uri = join(src, pathname);
