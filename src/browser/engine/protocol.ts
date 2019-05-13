@@ -9,7 +9,16 @@ import { Protocol } from '../../common';
 import { getExtensionById } from '../chrome-extension';
 import { protocolAsScheme } from '../../common/utils';
 
-// Match Chromium kDefaultContentSecurityPolicy
+/*
+Protocol.ts
+
+Everything related to `chrome-extension://` protocol goes here
+
+- Register protocol
+- Handle and serve extension web resources and background page
+*/
+
+// defaultContentSecurityPolicy match Chromium kDefaultContentSecurityPolicy
 // https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=31
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
@@ -20,9 +29,11 @@ const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chro
 );
 
 const protocolHandler = async (
-  { url }: Electron.RegisterBufferProtocolRequest,
+  h: Electron.RegisterBufferProtocolRequest,
   callback: Function
 ) => {
+  console.log(h);
+  const { url } = h;
   const { hostname, pathname } = parse(url);
   if (!hostname || !pathname) return callback();
 
@@ -65,6 +76,11 @@ const protocolHandler = async (
 
   // const accessibleResources = manifest.web_accessible_resources;
   // const isResourceAccessible = accessibleResources.includes(pathname.replace(/^\/+/g, '')); // remove leading slash for relative url
+
+  // check inner related scripts and assets
+
+  // webRequest doesn't work
+  // we don't have the referrer
 
   // if (!isResourceAccessible) {
   //   return callback({

@@ -98,7 +98,8 @@ app.on(
         //
         // `chrome-extension://` is registered as privilegied
         // with `webFrame.registerURLSchemeAsPrivileged()`
-        // but added iFrames don't bypass top frame CSP frame-src policy
+        // but added iFrames with extension protocol
+        // don't bypass top frame CSP frame-src policy
         //
         // ref: https://bugs.chromium.org/p/chromium/issues/detail?id=408932#c35
         //
@@ -140,7 +141,7 @@ app.on(
 
           headers.set(cspHeaderKey, [newPolicies]);
         }
-        // End override
+        // End override CSP iframe-src policy
 
         const accessControlAllowOrigin = responseheaders['access-control-allow-origin'] || [];
         const allowedOriginIsWildcard = accessControlAllowOrigin.includes('*');
