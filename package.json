@@ -51,6 +51,7 @@
     "p-queue": "^3.0.0",
     "querystring": "^0.2.0",
     "recursive-lowercase-json": "^0.2.0",
+    "string.prototype.matchall": "^3.0.1",
     "tmp-promise": "^1.0.5",
     "unzip-crx-3": "^0.2.0",
     "uuid": "^3.2.1",

@@ -102,7 +102,7 @@ app.on(
         // don't bypass top frame CSP frame-src policy
         //
         // ref: https://bugs.chromium.org/p/chromium/issues/detail?id=408932#c35
-        //
+        // todo: remove this block since Electron 5 fix the problem
         //
         // * Protocol `chrome-extension://` is considered trustworthy
         // ref: https://w3c.github.io/webappsec-secure-contexts/#is-origin-trustworthy

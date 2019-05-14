@@ -1,22 +1,25 @@
 import { app, protocol } from 'electron';
 import { readFileSync, createReadStream } from 'fs';
-import stream from 'stream';
+import { Transform, PassThrough } from 'stream';
 import { lookup } from 'mime-types';
-import { join } from 'path';
-import { parse } from 'url';
+import { join, dirname, normalize } from 'path';
+import { parse, URL } from 'url';
+// @ts-ignore no types
+import matchAll from 'string.prototype.matchall';
 
 import { Protocol } from '../../common';
 import { getExtensionById } from '../chrome-extension';
-import { protocolAsScheme } from '../../common/utils';
+import { protocolAsScheme, fromEntries } from '../../common/utils';
 
-/*
-Protocol.ts
-
-Everything related to `chrome-extension://` protocol goes here
-
-- Register protocol
-- Handle and serve extension web resources and background page
-*/
+/**
+ * Protocol.ts
+ *
+ * Everything related to `chrome-extension://` protocol goes here
+ *
+ * - Register protocol
+ * - Handle and serve extension web resources and background page
+ *
+**/
 
 // defaultContentSecurityPolicy match Chromium kDefaultContentSecurityPolicy
 // https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=31
@@ -28,12 +31,51 @@ const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chro
   { secure: true }
 );
 
+// The protocol handler load file into Buffers
+// before transform them into a Stream (expected in callback).
+// Stream callback allow custom headers.
+//
+// Handlable resources are listed in the extension manifest.
+// Allowed HTML pages can include extension assets that don't need
+// to be whitelisted. Since we didn't know the origin of the requests,
+// each time we serve a response, we scan the content to whitelist
+// inner resources.
+//
+// ref: https://developer.chrome.com/extensions/manifest/web_accessible_resources
+const whitelistedResourcesFromProtocolServedFiles = new Set();
+
+// Regex to capture the src attribute value for scrips, stylesheets...
+const resourceLinkRegex = /src\s*=\s*['"](.+?)['"]/g;
+
+const captureWhitelistableResourcesFromProtocolServedFile = (pathname: string) =>
+  new Transform({
+    transform(chunk: any, _encoding: any, cb: Function) {
+      const linksAllowed = matchAll(chunk.toString('utf8'), resourceLinkRegex);
+      const directory = dirname(pathname);
+
+      for (const [, link] of linksAllowed) {
+        try {
+          const isUrl = new URL(link);
+          if (isUrl) break;
+        } catch (e) { }
+
+        const fullPath = join(directory, normalize(link));
+
+        if (!whitelistedResourcesFromProtocolServedFiles.has(fullPath)) {
+          whitelistedResourcesFromProtocolServedFiles.add(fullPath);
+        }
+      }
+
+      // tslint:disable-next-line: no-invalid-this
+      this.push(chunk);
+      cb();
+    },
+  });
+
 const protocolHandler = async (
-  h: Electron.RegisterBufferProtocolRequest,
+  { url }: Electron.RegisterBufferProtocolRequest,
   callback: Function
 ) => {
-  console.log(h);
-  const { url } = h;
   const { hostname, pathname } = parse(url);
   if (!hostname || !pathname) return callback();
 
@@ -46,60 +88,60 @@ const protocolHandler = async (
   const manifestFile = await readFileSync(manifestPath, 'utf-8');
   const manifest = JSON.parse(manifestFile);
 
-  const headers = {};
+  const headers = new Map();
 
   // Always send CORS
   // refs:
   // https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=524
   // https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=330
   // https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=1017
-  headers['access-control-allow-origin'] = '*';
+  headers.set('access-control-allow-origin', '*');
 
   // Set Content Security Policy for Chrome Extensions
   const manifestContentSecurityPolicy = manifest.content_security_policy;
-  const contentSecurityPolicy = manifestContentSecurityPolicy ? manifestContentSecurityPolicy : defaultContentSecurityPolicy;
+  const contentSecurityPolicy = manifestContentSecurityPolicy ?
+    manifestContentSecurityPolicy : defaultContentSecurityPolicy;
 
-  headers['content-security-policy'] = contentSecurityPolicy;
+  headers.set('content-security-policy', contentSecurityPolicy);
 
   // Check if we serve the background page (html)
   if (`/${name}` === pathname) {
-    headers['content-type'] = 'text/html';
+    headers.set('content-type', 'text/html');
 
-    // Transform a Buffer into a Stream (expected in callback)
-    // Stream callback allow custom headers
+    const backgroundPageData = (new PassThrough())
+      .pipe(captureWhitelistableResourcesFromProtocolServedFile(pathname))
+      .end(html);
+
     return callback({
       statusCode: 200,
-      headers,
-      data: (new stream.PassThrough()).end(html),
+      headers: fromEntries(headers),
+      data: backgroundPageData,
     });
   }
 
-  // const accessibleResources = manifest.web_accessible_resources;
-  // const isResourceAccessible = accessibleResources.includes(pathname.replace(/^\/+/g, '')); // remove leading slash for relative url
+  const accessibleResources = manifest.web_accessible_resources
+    .map((r: any) => `/${r}`); // accessibles ressources are relatives to the extension folder. Make them absolut to play with URL Node module
 
-  // check inner related scripts and assets
+  const isResourceAccessible = accessibleResources.includes(pathname) ||
+    whitelistedResourcesFromProtocolServedFiles.has(pathname);
 
-  // webRequest doesn't work
-  // we don't have the referrer
+  if (!isResourceAccessible) {
+    return callback({
+      statusCode: 403,
+      headers: fromEntries(headers),
+    });
+  }
 
-  // if (!isResourceAccessible) {
-  //   return callback({
-  //     statusCode: 403,
-  //     headers,
-  //   });
-  // }
-
-  // Create file stream
   const uri = join(src, pathname);
-  const data = createReadStream(uri);
+  const data = createReadStream(uri)
+    .pipe(captureWhitelistableResourcesFromProtocolServedFile(pathname));
 
-  // Set Mime type
   const mimeType = lookup(pathname);
-  if (mimeType) headers['content-type'] = mimeType;
+  if (mimeType) headers.set('content-type', mimeType);
 
   return callback({
     statusCode: 200,
-    headers,
+    headers: fromEntries(headers),
     data,
   });
 };
