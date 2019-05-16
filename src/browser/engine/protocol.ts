@@ -1,23 +1,42 @@
 import { app, protocol } from 'electron';
-import { readFileSync, createReadStream } from 'fs';
-import stream from 'stream';
+import { createReadStream, readFile } from 'fs';
+import { PassThrough } from 'stream';
 import { lookup } from 'mime-types';
 import { join } from 'path';
 import { parse } from 'url';
+import { promisify } from 'util';
+// @ts-ignore no types
+import matchAll from 'string.prototype.matchall';
 
 import { Protocol } from '../../common';
 import { getExtensionById } from '../chrome-extension';
-import { protocolAsScheme } from '../../common/utils';
+import { protocolAsScheme, fromEntries } from '../../common/utils';
 
-import ECx from './api';
+const asyncReadFile = promisify(readFile);
 
+/**
+ * Protocol.ts
+ *
+ * Everything related to `chrome-extension://` protocol goes here
+ *
+ * - Register protocol
+ * - Handle and serve extension web resources and background page
+ *
+**/
+
+// defaultContentSecurityPolicy match Chromium kDefaultContentSecurityPolicy
+// https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=31
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
 
-protocol.registerStandardSchemes(
+(protocol as any).registerStandardSchemes(
   [protocolAsScheme(Protocol.Extension)],
   { secure: true }
 );
+
+// The protocol handler load file into Buffers
+// before transform them into a Stream (expected in callback).
+// Stream callback allow custom headers.
 
 const protocolHandler = async (
   { url }: Electron.RegisterBufferProtocolRequest,
@@ -30,52 +49,56 @@ const protocolHandler = async (
   if (!extension) return callback();
 
   const { src, backgroundPage: { name, html } } = extension;
-  const headers = {};
 
-  // Todo : Hack to get extension ID,
-  // revert to hostname when this (https://github.com/getstation/electron-chrome-extension/commit/8f8d37e13c47611ce9c8b184775a68fa52fc883d) is reverted too
-  const splitted = src.split('/');
-  const ecxId = splitted[splitted.length - 2];
+  const manifestPath = join(src, 'manifest.json');
+  const manifestFile = await asyncReadFile(manifestPath, 'utf-8');
+  const manifest = JSON.parse(manifestFile);
+
+  const headers = new Map();
+
+  // Always send CORS
+  // refs:
+  // https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=524
+  // https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=330
+  // https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=1017
+  headers.set('access-control-allow-origin', '*');
 
   // Set Content Security Policy for Chrome Extensions
-  if (ECx.isLoaded(ecxId)) {
-    const manifestPath = join(src, 'manifest.json');
-    const manifest = await readFileSync(manifestPath, 'utf-8');
+  //
+  // refs:
+  // GetSecurityPolicyForURL - https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=498
+  // CSPInfo::GetExtensionPagesCSP - https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=110
+  // CSPHandler::ParseExtensionPagesCSP - https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=216
+  // CSPHandler::SetDefaultExtensionPagesCSP - https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?rcl=4292bebbd8388070fc8718bb54d793b6f36fe4a6&l=311
+  const manifestContentSecurityPolicy = manifest.content_security_policy;
+  const contentSecurityPolicy = manifestContentSecurityPolicy ?
+    manifestContentSecurityPolicy : defaultContentSecurityPolicy;
 
-    const manifestContentSecurityPolicy = JSON.parse(manifest).content_security_policy;
-    const contentSecurityPolicy = manifestContentSecurityPolicy ? manifestContentSecurityPolicy : defaultContentSecurityPolicy;
+  headers.set('content-security-policy', contentSecurityPolicy);
 
-    headers['content-security-policy'] = contentSecurityPolicy;
-  }
-
-  // Check if it's the background page (html)
+  // Check if we serve the background page (html)
   if (`/${name}` === pathname) {
-    headers['content-type'] = 'text/html';
+    headers.set('content-type', 'text/html');
 
-    // Transform a Buffer into a Stream (expected in callback)
-    const dataStream = new stream.PassThrough();
-    dataStream.end(html);
+    const backgroundPageData = (new PassThrough())
+      .end(html);
 
     return callback({
       statusCode: 200,
-      headers,
-      data: dataStream,
+      headers: fromEntries(headers),
+      data: backgroundPageData,
     });
   }
 
-  // todo(hugo) check extension permissions
-
-  // Create file stream
   const uri = join(src, pathname);
   const data = createReadStream(uri);
 
-  // Set Mime type
   const mimeType = lookup(pathname);
-  if (mimeType) headers['content-type'] = mimeType;
+  if (mimeType) headers.set('content-type', mimeType);
 
   return callback({
     statusCode: 200,
-    headers,
+    headers: fromEntries(headers),
     data,
   });
 };

@@ -1,6 +1,6 @@
 {
   "name": "electron-chrome-extension",
-  "version": "2.0.7",
+  "version": "2.0.8-rc.4",
   "description": "Chrome Extensions Engine for Electron",
   "main": "index.js",
   "scripts": {
@@ -21,9 +21,9 @@
     "electron": ">=4.0.0"
   },
   "devDependencies": {
-    "@types/mime-types": "^2.1.0",
     "@types/fs-extra": "^5.0.4",
     "@types/glob": "^7.1.1",
+    "@types/mime-types": "^2.1.0",
     "@types/mocha": "^5.2.5",
     "@types/tmp": "0.0.33",
     "concurrently": "^4.1.0",
@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "capitalize": "^2.0.0",
+    "content-security-policy-parser": "^0.1.1",
     "download-crx": "^1.0.5",
     "electron-better-web-request": "^1.0.1",
     "electron-fetch": "^1.3.0",
@@ -51,9 +52,13 @@
     "p-queue": "^3.0.0",
     "querystring": "^0.2.0",
     "recursive-lowercase-json": "^0.2.0",
+    "string.prototype.matchall": "^3.0.1",
     "tmp-promise": "^1.0.5",
     "unzip-crx-3": "^0.2.0",
     "uuid": "^3.2.1",
     "xml-js": "^1.6.8"
+  },
+  "toolchain": {
+    "node": "10.15.3"
   }
 }
