@@ -2,9 +2,33 @@ import { app, webContents } from 'electron';
 import enhanceWebRequest from 'electron-better-web-request';
 // @ts-ignore
 import recursivelyLowercaseJSONKeys from 'recursive-lowercase-json';
+// @ts-ignore
+import parse from 'content-security-policy-parser';
 
 import { Protocol } from '../../common';
 import { fromEntries } from '../../common/utils';
+
+/**
+ * Convert object of policies into content security policy heder value
+ *
+ * @example
+ * {
+ * 'default-src': ["'self'"],
+ * 'script-src': ["'unsafe-eval'", 'scripts.com'],
+ * 'object-src': [],
+ * 'style-src': ['styles.biz']
+ * } => "default-src 'self'; script-src 'unsafe-eval' scripts.com; object-src; style-src styles.biz"
+ *
+ * @param { [name: string]: string[] } policies policies as object
+ * @return {string} the stringified policies
+ */
+const stringify = (policies: { [name: string]: string[] }): string =>
+  Object.entries(policies)
+    .map(
+      ([name, value]: [string, string[]]) =>
+        `${name} ${value.join(' ')}`
+    )
+    .join(';');
 
 const requestIsXhrOrSubframe = (details: any) => {
   const { resourcetype } = details;
@@ -125,27 +149,35 @@ app.on(
 
         const cspHeaderKey = 'content-security-policy';
         const cspPolicyKey = 'frame-src';
-        const cspPolicyDelimiter = ';';
-        const cspDirective: string | undefined = (responseheaders[cspHeaderKey] || [])[0];
+        const cspDirective: string = (responseheaders[cspHeaderKey] || [])[0];
 
         if (cspDirective) {
-          const policies = cspDirective.split(cspPolicyDelimiter);
+          const policies = parse(cspDirective);
+          const frameSrcPolicy = policies[cspPolicyKey];
 
-          const unmodifiedPolicies = policies.filter((p: string) => !p.includes(cspPolicyKey));
+          if (frameSrcPolicy) {
+            const policiesWithOverride = {
+              ...policies,
+              [cspPolicyKey]: [...frameSrcPolicy, Protocol.Extension],
+            };
 
-          const modifiedFrameSrcPolicies = policies
-            .filter((p: string) => p.includes(cspPolicyKey))
-            .map((p: string) => `${p} ${Protocol.Extension}`);
-
-          const newPolicies = unmodifiedPolicies.concat(modifiedFrameSrcPolicies).join(`${cspPolicyDelimiter} `);
-
-          headers.set(cspHeaderKey, [newPolicies]);
+            headers.set(cspHeaderKey, [stringify(policiesWithOverride)]);
+          }
         }
         // End override CSP iframe-src policy
 
         const accessControlAllowOrigin = responseheaders['access-control-allow-origin'] || [];
         const allowedOriginIsWildcard = accessControlAllowOrigin.includes('*');
 
+        // Code block for bypass preflight CORS check like Wavebox is doing it
+        // `chrome-extension://` requests doesn't bypass CORS
+        // check like in Chromium
+        //
+        // refs:
+        // https://fetch.spec.whatwg.org/#cors-check
+        // https://cs.chromium.org/chromium/src/extensions/common/cors_util.h?rcl=faf5cf5cb5985875dedd065d852b35a027e50914&l=21
+        // https://github.com/wavebox/waveboxapp/blob/09f791314e1ecc808cbbf919ac65e5f6dda785bd/src/app/src/Extensions/Chrome/CRExtensionRuntime/CRExtensionBackgroundPage.js#L195
+        // todo(hugo): find a better and understandable solution
         if (requestIsForExtension(formattedDetails)
           || allowedOriginIsWildcard) {
           headers.set('access-control-allow-credentials', ['true']);

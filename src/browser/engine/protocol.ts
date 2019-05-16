@@ -35,13 +35,19 @@ const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chro
 // before transform them into a Stream (expected in callback).
 // Stream callback allow custom headers.
 //
-// Handlable resources are listed in the extension manifest.
-// Allowed HTML pages can include extension assets that don't need
-// to be whitelisted. Since we didn't know the origin of the requests,
-// each time we serve a response, we scan the content to whitelist
-// inner resources.
+// Handlable resources are listed in the extension manifest
+// for a navigation from a **web origin** to an extension resource
+// Allowed HTML pages served under `chrome-extension://` protocol
+// can include extension assets that don't need to be whitelisted.
+// Since we didn't know the origin of the requests*, each time we serve
+// a response, we scan the content to whitelist inner resources.
 //
-// ref: https://developer.chrome.com/extensions/manifest/web_accessible_resources
+// * protocol request referrer is always blank.
+// issue: https://github.com/electron/electron/issues/14747
+//
+// refs:
+// https://developer.chrome.com/extensions/manifest/web_accessible_resources
+// AllowExtensionResourceLoad - https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=429
 const whitelistedResourcesFromProtocolServedFiles = new Set();
 
 // Regex to capture the src attribute value for scrips, stylesheets...
@@ -98,6 +104,12 @@ const protocolHandler = async (
   headers.set('access-control-allow-origin', '*');
 
   // Set Content Security Policy for Chrome Extensions
+  //
+  // refs:
+  // GetSecurityPolicyForURL - https://cs.chromium.org/chromium/src/extensions/browser/extension_protocols.cc?l=498
+  // CSPInfo::GetExtensionPagesCSP - https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=110
+  // CSPHandler::ParseExtensionPagesCSP - https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=216
+  // CSPHandler::SetDefaultExtensionPagesCSP - https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?rcl=4292bebbd8388070fc8718bb54d793b6f36fe4a6&l=311
   const manifestContentSecurityPolicy = manifest.content_security_policy;
   const contentSecurityPolicy = manifestContentSecurityPolicy ?
     manifestContentSecurityPolicy : defaultContentSecurityPolicy;
