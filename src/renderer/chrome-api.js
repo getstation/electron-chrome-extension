@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron');
 
 const constants = require('../common/constants');
+const { log } = require('../common/utils');
 const Event = require('./api/event');
 const MessageSender = require('./api/runtime/message-sender');
 const Tab = require('./api/runtime/tab');
@@ -73,8 +74,13 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
       if (cb) cb();
     },
 
-    get() {
-      console.log('get')
+    get(tabId, cb) {
+      const requestId = ++nextId;
+      ipcRenderer.once(`${constants.TABS_GET_RESULT_}${requestId}`, (event, result) => {
+        cb(result);
+      });
+
+      ipcRenderer.send(constants.TABS_GET, requestId, extensionId, tabId);
     },
 
     getCurrent() {
@@ -121,12 +127,12 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
 
   const manager = new RpcIpcManager(library, 'cx-event-cookies');
 
-  ipcRenderer.on(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, (event, tabId, portId, connectInfo) => {
-    chrome.runtime.onConnect.emit(Port.get(context, tabId, portId, extensionId, connectInfo.name))
+  ipcRenderer.on(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, (event, tabId, portId, connectInfo, url) => {
+    chrome.runtime.onConnect.emit(Port.get(context, tabId, portId, extensionId, connectInfo.name, url))
   });
 
   ipcRenderer.on(`${constants.RUNTIME_ONMESSAGE_}${extensionId}`, (event, tabId, message, resultID) => {
-    chrome.runtime.onMessage.emit(message, new MessageSender(tabId, extensionId), (messageResult) => {
+    chrome.runtime.onMessage.emit(message, new MessageSender({ tabId, extensionId }), (messageResult) => {
       ipcRenderer.send(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, messageResult)
     })
   });
@@ -137,6 +143,17 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
 
   ipcRenderer.on(constants.TABS_ONREMOVED, (event, tabId) => {
     chrome.tabs.onRemoved.emit(tabId)
+  });
+
+  ipcRenderer.on('cx-event', (_, e) => {
+    const { channel, payload } = e;
+    const cxEventEmitter = channel.split('.')
+      .reduce(
+        (emitter, path) => emitter = emitter[path],
+        chrome
+      )
+
+    cxEventEmitter.emit(...payload)
   });
 
   chrome.runtime.onInstalled.emit({ reason: 'install' });
@@ -163,7 +180,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
               return new Proxy(result, handler);
             }
 
-            console.log(`${apis.__path}.${prop}`, ...args, result);
+            log(`${apis.__path}.${prop} `, ...args, result);
 
             return result;
           }
@@ -175,7 +192,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
             return new Proxy(result, handler);
           }
 
-          console.log(`${apis.__path}.${prop}`, result);
+          log(`${apis.__path}.${prop} `, result);
 
           return result;
         }
@@ -183,7 +200,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
 
       if (['string', 'number'].includes(typeof apis[prop])) {
         const result = apis[prop];
-        console.log(`${apis.__path}.${prop}`, result);
+        log(`${apis.__path}.${prop} `, result);
 
         return result;
       }

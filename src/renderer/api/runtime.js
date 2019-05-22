@@ -78,7 +78,8 @@ class Runtime {
       [targetExtensionId, connectInfo] = args
     }
 
-    const { tabId, portId } = ipcRenderer.sendSync(constants.RUNTIME_CONNECT, targetExtensionId, connectInfo)
+    const url = window && window.location ? window.location.href : undefined;
+    const { tabId, portId } = ipcRenderer.sendSync(constants.RUNTIME_CONNECT, targetExtensionId, connectInfo, url)
     return Port.get(this.context, tabId, portId, this.id, connectInfo.name)
   }
 
@@ -96,14 +97,14 @@ class Runtime {
     } else if (args.length === 2) {
       // A case of not provide extension-id: (message, responseCallback)
       if (typeof args[1] === 'function') {
-        ipcRenderer.on(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[1](result))
+        ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[1](result))
         message = args[0]
       } else {
         [targetExtensionId, message] = args
       }
     } else {
       console.error('options is not supported')
-      ipcRenderer.on(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[2](result))
+      ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[2](result))
     }
 
     ipcRenderer.send(constants.RUNTIME_SENDMESSAGE, targetExtensionId, message, this.originResultID)
