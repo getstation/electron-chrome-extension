@@ -1,7 +1,9 @@
 import { session as electronSession } from 'electron';
 const { rpc } = require('electron-simple-rpc');
+
 import { IExtension } from '../../common/types';
 import { Cookie, SameSiteStatus } from '../../common/apis/cookies';
+
 import Handler from './handler';
 
 // todo(hugo) check permisions for URLs

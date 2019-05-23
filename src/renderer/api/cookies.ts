@@ -1,6 +1,7 @@
 import { Api } from '../../common';
 import { IExtension } from '../../common/types';
 import { Methods } from '../../common/apis/cookies';
+
 import Event from './event';
 import line from './line';
 
