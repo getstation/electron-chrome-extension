@@ -209,7 +209,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     }
   };
 
-  chrome = new Proxy(chrome, handler);
+  // chrome = new Proxy(chrome, handler);
 
   return chrome;
 };
