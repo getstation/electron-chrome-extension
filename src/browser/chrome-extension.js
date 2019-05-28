@@ -156,7 +156,7 @@ const hookWebContentsEvents = function (webContents) {
   webContents.on('did-start-loading', (...args) => {
     const changeInfo = { status: 'loading' };
 
-    sendEvent({
+    sendEventToExtensions({
       channel: 'tabs.onUpdated',
       payload: [tabId, changeInfo, wcAsTab(webContents)],
     })
@@ -165,7 +165,7 @@ const hookWebContentsEvents = function (webContents) {
   webContents.on('did-stop-loading', (...args) => {
     const changeInfo = { status: 'complete' };
 
-    sendEvent({
+    sendEventToExtensions({
       channel: 'tabs.onUpdated',
       payload: [tabId, changeInfo, wcAsTab(webContents)],
     })
