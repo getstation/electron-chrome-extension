@@ -134,7 +134,7 @@ const sendToBackgroundPages = function (...args) {
   }
 }
 
-const sendEvent = (e) => sendToBackgroundPages('cx-event', e);
+const sendEventToExtensions = (e) => sendToBackgroundPages('cx-event', e);
 
 // Dispatch web contents events to Chrome APIs
 const hookWebContentsEvents = function (webContents) {
@@ -283,17 +283,6 @@ ipcMain.on(
   }
 );
 
-app.on('browser-window-focus',
-  (_, __) => {
-    const wc = webContents.getFocusedWebContents();
-
-    sendEvent({
-      channel: 'tabs.onActivated',
-      payload: [{ tabId: wc.id, windowId: 1 }],
-    })
-  }
-)
-
 ipcMain.on(constants.RUNTIME_GET_MANIFEST, (event, extensionId) => {
   event.returnValue = manifestMap[extensionId];
 })
@@ -406,6 +395,8 @@ app.on('web-contents-created', function (event, webContents) {
 })
 
 module.exports = {
+  sendEventToExtensions,
+
   // should be removed when we have a typed extensions memory store
   getExtensionById: function (extensionId) {
     const bgExt = backgroundPages[extensionId]

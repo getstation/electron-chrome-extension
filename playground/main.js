@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const { join } = require('path');
 const { format } = require('url');
 const { mkdirSync, existsSync } = require('fs');
@@ -54,6 +54,13 @@ app.on('ready', async () => {
   // Load Grammarly
   await ECx.load('kbfnbcaeplbcioakkpcpgfkobkghlhen');
 });
+
+ipcMain.on('WEBVIEW_FOCUS', (_, tabId) =>
+  ECx.sendEvent({
+    channel: 'tabs.onActivated',
+    payload: [{ tabId, windowId: 1 }],
+  })
+);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

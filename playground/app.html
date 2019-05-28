@@ -20,13 +20,33 @@
   </style>
 
   <div class="container">
-    <!-- <webview allowPopups webpreferences="nativeWindowOpen=yes" preload='../lib/src/renderer/init.js'
+    <webview allowPopups webpreferences="nativeWindowOpen=yes" preload='../lib/src/renderer/init.js'
       src="https://translate.google.com/">
-    </webview> -->
+    </webview>
+
     <webview allowPopups webpreferences="nativeWindowOpen=yes" preload='../lib/src/renderer/init.js'
       src="https://mail.google.com/">
     </webview>
   </div>
+
+
+  <script>
+    setTimeout(
+      () => {
+        const { ipcRenderer } = require('electron')
+        const webviews = document.querySelectorAll('webview')
+
+        for (wv of webviews) {
+          wv.addEventListener(
+            'focus',
+            event => ipcRenderer.send('WEBVIEW_FOCUS', event.target.getWebContents().id),
+            true
+          );
+        }
+      },
+      1000
+    );
+  </script>
 </body>
 
 </html>

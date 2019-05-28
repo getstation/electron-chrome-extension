@@ -34,6 +34,11 @@ export enum ExtensionStatus {
   Discovered = 'chrome-extension-discoverd',
 }
 
+export type ExtensionEventMessage<T = any> = {
+  channel: string,
+  payload: T,
+};
+
 // API
 
 export type ChromeApi = any;
