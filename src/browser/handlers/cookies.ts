@@ -2,8 +2,7 @@ import { session as electronSession } from 'electron';
 
 import { IExtension, ExtensionEventMessage } from '../../common/types';
 import { Cookie, SameSiteStatus, Events } from '../../common/apis/cookies';
-
-import Handler from './handler';
+import Handler from '../engine/handler';
 
 // todo(hugo) check permisions for URLs
 

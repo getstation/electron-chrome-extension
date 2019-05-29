@@ -1,8 +1,8 @@
 const { rpc } = require('electron-simple-rpc');
-import { extensionScope, Channel, Api } from '../../common';
-import { IExtension } from '../../common/types';
+import { extensionScope, Channel, Api } from '../common';
+import { IExtension } from '../common/types';
 
-const line = <T>(api: Api, extensionId: IExtension['id']) => {
+export const createWire = <T>(api: Api, extensionId: IExtension['id']) => {
   const scope = extensionScope(Channel.Handler, api, extensionId);
 
   return (method: T) => {
@@ -18,5 +18,3 @@ const line = <T>(api: Api, extensionId: IExtension['id']) => {
     };
   };
 };
-
-export default line;

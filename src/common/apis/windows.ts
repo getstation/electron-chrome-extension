@@ -72,3 +72,10 @@ export interface UpdateInfo {
   drawAttention?: boolean,
   state?: WindowState,
 }
+
+// Events
+
+export enum Events {
+  OnCreated = 'onCreated',
+  OnRemoved = 'onRemoved',
+}

@@ -31,7 +31,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   chrome.i18n = require('./api/i18n').setup(extensionId);
   chrome.webNavigation = require('./api/web-navigation').setup();
   chrome.omnibox = require('./api/omnibox').setup(extensionId);
-  chrome.windows = require('./api/windows').setup(extensionId);
+  chrome.windows = require('./api/windows').default(extensionId);
 
   chrome.extension = {
     getURL: (...args) => chrome.runtime.getURL(...args),

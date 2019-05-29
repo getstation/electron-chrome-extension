@@ -3,41 +3,22 @@ import { BrowserWindow } from 'electron';
 import {
   Window,
   CreateData,
-  Methods,
   GetInfo,
   UpdateInfo,
+  Events,
 } from '../../common/apis/windows';
-import { Channel, Api, scope, extensionScope } from '../../common/';
-const { RpcIpcManager, rpc } = require('electron-simple-rpc');
+import { IExtension, ExtensionEventMessage } from '../../common/types';
+import Handler from '../engine/handler';
 
-class ChromeWindowsAPIHandler {
-  protected rpcIpcManager: any;
-  protected handlerScope: string;
-  protected eventScope: string;
+export default class Windows extends Handler<Events> {
   protected extensionWebContents: Map<
     Electron.WebContents['id'],
     Electron.WebContents
   >;
 
-  constructor(extensionId: string) {
+  constructor(extensionId: IExtension['id'], emitter: (payload: ExtensionEventMessage['payload']) => void) {
+    super(extensionId, emitter);
     this.extensionWebContents = new Map();
-
-    const rpcLibraries = Object
-      .keys(Methods)
-      .reduce(
-        (library, method) => {
-          const handler = this[`handle${method}`];
-          library[Methods[method]] = (...args: any[]) => {
-            return handler.apply(this, args);
-          };
-          return library;
-        },
-        {}
-      );
-
-    this.eventScope = scope(Channel.Event, Api.Windows);
-    this.handlerScope = extensionScope(Channel.Handler, Api.Windows, extensionId);
-    this.rpcIpcManager = new RpcIpcManager(rpcLibraries, this.handlerScope);
   }
 
   handleGet(windowId: Window['id'], _getInfo: GetInfo) {
@@ -126,7 +107,7 @@ class ChromeWindowsAPIHandler {
       alwaysOnTop: false,
     };
 
-    rpc(this.eventScope, 'onCreated', response);
+    this.emit(Events.OnCreated, response);
 
     return response;
   }
@@ -169,14 +150,10 @@ class ChromeWindowsAPIHandler {
     if (window && this.extensionWebContents.has(window.webContents.id)) {
       window.close();
       this.extensionWebContents.delete(window.webContents.id);
-      rpc(this.eventScope, 'onRemoved', windowId);
+      this.emit(Events.OnRemoved, windowId);
     }
 
     return;
-  }
-
-  release() {
-    this.rpcIpcManager.release();
   }
 
   private findBrowserWindow(windowId: Window['id']) {
@@ -185,5 +162,3 @@ class ChromeWindowsAPIHandler {
       .find((window) => window.webContents.id === windowId);
   }
 }
-
-export default ChromeWindowsAPIHandler;
