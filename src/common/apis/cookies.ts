@@ -62,7 +62,11 @@ export enum Methods {
   GetAllCookieStores = 'get-all-cookie-stores',
 }
 
-// Types
+// Events
+
+export enum Events {
+  OnChanged = 'onChanged',
+}
 
 export type OnChanged = Event<{
   cookie: Cookie,

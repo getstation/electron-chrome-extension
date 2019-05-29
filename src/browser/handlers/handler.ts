@@ -6,19 +6,22 @@ import {
   Api,
   Channel,
   extensionScope,
-  scope,
+  eventScope,
 } from '../../common';
+import { ExtensionEventMessage } from '../../common/types';
 
-// todo(hugo) abstract event emitter here for emit via RPC
+export default class Handler<E> {
 
-export default class Handler {
+  protected namespace: Api;
   protected manager: any;
+  protected emitter: (payload: ExtensionEventMessage['payload']) => void;
   protected handlerScope: string;
   protected eventScope: string;
 
-  constructor(extensionId: string) {
-    const namespace = this.constructor.name;
-    const definitions = join('..', '..', 'common', 'apis', namespace.toLowerCase());
+  constructor(extensionId: string, emitter: (payload: ExtensionEventMessage['payload']) => void) {
+    this.namespace = this.constructor.name as Api;
+    this.emitter = emitter;
+    const definitions = join('..', '..', 'common', 'apis', this.namespace.toLowerCase());
     const { Methods } = require(definitions);
 
     const library = Object
@@ -36,12 +39,15 @@ export default class Handler {
       );
 
     const handlerScope = extensionScope(
-      Channel.Handler, Api[namespace], extensionId
+      Channel.Handler, Api[this.namespace], extensionId
     );
 
-    this.eventScope = scope(Channel.Event, Api[namespace]);
-
     this.manager = new RpcIpcManager(library, handlerScope);
+  }
+
+  emit(eventName: E, payload: ExtensionEventMessage['payload']) {
+    const channel = eventScope(Api[this.namespace] as Api, eventName);
+    this.emitter({ channel, payload });
   }
 
   release() {

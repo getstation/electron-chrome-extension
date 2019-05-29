@@ -364,7 +364,7 @@ const loadExtension = function (manifest) {
   const { extensionId } = manifest;
 
   if (!(extensionId in apiHandlersMap)) {
-    apiHandlersMap[extensionId] = new ChromeAPIHandler(extensionId);
+    apiHandlersMap[extensionId] = new ChromeAPIHandler(extensionId, sendEventToExtensions);
   }
 
   startBackgroundPages(manifest)

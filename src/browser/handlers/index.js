@@ -4,11 +4,11 @@ const ChromeWindowsAPIHandler = require('./windows').default;
 const Cookies = require('./cookies').default;
 
 class ChromeAPIHandler {
-    constructor(extensionId) {
+    constructor(extensionId, emitter) {
         this.storage = new ChromeStorageAPIHandler(extensionId);
         this.webRequest = new ChromeWebRequestAPIHandler(extensionId);
         this.windows = new ChromeWindowsAPIHandler(extensionId);
-        this.cookies = new Cookies(extensionId);
+        this.cookies = new Cookies(extensionId, emitter);
     }
 
     release() {

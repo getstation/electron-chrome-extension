@@ -1,8 +1,7 @@
 import { session as electronSession } from 'electron';
-const { rpc } = require('electron-simple-rpc');
 
-import { IExtension } from '../../common/types';
-import { Cookie, SameSiteStatus } from '../../common/apis/cookies';
+import { IExtension, ExtensionEventMessage } from '../../common/types';
+import { Cookie, SameSiteStatus, Events } from '../../common/apis/cookies';
 
 import Handler from './handler';
 
@@ -16,11 +15,11 @@ const ELECTRON_TO_CRX_COOKIE_CHANGE_CAUSE = {
   'expired-overwrite': 'expired_overwrite',
 };
 
-export default class Cookies extends Handler {
+export default class Cookies extends Handler<Events> {
   private electronCookies: Electron.Cookies;
 
-  constructor(extensionId: IExtension['id']) {
-    super(extensionId);
+  constructor(extensionId: IExtension['id'], emitter: (payload: ExtensionEventMessage['payload']) => void) {
+    super(extensionId, emitter);
     this.electronCookies = electronSession.defaultSession!.cookies;
 
     this.electronCookies.addListener(
@@ -35,7 +34,7 @@ export default class Cookies extends Handler {
           removed,
         };
 
-        rpc(this.eventScope, 'onChanged')(details);
+        this.emit(Events.OnChanged, details);
       }
     );
   }

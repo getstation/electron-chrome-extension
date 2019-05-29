@@ -9,3 +9,11 @@ export const fromEntries = (iterable: any) => [...iterable]
 export const log = (...args: any[]) => console.log(
   (new Date(Date.now())).toJSON(), ...args
 );
+
+export const isIterable = (obj: any) => {
+  if (obj === null || obj === undefined) {
+    return false;
+  }
+
+  return typeof obj[Symbol.iterator] === 'function';
+};

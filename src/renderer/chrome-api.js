@@ -1,7 +1,7 @@
 const { ipcRenderer } = require('electron');
 
 const constants = require('../common/constants');
-const { log } = require('../common/utils');
+const { isIterable, log } = require('../common/utils');
 const Event = require('./api/event');
 const MessageSender = require('./api/runtime/message-sender');
 const Tab = require('./api/runtime/tab');
@@ -20,7 +20,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     chrome = {}
   }
 
-  // Maintain ports references (prevent garbage collection)
+  // Maintain ports references for debug purpose
   context.__ports = new Map();
 
   chrome.runtime = require('./api/runtime').setup(context, extensionId, isBackgroundPage);
@@ -69,8 +69,6 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     },
 
     insertCSS(tabId, details, cb) {
-      console.log('insertCSS: ', tabId, details);
-
       if (cb) cb();
     },
 
@@ -84,11 +82,9 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     },
 
     getCurrent() {
-      console.log('getCurrent')
     },
 
     create(details, cb) {
-      console.log('create: ', details);
       cb();
     },
 
@@ -119,14 +115,6 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
 
   chrome.cookies = require('./api/cookies').default(extensionId);
 
-  const { RpcIpcManager } = require('electron-simple-rpc');
-
-  const library = {
-    onChanged: (arg) => chrome.cookies.onChanged.emit(arg),
-  };
-
-  const manager = new RpcIpcManager(library, 'cx-event-cookies');
-
   ipcRenderer.on(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, (event, tabId, portId, connectInfo, url) => {
     chrome.runtime.onConnect.emit(Port.get(context, tabId, portId, extensionId, connectInfo.name, url))
   });
@@ -152,8 +140,9 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
         (emitter, path) => emitter = emitter[path],
         chrome
       )
+    const emittablePayload = isIterable(payload) ? payload : [payload];
 
-    cxEventEmitter.emit(...payload)
+    cxEventEmitter.emit(...emittablePayload)
   });
 
   chrome.runtime.onInstalled.emit({ reason: 'install' });
@@ -209,7 +198,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     }
   };
 
-  // chrome = new Proxy(chrome, handler);
+  chrome = new Proxy(chrome, handler);
 
   return chrome;
 };

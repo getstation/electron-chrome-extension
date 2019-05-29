@@ -30,6 +30,9 @@ export enum Api {
 export const scope = (channel: Channel, api: Api) =>
   [channel, api].join('-');
 
+export const eventScope = <E>(api: Api, eventName: E) =>
+  [api, eventName].join('.');
+
 export const extensionScope = (
   channel: Channel,
   api: Api,
