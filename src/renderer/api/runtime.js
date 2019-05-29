@@ -30,7 +30,7 @@ class Runtime {
   }
 
   getURL(path) {
-    const finalPath = path.startsWith('/') ? path : `/${path}`
+    const finalPath = path && path.startsWith('/') ? path : `/${path}`
 
     return url.format({
       protocol: constants.EXTENSION_PROTOCOL,
