@@ -97,9 +97,7 @@ class ECx {
     return await this.fetcher.fetch(extensionId);
   }
 
-  sendEvent(
-    event: ExtensionEventMessage
-  ): void {
+  sendEvent(event: ExtensionEventMessage): void {
     sendEventToExtensions(event);
   }
 

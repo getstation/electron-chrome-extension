@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 const constants = require('../common/constants');
 const { isIterable, log } = require('../common/utils');
 const Event = require('./api/event');
+const middlewareLogger = require('./logger').default;
 const MessageSender = require('./api/runtime/message-sender');
 const Tab = require('./api/runtime/tab');
 const Port = require('./api/runtime/port');
@@ -147,58 +148,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
 
   chrome.runtime.onInstalled.emit({ reason: 'install' });
 
-  // API Calls Logger for debug purpose
-
-  const handler = {
-    get: (apis, prop) => {
-      if (!Boolean(apis.__path)) {
-        apis.__path = 'chrome';
-      }
-
-      if (apis[prop] && typeof apis[prop] === 'object') {
-        apis[prop].__path = `${apis.__path}.${prop}`;
-        return new Proxy(apis[prop], handler);
-      }
-
-      if (typeof apis[prop] === 'function') {
-        return (...args) => {
-          if (args.filter(String).length > 0) {
-            const result = apis[prop](...args);
-            if (typeof result === 'object') {
-              result.__path = result.constructor.name.toLowerCase();
-              return new Proxy(result, handler);
-            }
-
-            log(`${apis.__path}.${prop} `, ...args, result);
-
-            return result;
-          }
-
-          const result = apis[prop]();
-
-          if (result.constructor.name.toLowerCase() === 'object') {
-            result.__path = result.constructor.name.toLowerCase();
-            return new Proxy(result, handler);
-          }
-
-          log(`${apis.__path}.${prop} `, result);
-
-          return result;
-        }
-      }
-
-      if (['string', 'number'].includes(typeof apis[prop])) {
-        const result = apis[prop];
-        log(`${apis.__path}.${prop} `, result);
-
-        return result;
-      }
-
-      return apis[prop];
-    }
-  };
-
-  chrome = new Proxy(chrome, handler);
+  chrome = middlewareLogger(chrome);
 
   return chrome;
 };

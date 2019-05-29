@@ -20,7 +20,10 @@ export const windows = (extensionId: IExtension['id']) => {
     update: bind(Methods.Update),
     remove: bind(Methods.Remove),
 
+    onCreated: new Event(),
+    onRemoved: new Event(),
     onChanged: new Event(),
+    onFocusChanged: new Event(),
   };
 };
 
