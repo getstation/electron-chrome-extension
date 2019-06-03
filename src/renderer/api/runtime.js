@@ -30,13 +30,13 @@ class Runtime {
   }
 
   getURL(path) {
-    const finalPath = path && path.startsWith('/') ? path : `/${path}`
+    const canonicalPath = path && path.startsWith('/') ? path : `/${path}`
 
     return url.format({
       protocol: constants.EXTENSION_PROTOCOL,
       slashes: true,
       hostname: this.id,
-      pathname: path
+      pathname: canonicalPath
     })
   }
 
