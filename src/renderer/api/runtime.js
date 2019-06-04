@@ -30,7 +30,17 @@ class Runtime {
   }
 
   getURL(path) {
-    const canonicalPath = path && path.startsWith('/') ? path : `/${path}`
+    let canonicalPath = undefined;
+
+    if (path) {
+      if (path.startsWith('/')) {
+        canonicalPath = path;
+      } else {
+        canonicalPath = `/${path}`;
+      }
+    } else {
+      canonicalPath = '/';
+    }
 
     return url.format({
       protocol: constants.EXTENSION_PROTOCOL,

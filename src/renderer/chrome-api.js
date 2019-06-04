@@ -1,12 +1,13 @@
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, remote: { app: { isPackaged } } } = require('electron');
 
 const constants = require('../common/constants');
-const { isIterable, log } = require('../common/utils');
+const { log } = require('../common/utils');
 const Event = require('./api/event');
 const middlewareLogger = require('./logger').default;
 const MessageSender = require('./api/runtime/message-sender');
 const Tab = require('./api/runtime/tab');
 const Port = require('./api/runtime/port');
+const subscribeAndForwardEvents = require('./event-dispatcher').default;
 
 let nextId = 0;
 
@@ -134,21 +135,13 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     chrome.tabs.onRemoved.emit(tabId)
   });
 
-  ipcRenderer.on('cx-event', (_, e) => {
-    const { channel, payload } = e;
-    const cxEventEmitter = channel.split('.')
-      .reduce(
-        (emitter, path) => emitter = emitter[path],
-        chrome
-      )
-    const emittablePayload = isIterable(payload) ? payload : [payload];
-
-    cxEventEmitter.emit(...emittablePayload)
-  });
-
   chrome.runtime.onInstalled.emit({ reason: 'install' });
 
-  chrome = middlewareLogger(chrome);
+  subscribeAndForwardEvents(chrome);
+
+  if (!isPackaged) {
+    chrome = middlewareLogger(chrome);
+  }
 
   return chrome;
 };

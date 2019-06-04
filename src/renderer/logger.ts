@@ -1,6 +1,6 @@
 import { log } from '../common/utils';
 
-// API Calls Logger
+// Proxy for log functions/properties calls in a given context
 
 const handler = {
   get: (apis: any, prop: string): any => {
@@ -51,6 +51,6 @@ const handler = {
   },
 };
 
-export const logger = (context: any) => new Proxy(context, handler);
+export const middlewareLogger = (context: any) => new Proxy(context, handler);
 
-export default logger;
+export default middlewareLogger;

@@ -10,7 +10,18 @@ import {
 } from '../../common';
 import { ExtensionEventMessage } from '../../common/types';
 
-export default class Handler<E> {
+/**
+ * @name Handler
+ * @abstract This abstract class provide the glue to be triggered
+ * from the renderer via RPC and emit events. The handler prepare
+ * a custom scope per extension id for the RPC Manager and
+ * assign methods defined in the enum to the linked handler method.
+ * @example see `src/browser/handlers/cookies.ts`
+ * @param extensionId string
+ * @param emitter Function - the event bus that will forward events to renderers
+ */
+
+export default abstract class Handler<E> {
 
   protected namespace: Api;
   protected manager: any;
