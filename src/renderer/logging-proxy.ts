@@ -1,6 +1,20 @@
 import { log } from '../common/utils';
 
 // Proxy for log functions/properties calls in a given context
+/**
+ * @name loggingProxy
+ * @abstract This recursive proxy log function calls and property access
+ * for debugging purpose
+ * @example
+ * ```ts
+ * // somewhere in the extension codebase
+ * chrome.cookies.getAll({ url: 'google.com' }, myCallback)
+ *
+ * // in the renderer devtool console
+ * (log) chrome.cookies.getAll - { url: 'google.com' } myCallback - [...resultCookies]
+ * ```
+ * @param context object
+ */
 
 const handler = {
   get: (apis: any, prop: string): any => {
@@ -51,6 +65,6 @@ const handler = {
   },
 };
 
-export const middlewareLogger = (context: any) => new Proxy(context, handler);
+export const loggingProxy = (context: any) => new Proxy(context, handler);
 
-export default middlewareLogger;
+export default loggingProxy;

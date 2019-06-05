@@ -3,7 +3,7 @@ const { ipcRenderer, remote: { app: { isPackaged } } } = require('electron');
 const constants = require('../common/constants');
 const { log } = require('../common/utils');
 const Event = require('./api/event');
-const middlewareLogger = require('./logger').default;
+const loggingProxy = require('./logging-proxy').default;
 const MessageSender = require('./api/runtime/message-sender');
 const Tab = require('./api/runtime/tab');
 const Port = require('./api/runtime/port');
@@ -140,7 +140,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   subscribeAndForwardEvents(chrome);
 
   if (!isPackaged) {
-    chrome = middlewareLogger(chrome);
+    chrome = loggingProxy(chrome);
   }
 
   return chrome;
