@@ -1,3 +1,3 @@
-import ChromeWindowsAPIHandler from '../../src/browser/handlers/windows';
+import Windows from '../../src/browser/handlers/windows';
 
-new ChromeWindowsAPIHandler('test');
+new Windows('test', () => { });

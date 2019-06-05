@@ -9,6 +9,20 @@ const url = require('url')
 
 const constants = require('../common/constants');
 
+const wcAsTab = wc => ({
+  id: wc.id,
+  index: wc.id,
+  windowId: 1,
+  highlighted: wc.isFocused(),
+  active: wc.isFocused(),
+  pined: false,
+  discarded: false,
+  autoDiscardable: false,
+  url: wc.getURL(),
+  title: wc.getTitle(),
+  incognito: false,
+})
+
 // TODO(zcbenz): Remove this when we have Object.values().
 const objectValues = function (object) {
   return Object.keys(object).map(function (key) { return object[key] })
@@ -88,8 +102,8 @@ const startBackgroundPages = function (manifest) {
     html = Buffer.from(`<html><body>${scripts}</body></html>`)
   }
 
+  // ref: https://cs.chromium.org/chromium/src/chrome/browser/background/background_contents_service.cc?l=678
   const contents = webContents.create({
-    partition: `persist:__chrome_extension:${manifest.extensionId}`,
     isBackgroundPage: true,
     commandLineSwitches: [
       '--electron-chrome-extension-background-page',
@@ -120,6 +134,8 @@ const sendToBackgroundPages = function (...args) {
   }
 }
 
+const sendEventToExtensions = (e) => sendToBackgroundPages('cx-event', e);
+
 // Dispatch web contents events to Chrome APIs
 const hookWebContentsEvents = function (webContents) {
   const tabId = webContents.id
@@ -134,6 +150,24 @@ const hookWebContentsEvents = function (webContents) {
       tabId: tabId,
       timeStamp: Date.now(),
       url: url
+    })
+  })
+
+  webContents.on('did-start-loading', (...args) => {
+    const changeInfo = { status: 'loading' };
+
+    sendEventToExtensions({
+      channel: 'tabs.onUpdated',
+      payload: [tabId, changeInfo, wcAsTab(webContents)],
+    })
+  })
+
+  webContents.on('did-stop-loading', (...args) => {
+    const changeInfo = { status: 'complete' };
+
+    sendEventToExtensions({
+      channel: 'tabs.onUpdated',
+      payload: [tabId, changeInfo, wcAsTab(webContents)],
     })
   })
 
@@ -156,7 +190,7 @@ const hookWebContentsEvents = function (webContents) {
 // Handle the chrome.* API messages.
 let nextId = 0
 
-ipcMain.on(constants.RUNTIME_CONNECT, function (event, extensionId, connectInfo) {
+ipcMain.on(constants.RUNTIME_CONNECT, function (event, extensionId, connectInfo, url) {
   const page = backgroundPages[extensionId]
   if (!page) {
     console.error(`Connect to unknown extension ${extensionId}`)
@@ -164,13 +198,13 @@ ipcMain.on(constants.RUNTIME_CONNECT, function (event, extensionId, connectInfo)
   }
 
   const portId = ++nextId
-  event.returnValue = { tabId: page.webContents.id, portId: portId }
+  event.returnValue = { tabId: page.webContents.id, portId }
 
   event.sender.once('render-view-deleted', () => {
     if (page.webContents.isDestroyed()) return
     page.webContents.sendToAll(`${constants.PORT_DISCONNECT_}${portId}`)
   })
-  page.webContents.sendToAll(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, event.sender.id, portId, connectInfo)
+  page.webContents.sendToAll(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, event.sender.id, portId, connectInfo, url)
 })
 
 ipcMain.on(constants.I18N_MANIFEST, function (event, extensionId) {
@@ -186,8 +220,8 @@ ipcMain.on(constants.RUNTIME_SENDMESSAGE, function (event, extensionId, message,
   }
 
   page.webContents.sendToAll(`${constants.RUNTIME_ONMESSAGE_}${extensionId}`, event.sender.id, message, resultID)
-  ipcMain.once(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, (event, result) => {
-    event.sender.send(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, result)
+  ipcMain.once(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, (eventResult, result) => {
+    eventResult.sender.send(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, result)
   })
   resultID++
 })
@@ -202,8 +236,8 @@ ipcMain.on(constants.TABS_SEND_MESSAGE, function (event, tabId, extensionId, isB
   const senderTabId = isBackgroundPage ? null : event.sender.id
 
   contents.sendToAll(`${constants.RUNTIME_ONMESSAGE_}${extensionId}`, senderTabId, message, resultID)
-  ipcMain.once(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, (event, result) => {
-    event.sender.send(`${constants.TABS_SEND_MESSAGE_RESULT_}${originResultID}`, result)
+  ipcMain.once(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, (eventResult, result) => {
+    eventResult.sender.send(`${constants.TABS_SEND_MESSAGE_RESULT_}${originResultID}`, result)
   })
   resultID++
 })
@@ -227,6 +261,27 @@ ipcMain.on(constants.TABS_EXECUTESCRIPT, function (event, requestId, tabId, exte
 
   contents.send(constants.TABS_EXECUTESCRIPT, event.sender.id, requestId, extensionId, url, code)
 })
+
+ipcMain.on(
+  constants.TABS_QUERY,
+  function (event, requestId, _extensionId) {
+    const tabs = webContents.getAllWebContents()
+      .filter(wc => wc.getType() === 'webview')
+      .map(wcAsTab)
+
+    event.sender.send(`${constants.TABS_QUERY_RESULT_}${requestId}`, tabs);
+  }
+);
+
+ipcMain.on(
+  constants.TABS_GET,
+  function (event, requestId, _extensionId, tabId) {
+    const wc = webContents.getAllWebContents()
+      .find(wc => wc.id === tabId);
+
+    event.sender.send(`${constants.TABS_GET_RESULT_}${requestId}`, wcAsTab(wc));
+  }
+);
 
 ipcMain.on(constants.RUNTIME_GET_MANIFEST, (event, extensionId) => {
   event.returnValue = manifestMap[extensionId];
@@ -309,7 +364,7 @@ const loadExtension = function (manifest) {
   const { extensionId } = manifest;
 
   if (!(extensionId in apiHandlersMap)) {
-    apiHandlersMap[extensionId] = new ChromeAPIHandler(extensionId);
+    apiHandlersMap[extensionId] = new ChromeAPIHandler(extensionId, sendEventToExtensions);
   }
 
   startBackgroundPages(manifest)
@@ -326,11 +381,8 @@ const loadDevToolsExtensions = function (win, manifests) {
   extensionInfoArray.forEach((extension) => {
     win.devToolsWebContents._grantOriginAccess(extension.startPage)
   })
-  // Calling setTimeout allows us to bypass the following issue:
-  // https://bugs.chromium.org/p/chromium/issues/detail?id=822966
-  setTimeout(() => {
-    win.devToolsWebContents.executeJavaScript(`DevToolsAPI.addExtensions(${JSON.stringify(extensionInfoArray)})`)
-  }, 1000)
+  // ref: https://github.com/electron/electron/pull/17614/files#diff-8d85c651cb0fb8feef2c4694d52da2e3R400
+  win.devToolsWebContents.executeJavaScript(`InspectorFrontendAPI.addExtensions(${JSON.stringify(extensionInfoArray)})`)
 }
 
 app.on('web-contents-created', function (event, webContents) {
@@ -343,6 +395,8 @@ app.on('web-contents-created', function (event, webContents) {
 })
 
 module.exports = {
+  sendEventToExtensions,
+
   // should be removed when we have a typed extensions memory store
   getExtensionById: function (extensionId) {
     const bgExt = backgroundPages[extensionId]

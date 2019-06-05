@@ -1,6 +1,7 @@
-export const ApiHandler = 'cx-handler';
-export const ApiEvent = 'cx-event';
+import * as Windows from './windows';
+import * as Cookies from './cookies';
 
-export enum ApiChannels {
-  Windows = 'channel-windows',
-}
+export default {
+  Windows,
+  Cookies,
+};

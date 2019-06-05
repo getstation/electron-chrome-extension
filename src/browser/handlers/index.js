@@ -1,12 +1,14 @@
 const ChromeStorageAPIHandler = require('./storage');
 const ChromeWebRequestAPIHandler = require('./web-request');
-const ChromeWindowsAPIHandler = require('./windows').default;
+const Windows = require('./windows').default;
+const Cookies = require('./cookies').default;
 
 class ChromeAPIHandler {
-    constructor(extensionId) {
+    constructor(extensionId, emitter) {
         this.storage = new ChromeStorageAPIHandler(extensionId);
         this.webRequest = new ChromeWebRequestAPIHandler(extensionId);
-        this.windows = new ChromeWindowsAPIHandler(extensionId);
+        this.windows = new Windows(extensionId, emitter);
+        this.cookies = new Cookies(extensionId, emitter);
     }
 
     release() {

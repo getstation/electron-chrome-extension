@@ -34,10 +34,20 @@ export enum ExtensionStatus {
   Discovered = 'chrome-extension-discoverd',
 }
 
+export type ExtensionEventMessage<T = any> = {
+  channel: string,
+  payload: T,
+};
+
 // API
 
 export type ChromeApi = any;
 
-// Utils
-
 export type Callback<T> = (payload: T) => void;
+
+export type Event<T> = {
+  addListener: (listener: Callback<T>) => void,
+  removeListener: (listener: Callback<T>) => void,
+  hasListener: (listener: Callback<T>) => boolean,
+  emit: (args: T) => Callback<T>,
+};

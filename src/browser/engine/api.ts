@@ -2,6 +2,7 @@ import Fetcher from '../fetcher';
 import {
   addExtension as startExtension,
   removeExtension as stopExtension,
+  sendEventToExtensions,
 } from '../chrome-extension';
 import {
   IExtension,
@@ -9,6 +10,7 @@ import {
   ExtensionStatus,
   Callback,
   Configuration,
+  ExtensionEventMessage,
 } from '../../common/types';
 
 class ECx {
@@ -93,6 +95,10 @@ class ECx {
     }
 
     return await this.fetcher.fetch(extensionId);
+  }
+
+  sendEvent(event: ExtensionEventMessage): void {
+    sendEventToExtensions(event);
   }
 
   private registerExtensionUpdateListener(

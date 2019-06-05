@@ -1,4 +1,4 @@
-const {ipcRenderer} = require('electron');
+const { ipcRenderer } = require('electron');
 const url = require('url');
 
 const Event = require('./event');
@@ -7,7 +7,8 @@ const Port = require('./runtime/port')
 
 class Runtime {
 
-  constructor(extensionId, isBackgroundPage) {
+  constructor(context, extensionId, isBackgroundPage) {
+    this.context = context;
     this.id = extensionId;
     this.isBackgroundPage = isBackgroundPage;
     this.originResultID = 1;
@@ -29,11 +30,23 @@ class Runtime {
   }
 
   getURL(path) {
+    let canonicalPath = undefined;
+
+    if (path) {
+      if (path.startsWith('/')) {
+        canonicalPath = path;
+      } else {
+        canonicalPath = `/${path}`;
+      }
+    } else {
+      canonicalPath = '/';
+    }
+
     return url.format({
       protocol: constants.EXTENSION_PROTOCOL,
       slashes: true,
       hostname: this.id,
-      pathname: path
+      pathname: canonicalPath
     })
   }
 
@@ -60,7 +73,7 @@ class Runtime {
     }
   }
 
-  connect (...args) {
+  connect(...args) {
     if (this.isBackgroundPage) {
       console.error('chrome.runtime.connect is not supported in background page')
       return
@@ -68,18 +81,19 @@ class Runtime {
 
     // Parse the optional args.
     let targetExtensionId = this.id
-    let connectInfo = {name: ''}
+    let connectInfo = { name: '' }
     if (args.length === 1) {
       connectInfo = args[0]
     } else if (args.length === 2) {
       [targetExtensionId, connectInfo] = args
     }
 
-    const {tabId, portId} = ipcRenderer.sendSync(constants.RUNTIME_CONNECT, targetExtensionId, connectInfo)
-    return Port.get(tabId, portId, this.id, connectInfo.name)
+    const url = window && window.location ? window.location.href : undefined;
+    const { tabId, portId } = ipcRenderer.sendSync(constants.RUNTIME_CONNECT, targetExtensionId, connectInfo, url)
+    return Port.get(this.context, tabId, portId, this.id, connectInfo.name)
   }
 
-  sendMessage (...args) {
+  sendMessage(...args) {
     if (this.isBackgroundPage) {
       console.error('chrome.runtime.sendMessage is not supported in background page')
       return
@@ -93,14 +107,14 @@ class Runtime {
     } else if (args.length === 2) {
       // A case of not provide extension-id: (message, responseCallback)
       if (typeof args[1] === 'function') {
-        ipcRenderer.on(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[1](result))
+        ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[1](result))
         message = args[0]
       } else {
         [targetExtensionId, message] = args
       }
     } else {
       console.error('options is not supported')
-      ipcRenderer.on(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[2](result))
+      ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[2](result))
     }
 
     ipcRenderer.send(constants.RUNTIME_SENDMESSAGE, targetExtensionId, message, this.originResultID)
@@ -124,7 +138,8 @@ class Runtime {
 const store = new Map();
 
 const getRuntime = (extensionId, isBackgroundPage) => {
-  const key = { extensionId: extensionId, isBackgroundPage: isBackgroundPage}
+  const key = `${extensionId}-${isBackgroundPage}`;
+
   if (store.has(key)) {
     return store.get(key)
   } else {
