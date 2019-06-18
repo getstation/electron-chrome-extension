@@ -27,6 +27,25 @@
     </webview>
 
   </div>
+
+
+  <script>
+    setTimeout(
+      () => {
+        const { ipcRenderer } = require('electron')
+        const webviews = document.querySelectorAll('webview')
+
+        for (wv of webviews) {
+          wv.addEventListener(
+            'focus',
+            event => ipcRenderer.send('WEBVIEW_FOCUS', event.target.getWebContents().id),
+            true
+          );
+        }
+      },
+      1000
+    );
+  </script>
 </body>
 
 </html>

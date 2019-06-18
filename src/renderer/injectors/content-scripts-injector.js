@@ -13,7 +13,7 @@ const matchesPattern = function (pattern) {
 }
 
 const setupContentScript = function (extensionId, worldId, callback) {
-  const chromeAPIs = require('../chrome-api').injectTo(extensionId, false)
+  const chromeAPIs = require('../chrome-api').injectTo(extensionId, false, {})
 
   webFrame.executeJavaScriptInIsolatedWorld(worldId, [{ code: 'window', url: `${extensionId}://ChromeAPI` }], function (isolatedWorldWindow) {
     isolatedWorldWindow.chrome = chromeAPIs;

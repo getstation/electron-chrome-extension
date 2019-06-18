@@ -10,10 +10,6 @@ Tested with `Electron v4.0.4` - `Node v8.9.0` - `NPM v5.5.1`
 - **Renderer - preload**
 
 ```ts
-// todo: @hugo update
-```
-
-```ts
 require('electron-chrome-extension/preload');
 ```
 
@@ -23,7 +19,31 @@ to redefine the user agent via the `Object.defineProperty` method after the impo
 - **Main**
 
 ```ts
-// todo: @hugo update
+import ECx from 'electron-chrome-extension';
+
+app.on('ready', async () => {
+  createWindow();
+
+  // Load Grammarly
+  await ECx.load('kbfnbcaeplbcioakkpcpgfkobkghlhen');
+});
+```
+
+### Connect your application logic
+
+Extensions react to browser events for trigger their own logic.
+ECx send inner webContents events to extensions subscribers but external events
+like creating new window, changing tab focus etc should be triggered on your side like this:
+
+```js
+// main.js
+
+ipcMain.on('YOUR_EVENT', (...) =>
+  ECx.sendEvent({
+    channel: 'tabs.onActivated',
+    payload: [{ tabId, windowId }],
+  })
+);
 ```
 
 ### Usage with DevTools extension
@@ -48,6 +68,16 @@ import ECx from 'electron-chrome-extension';
 ECx.load('jdkknkkbebbapilgoeccciglkfbmbnfm');
 
 ```
+
+## ECx APIs
+
+- `ECx.load(extensionId: IExtension['id']): Promise<IExtension>`
+- `ECx.unload(extensionId: IExtension['id']): void`
+- `ECx.setConfiguration(configuration: Configuration = {}): Promise<ECx>`
+- `ECx.isLoaded(extensionId: IExtension['id']): boolean`
+- `ECx.isUpToDate(extensionId: IExtension['id']): Promise<boolean>`
+- `ECx.get(extensionId: IExtension['id']): Promise<IExtension>`
+- `ECx.sendEvent(event: ExtensionEventMessage): void`
 
 ## Tools
 
@@ -77,3 +107,17 @@ $ npm publish
 - [Chrome Extensions Overview](https://developer.chrome.com/extensions/overview)
 - [Chrome Extensions API index](https://developer.chrome.com/extensions/api_index)
 - [Station Exploration](https://www.notion.so/stationhq/Chrome-Extensions-c964f683125f4a758490b60b5d8e28be)
+
+## Know supported extensions
+
+*as of 05/29/19 with their Chrome WebStore ID*
+
+- Mixmax: ocpljaamllnldhepankaeljmeeeghnid
+- Gmelius: dheionainndbbpoacpnopgmnihkcmnkl
+- Mailtracker: pgbdljpkijehgoacbjpolaomhkoffhnl
+- Boomerang: mdanidgdpmkimeiiojknlnekblgmpdll
+- Clearbit Connect: pmnhcgfcafcnkbengdcanjablaabjplo
+- Grammarly: kbfnbcaeplbcioakkpcpgfkobkghlhen
+- React Developers Tools: fmkadmapgofadopljbjfkapdkoienihi
+- Redux DevTools: lmhkpmbekcpmknklioeibfkpmmfibljd
+- Apollo Client Developer Tools: jdkknkkbebbapilgoeccciglkfbmbnfm

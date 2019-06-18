@@ -86,7 +86,7 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, nonNativeWinOpenF
   if (nonNativeWinOpenForEmptyUrl) {
     win.open = (url, frameName, features) => {
       if (url !== '') {
-        return originalWinOpen.apply(window, [url]);
+        return originalWinOpen.apply(win, [url]);
       }
 
       const guestId = ipcRenderer.sendSync('ELECTRON_GUEST_WINDOW_MANAGER_WINDOW_OPEN', url, toString(frameName), toString(features));

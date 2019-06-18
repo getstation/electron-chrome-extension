@@ -1,10 +1,13 @@
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, remote: { app: { isPackaged } } } = require('electron');
 
 const constants = require('../common/constants');
+const { log } = require('../common/utils');
 const Event = require('./api/event');
+const loggingProxy = require('./logging-proxy').default;
 const MessageSender = require('./api/runtime/message-sender');
 const Tab = require('./api/runtime/tab');
 const Port = require('./api/runtime/port');
+const subscribeAndForwardEvents = require('./event-dispatcher').default;
 
 let nextId = 0;
 
@@ -19,7 +22,10 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     chrome = {}
   }
 
-  chrome.runtime = require('./api/runtime').setup(extensionId, isBackgroundPage);
+  // Maintain ports references for debug purpose
+  context.__ports = new Map();
+
+  chrome.runtime = require('./api/runtime').setup(context, extensionId, isBackgroundPage);
   chrome.storage = require('./api/storage').setup(extensionId);
   chrome.browserAction = require('./api/browser-action').setup(extensionId);
   chrome.notifications = require('./api/notifications').setup(extensionId);
@@ -27,7 +33,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   chrome.i18n = require('./api/i18n').setup(extensionId);
   chrome.webNavigation = require('./api/web-navigation').setup();
   chrome.omnibox = require('./api/omnibox').setup(extensionId);
-  chrome.windows = require('./api/windows').setup(extensionId);
+  chrome.windows = require('./api/windows').default(extensionId);
 
   chrome.extension = {
     getURL: (...args) => chrome.runtime.getURL(...args),
@@ -64,7 +70,35 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
       chrome.runtime.incrementOriginResultID()
     },
 
-    query() { },
+    insertCSS(tabId, details, cb) {
+      if (cb) cb();
+    },
+
+    get(tabId, cb) {
+      const requestId = ++nextId;
+      ipcRenderer.once(`${constants.TABS_GET_RESULT_}${requestId}`, (event, result) => {
+        cb(result);
+      });
+
+      ipcRenderer.send(constants.TABS_GET, requestId, extensionId, tabId);
+    },
+
+    getCurrent() {
+    },
+
+    create(details, cb) {
+      cb();
+    },
+
+    query(args, cb) {
+      const requestId = ++nextId;
+      ipcRenderer.once(`${constants.TABS_QUERY_RESULT_}${requestId}`, (event, result) => {
+        cb(result);
+      });
+
+      ipcRenderer.send(constants.TABS_QUERY, requestId, extensionId);
+    },
+
     onUpdated: new Event(),
     onCreated: new Event(),
     onRemoved: new Event(),
@@ -81,12 +115,14 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     getPopup() { }
   };
 
-  ipcRenderer.on(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, (event, tabId, portId, connectInfo) => {
-    chrome.runtime.onConnect.emit(Port.get(tabId, portId, extensionId, connectInfo.name))
+  chrome.cookies = require('./api/cookies').default(extensionId);
+
+  ipcRenderer.on(`${constants.RUNTIME_ONCONNECT_}${extensionId}`, (event, tabId, portId, connectInfo, url) => {
+    chrome.runtime.onConnect.emit(Port.get(context, tabId, portId, extensionId, connectInfo.name, url))
   });
 
   ipcRenderer.on(`${constants.RUNTIME_ONMESSAGE_}${extensionId}`, (event, tabId, message, resultID) => {
-    chrome.runtime.onMessage.emit(message, new MessageSender(tabId, extensionId), (messageResult) => {
+    chrome.runtime.onMessage.emit(message, new MessageSender({ tabId, extensionId }), (messageResult) => {
       ipcRenderer.send(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, messageResult)
     })
   });
@@ -100,6 +136,12 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   });
 
   chrome.runtime.onInstalled.emit({ reason: 'install' });
+
+  subscribeAndForwardEvents(chrome);
+
+  if (!isPackaged) {
+    chrome = loggingProxy(chrome);
+  }
 
   return chrome;
 };

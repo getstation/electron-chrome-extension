@@ -1,98 +1,30 @@
-const { RpcIpcManager, rpc } = require('electron-simple-rpc');
-const Event = require('./event');
+import { Methods } from '../../common/apis/windows';
+import { Api } from '../../common/';
+import { IExtension } from '../../common/types';
+import { createWire } from '../wire';
 
-import {
-  Window,
-  CreateData,
-  CxWindowsApi,
-  GetInfo,
-  UpdateInfo,
-} from '../../common/apis/windows';
-import {
-  ApiHandler,
-  ApiEvent,
-  ApiChannels,
-} from '../../common/apis';
-import { Callback } from '../../common/types';
+import Event from './event';
 
-class ChromeWindowsAPIClient {
-  WINDOW_ID_NONE: number;
-  WINDOW_ID_CURRENT: number;
+export const windows = (extensionId: IExtension['id']) => {
+  const bind = createWire<Methods>(Api.Windows, extensionId);
 
-  handlerScope: string;
-  eventScope: string;
+  return {
+    WINDOW_ID_NONE: -1,
+    WINDOW_ID_CURRENT: -2,
 
-  onCreated: Event;
-  onRemoved: Event;
-  onFocusChanged: Event;
+    get: bind(Methods.Get),
+    getCurrent: bind(Methods.GetCurrent),
+    getLastFocused: bind(Methods.GetLastFocused),
+    getAll: bind(Methods.GetAll),
+    create: bind(Methods.Create),
+    update: bind(Methods.Update),
+    remove: bind(Methods.Remove),
 
-  rpcIpcEventsManager: any;
+    onCreated: new Event(),
+    onRemoved: new Event(),
+    onChanged: new Event(),
+    onFocusChanged: new Event(),
+  };
+};
 
-  constructor(extensionId: string) {
-    this.handlerScope = `${ApiHandler}-${ApiChannels.Windows}-${extensionId}`;
-
-    this.eventScope = `${ApiEvent}-${ApiChannels.Windows}`;
-
-    this.WINDOW_ID_NONE = -1;
-    this.WINDOW_ID_CURRENT = -2;
-
-    this.onCreated = new Event();
-    this.onRemoved = new Event();
-    this.onFocusChanged = new Event();
-
-    const library = {
-      onCreated: this.onCreated,
-      onRemoved: this.onRemoved,
-      onFocusChanged: this.onFocusChanged,
-    };
-
-    this.rpcIpcEventsManager = new RpcIpcManager(library, this.eventScope);
-  }
-
-  get(windowId: Window['id'], getInfo: GetInfo, callback: Callback<Window>) {
-    rpc(this.handlerScope, CxWindowsApi.Get)(windowId, getInfo).then(callback);
-  }
-
-  getCurrent(getInfo: GetInfo, callback: Callback<Window>) {
-    rpc(this.handlerScope, CxWindowsApi.GetCurrent)(getInfo).then(callback);
-  }
-
-  getLastFocused(getInfo: GetInfo, callback: Callback<Window>) {
-    rpc(this.handlerScope, CxWindowsApi.GetLastFocused)(getInfo).then(callback);
-  }
-
-  getAll(getInfo: GetInfo, callback: Callback<Window>) {
-    rpc(this.handlerScope, CxWindowsApi.GetAll)(getInfo).then(callback);
-  }
-
-  create(createData: CreateData, callback?: Callback<Window>) {
-    if (callback) {
-      return rpc(this.handlerScope, CxWindowsApi.Create)(createData).then(callback);
-    }
-
-    rpc(this.handlerScope, CxWindowsApi.Create)(createData);
-  }
-
-  update(
-    windowId: Window['id'],
-    updateInfo: UpdateInfo,
-    callback?: Callback<Window>
-  ) {
-    if (callback) {
-      return rpc(this.handlerScope, CxWindowsApi.Update)(windowId).then(callback);
-    }
-
-    rpc(this.handlerScope, CxWindowsApi.Update)(windowId, updateInfo);
-  }
-
-  remove(windowId: Window['id'], callback?: Callback<Window>) {
-    if (callback) {
-      return rpc(this.handlerScope, CxWindowsApi.GetCurrent)(windowId).then(callback);
-    }
-
-    rpc(this.handlerScope, CxWindowsApi.GetCurrent)(windowId);
-  }
-}
-
-exports.setup = (extensionId: string) =>
-  new ChromeWindowsAPIClient(extensionId);
+export default windows;
