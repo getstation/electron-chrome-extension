@@ -99,23 +99,46 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, nonNativeWinOpenF
     };
   }
 
-  if (openerId != null && win.opener == null) {
-    win.opener = getOrCreateProxy(ipcRenderer, openerId);
-  }
+  if (win.opener === null) {
+    if (openerId !== null) {
+      win.opener = getOrCreateProxy(ipcRenderer, openerId);
+    }
 
-  ipcRenderer.removeAllListeners('ELECTRON_GUEST_WINDOW_POSTMESSAGE');
-  ipcRenderer.on('ELECTRON_GUEST_WINDOW_POSTMESSAGE', (event, sourceId, message, sourceOrigin) => {
-    event = new MessageEvent('message', { data: message, origin: sourceOrigin });
-    event.source = getOrCreateProxy(ipcRenderer, sourceId);
+    // Optimistic code block workaround for a well-know Electron bug
+    //
+    // After cross site navigation with the native window.open method,
+    // we lost the opener reference.
+    //
+    // We polyfill the *postMessage* method to forward the message via the main
+    // (src/browser/engine/window.ts). The main broadcast the message for
+    // all allowed webContents (matching type, protocol) only if the
+    // webContents sender match the *targetOrigin*
+    //
+    // used by: Mixmax and other apps using Google OAuth
+    // issue ref: https://github.com/electron/electron/issues/18032
+    win.opener = {
+      postMessage: (message, targetOrigin) => {
+        ipcRenderer.send('ECX_POLYFILL_WINDOW_OPENER_POST_MESSAGE', win.location.origin, message, targetOrigin);
+      },
+    }
 
     // This next code block polyfills Mixmax event forwarding
     // between the opened window and the iframe's event listener.
     // Electron loses event references between the content-scripts
     // and the iframe.
     // We manually trigger the intented effect.
-    if (event.data && event.data.method === 'loginFinished') {
-      win.location.reload();
-    }
+    win.addEventListener('message', (event) => {
+      if (event.data && event.data.method === 'loginFinished') {
+        win.location.reload();
+      }
+    })
+  }
+
+
+  ipcRenderer.removeAllListeners('ELECTRON_GUEST_WINDOW_POSTMESSAGE');
+  ipcRenderer.on('ELECTRON_GUEST_WINDOW_POSTMESSAGE', (event, sourceId, message, sourceOrigin) => {
+    event = new MessageEvent('message', { data: message, origin: sourceOrigin });
+    event.source = getOrCreateProxy(ipcRenderer, sourceId);
 
     win.dispatchEvent(event);
   });

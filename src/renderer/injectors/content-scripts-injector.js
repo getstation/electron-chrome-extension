@@ -1,8 +1,5 @@
-const { ipcRenderer, webFrame } = require('electron')
-const { runInThisContext } = require('vm')
-const constants = require('../../common/constants')
-
-webFrame.registerURLSchemeAsPrivileged(constants.EXTENSION_PROTOCOL, { corsEnabled: false })
+const { ipcRenderer, webFrame } = require('electron');
+const constants = require('../../common/constants');
 
 process.setMaxListeners(100);
 
@@ -71,24 +68,29 @@ ipcRenderer.on(constants.TABS_EXECUTESCRIPT, function (event, senderWebContentsI
 
 // Read the renderer process preferences.
 const getContentScripts = () => ipcRenderer.sendSync('GET_CONTENTSCRIPTS_SYNC');
+const getContentSecurityPolicy = () => ipcRenderer.sendSync('GET_CONTENTSECURITYPOLICY_SYNC');
 const contentScripts = getContentScripts();
+
+const setIsolatedWorldInfo = (worldId, humanReadableName, securityOrigin, csp) => {
+  webFrame.setIsolatedWorldInfo(
+    worldId,
+    {
+      securityOrigin,
+      name: humanReadableName,
+      csp,
+    });
+};
 
 Object.keys(contentScripts).forEach(key => {
   const cs = contentScripts[key];
   const worldId = require('../isolated-worlds').getIsolatedWorldId(cs.extensionId)
 
-  webFrame.setIsolatedWorldHumanReadableName(worldId, cs.extensionName)
-  webFrame.setIsolatedWorldSecurityOrigin(worldId, `${constants.EXTENSION_PROTOCOL}://${cs.extensionId}`)
-
-  const getContentSecurityPolicy = () => ipcRenderer.sendSync('GET_CONTENTSECURITYPOLICY_SYNC');
   const contentSecurityPolicy = getContentSecurityPolicy();
-  if (contentSecurityPolicy.policy) {
-    webFrame.setIsolatedWorldContentSecurityPolicy(worldId, contentSecurityPolicy.policy);
-  } else {
-    // Match Chromium kDefaultIsolatedWorldCSP_Secure
-    // https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=36
-    webFrame.setIsolatedWorldContentSecurityPolicy(worldId, "script-src 'self'; object-src 'self'");
-  }
+  // Defaults to Chromium kDefaultIsolatedWorldCSP_Secure
+  // https://cs.chromium.org/chromium/src/extensions/common/manifest_handlers/csp_info.cc?l=36
+  const csp = contentSecurityPolicy.policy || "script-src 'self'; object-src 'self'";
+
+  setIsolatedWorldInfo(worldId, cs.extensionName, `${constants.EXTENSION_PROTOCOL}://${cs.extensionId}`, csp);
 
   if (cs.contentScripts) {
     setupContentScript(cs.extensionId, worldId, function (isolatedWorldWindow) {

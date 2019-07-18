@@ -16,7 +16,15 @@ const ECx = require('../lib/src/browser/').default;
 let mainWindow;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({ width: 800, height: 600 });
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+      webviewTag: true,
+      contextIsolation: false,
+    }
+  });
 
   mainWindow.loadURL(format({
     pathname: join(__dirname, 'app.html'),
@@ -51,8 +59,8 @@ app.on('ready', async () => {
     fetcher: { autoUpdate: true, autoUpdateInterval: 1000000 },
   });
 
-  // Load Grammarly
-  await ECx.load('kbfnbcaeplbcioakkpcpgfkobkghlhen');
+  // load Mixmax for the fun
+  await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
 });
 
 ipcMain.on('WEBVIEW_FOCUS', (_, tabId) =>
@@ -79,5 +87,5 @@ app.on('session-created', session => {
   session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''));
 
   // to make devtools work, we need this
-  session.setPreloads([join(__dirname, '../lib/src/renderer/init.js')]);
+  session.setPreloads([join(__dirname, '../lib/src/renderer/index.js')]);
 });

@@ -279,7 +279,11 @@ ipcMain.on(
     const wc = webContents.getAllWebContents()
       .find(wc => wc.id === tabId);
 
-    event.sender.send(`${constants.TABS_GET_RESULT_}${requestId}`, wcAsTab(wc));
+    if (wc) {
+      event.sender.send(`${constants.TABS_GET_RESULT_}${requestId}`, wcAsTab(wc));
+    } else {
+      event.sender.send(`${constants.TABS_GET_RESULT_}${requestId}`, undefined);
+    }
   }
 );
 

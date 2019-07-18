@@ -29,10 +29,10 @@ const asyncReadFile = promisify(readFile);
 // tslint:disable-next-line: max-line-length
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
 
-(protocol as any).registerStandardSchemes(
-  [protocolAsScheme(Protocol.Extension)],
-  { secure: true }
-);
+(protocol as any).registerSchemesAsPrivileged([
+  { scheme: protocolAsScheme(Protocol.Extension),
+    privileges: { standard: true, secure: true, bypassCSP: true } },
+]);
 
 // The protocol handler load file into Buffers
 // before transform them into a Stream (expected in callback).
