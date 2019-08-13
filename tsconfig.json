@@ -22,6 +22,7 @@
     "module": "commonjs",
     "target": "es2016",
     "baseUrl": ".",
+    "skipLibCheck": true,
     "lib": [
       "es2017",
       "dom"
