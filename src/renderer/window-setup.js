@@ -100,7 +100,7 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, nonNativeWinOpenF
   }
 
   if (win.opener === null) {
-    if (openerId !== null) {
+    if (!!openerId) {
       win.opener = getOrCreateProxy(ipcRenderer, openerId);
     }
 
