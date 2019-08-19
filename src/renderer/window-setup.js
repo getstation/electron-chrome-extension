@@ -100,26 +100,8 @@ module.exports = (win, ipcRenderer, guestInstanceId, openerId, nonNativeWinOpenF
   }
 
   if (win.opener === null) {
-    if (openerId !== null) {
+    if (!!openerId) {
       win.opener = getOrCreateProxy(ipcRenderer, openerId);
-    }
-
-    // Optimistic code block workaround for a well-know Electron bug
-    //
-    // After cross site navigation with the native window.open method,
-    // we lost the opener reference.
-    //
-    // We polyfill the *postMessage* method to forward the message via the main
-    // (src/browser/engine/window.ts). The main broadcast the message for
-    // all allowed webContents (matching type, protocol) only if the
-    // webContents sender match the *targetOrigin*
-    //
-    // used by: Mixmax and other apps using Google OAuth
-    // issue ref: https://github.com/electron/electron/issues/18032
-    win.opener = {
-      postMessage: (message, targetOrigin) => {
-        ipcRenderer.send('ECX_POLYFILL_WINDOW_OPENER_POST_MESSAGE', win.location.origin, message, targetOrigin);
-      },
     }
 
     // This next code block polyfills Mixmax event forwarding
