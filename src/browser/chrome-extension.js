@@ -1,5 +1,4 @@
 const { app, ipcMain, webContents, BrowserWindow, protocol } = require('electron')
-const { getAllWebContents } = process.atomBinding('web_contents')
 const ChromeAPIHandler = require('./handlers');
 
 const { Buffer } = require('buffer')
@@ -438,7 +437,7 @@ module.exports = {
     const manifest = getManifestFromPath(extensionId, srcDirectory)
     if (manifest) {
       loadExtension(manifest)
-      for (const webContents of getAllWebContents()) {
+      for (const webContents of webContents.getAllWebContents()) {
         if (isWindowOrWebView(webContents)) {
           loadDevToolsExtensions(webContents, [manifest])
         }

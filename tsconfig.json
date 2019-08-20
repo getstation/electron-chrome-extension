@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "lib",
+    "outDir": "playground/lib",
     // "declaration": true,
     "allowJs": true,
     "resolveJsonModule": true,

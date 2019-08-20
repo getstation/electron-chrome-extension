@@ -81,6 +81,23 @@ app.on(
   (session: Electron.Session) => {
     enhanceWebRequest(session);
 
+    session.webRequest.onBeforeRequest(
+      // @ts-ignore
+      (details: any, callback: Function) => {
+        const formattedDetails = recursivelyLowercaseJSONKeys(details);
+        const { id, headers: { origin } } = formattedDetails;
+
+        requestsOrigins.set(id, origin);
+
+        callback({
+          cancel: false,
+        });
+      },
+      {
+        origin: 'ecx-cors',
+      }
+    );
+
     session.webRequest.onBeforeSendHeaders(
       // @ts-ignore
       (details: any, callback: Function) => {

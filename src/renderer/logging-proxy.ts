@@ -43,7 +43,7 @@ const handler = {
 
         const result = apis[prop]();
 
-        if (result.constructor.name.toLowerCase() === 'object') {
+        if (result && result.constructor.name.toLowerCase() === 'object') {
           result.__path = result.constructor.name.toLowerCase();
           return new Proxy(result, handler);
         }

@@ -1,6 +1,6 @@
 {
   "name": "electron-chrome-extension",
-  "version": "3.0.1",
+  "version": "4.0.0-rc.1",
   "description": "Chrome Extensions Engine for Electron",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "author": "Station <hello@getstation.com>",
   "license": "ISC",
   "peerDependencies": {
-    "electron": ">=5.0.4"
+    "electron": ">=6.0.2"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",
@@ -27,7 +27,7 @@
     "@types/mocha": "^5.2.5",
     "@types/tmp": "0.0.33",
     "concurrently": "^4.1.0",
-    "electron": "^5.0.1",
+    "electron": "^6.0.2",
     "electron-mocha": "^8.0.1",
     "electron-process-manager": "^0.7.1",
     "mocha": "^5.2.0",
@@ -47,6 +47,7 @@
     "electron-simple-ipc": "^1.0.2",
     "electron-simple-rpc": "github:alexstrat/electron-simple-rpc#a5195677a2c8a4a9bd67ae5120ee4d7037f88db3",
     "fs-extra": "^7.0.1",
+    "glob": "7.1.4",
     "mime-types": "^2.1.21",
     "p-queue": "^3.0.0",
     "querystring": "^0.2.0",
@@ -57,7 +58,8 @@
     "uuid": "^3.2.1",
     "xml-js": "^1.6.8"
   },
-  "toolchain": {
-    "node": "10.15.3"
+  "volta": {
+    "node": "12.8.1",
+    "yarn": "1.17.3"
   }
 }
