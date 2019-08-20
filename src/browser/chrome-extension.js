@@ -437,11 +437,11 @@ module.exports = {
     const manifest = getManifestFromPath(extensionId, srcDirectory)
     if (manifest) {
       loadExtension(manifest)
-      for (const webContents of webContents.getAllWebContents()) {
-        if (isWindowOrWebView(webContents)) {
-          loadDevToolsExtensions(webContents, [manifest])
-        }
-      }
+      // for (const webContents of webContents.getAllWebContents()) {
+      //   if (isWindowOrWebView(webContents)) {
+      //     loadDevToolsExtensions(webContents, [manifest])
+      //   }
+      // }
       return manifest.name
     }
   },
