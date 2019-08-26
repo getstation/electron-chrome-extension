@@ -1,10 +1,10 @@
 {
   "name": "electron-chrome-extension",
-  "version": "4.0.0-rc.2",
+  "version": "4.0.0-rc.3",
   "description": "Chrome Extensions Engine for Electron",
   "main": "index.js",
   "scripts": {
-    "prestart": "rm -rf ./lib/ && tsc -p .",
+    "prestart": "rm -rf ./lib/ && tsc -p tsconfig.dev.json",
     "start": "concurrently -k -r -s first \"npm:start:*\"",
     "start:runner": "electron playground/main.js --inspect=9222",
     "pretest": "rm -rf ./lib/ && tsc -p . && cp -R test/assets lib/test/assets",
@@ -12,7 +12,7 @@
     "test:watch": "tsc -p . -w",
     "test:runner": "xvfb-maybe electron-mocha --debug --interactive --require-main test/main-loader.js --renderer test/loader.js",
     "ci": "npm run pretest && tslint -p . && NODE_ENV=test xvfb-maybe electron-mocha --require-main test/main-loader.js --renderer test/loader.js",
-    "prepublishOnly": "npm run ci && rm -rf ./lib/ && tslint -p . && tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run ci && rm -rf ./lib/ && tslint -p . && tsc -p .",
     "playground:reset": "rm -rf playground/.electron-user-data"
   },
   "author": "Station <hello@getstation.com>",
