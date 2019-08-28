@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "outDir": "lib",
-    // "declaration": true,
     "allowJs": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
