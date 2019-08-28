@@ -81,6 +81,13 @@ app.on(
   (session: Electron.Session) => {
     enhanceWebRequest(session);
 
+    /**
+     * Capture origin header to override CSP on response received
+     * See comment below for full explanation
+     * Capture in two listeners: onBeforeRequest and onBeforeSendHeaders
+     * since some requests with custom protocol are not catched
+     * in the onBeforeSendHeaders listener but in onBeforeRequest
+     */
     session.webRequest.onBeforeRequest(
       // @ts-ignore
       (details: any, callback: Function) => {
