@@ -28,8 +28,6 @@
     ]
   },
   "include": [
-    "index.d.ts",
     "src/**/*",
-    "test/**/*",
   ],
 }

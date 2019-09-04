@@ -1,2 +1,3 @@
-# will be used to store the userData of the electron app used for payground
+# will be used to store the userData and local build of the electron app used for payground
 .electron-user-data
+lib/

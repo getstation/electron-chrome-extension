@@ -30,10 +30,10 @@ if (protocol === `${constants.EXTENSION_PROTOCOL}:`) {
   })
 } else {
   // native window open workaround
-  const ipcRenderer = require('@electron/internal/renderer/ipc-renderer-internal');
+  const { ipcRendererInternal } = require('@electron/internal/renderer/ipc-renderer-internal');
   const { guestInstanceId, openerId } = process;
 
-  require('./window-setup')(window, ipcRenderer, guestInstanceId, openerId);
+  require('./window-setup')(window, ipcRendererInternal, guestInstanceId, openerId);
   // end workaround
 
   require('./xhr').default(window);
