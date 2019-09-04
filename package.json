@@ -1,13 +1,13 @@
 {
   "name": "electron-chrome-extension",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Chrome Extensions Engine for Electron",
   "main": "index.js",
   "scripts": {
     "prestart": "rm -rf ./lib/ && tsc -p tsconfig.dev.json",
     "start": "concurrently -k -r -s first \"npm:start:*\"",
     "start:runner": "electron playground/main.js --inspect=9222",
-    "pretest": "rm -rf ./lib/ && tsc -p . && cp -R test/assets lib/test/assets",
+    "pretest": "rm -rf ./lib/ && tsc -p tsconfig.test.json && cp -R test/assets lib/test/assets",
     "test": "NODE_ENV=test concurrently -k -r -s first \"npm:test:*\"",
     "test:watch": "tsc -p . -w",
     "test:runner": "xvfb-maybe electron-mocha --debug --interactive --require-main test/main-loader.js --renderer test/loader.js",

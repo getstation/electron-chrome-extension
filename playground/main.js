@@ -11,7 +11,7 @@ if (!app.isPackaged) {
   app.setPath('userData', userDataPath);
 }
 
-const ECx = require('./lib/src/browser/').default;
+const ECx = require('./lib/browser/').default;
 
 let mainWindow;
 
@@ -87,5 +87,5 @@ app.on('session-created', session => {
   session.setUserAgent(userAgent.replace(/Electron\/\S*\s/, ''));
 
   // to make devtools work, we need this
-  session.setPreloads([join(__dirname, 'lib/src/renderer/index.js')]);
+  session.setPreloads([join(__dirname, 'lib/renderer/index.js')]);
 });

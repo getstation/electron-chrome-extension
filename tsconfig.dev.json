@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "lib",
+    "outDir": "playground/lib",
     "allowJs": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -28,6 +28,7 @@
     ]
   },
   "include": [
+    "index.d.ts",
     "src/**/*",
   ],
 }
