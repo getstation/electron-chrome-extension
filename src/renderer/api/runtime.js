@@ -3,7 +3,10 @@ const url = require('url');
 
 const Event = require('./event');
 const constants = require('../../common/constants');
+const { log } = require('../../common/utils');
 const Port = require('./runtime/port')
+
+let originResultID = 1
 
 class Runtime {
 
@@ -11,7 +14,6 @@ class Runtime {
     this.context = context;
     this.id = extensionId;
     this.isBackgroundPage = isBackgroundPage;
-    this.originResultID = 1;
 
     this.onConnect = new Event()
     this.onMessage = new Event()
@@ -26,7 +28,6 @@ class Runtime {
     this.sendMessage = this.sendMessage.bind(this)
     this.getManifest = this.getManifest.bind(this)
     this.setUninstallURL = this.setUninstallURL.bind(this)
-    this.incrementOriginResultID = this.incrementOriginResultID.bind(this)
   }
 
   getURL(path) {
@@ -107,18 +108,21 @@ class Runtime {
     } else if (args.length === 2) {
       // A case of not provide extension-id: (message, responseCallback)
       if (typeof args[1] === 'function') {
-        ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[1](result))
+        ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, (event, result) => {
+          // log(`Runtime message result (runtime.js) #${originResultID}:`, args[0], result)
+          return args[1](result);
+        })
         message = args[0]
       } else {
         [targetExtensionId, message] = args
       }
     } else {
       console.error('options is not supported')
-      ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${this.originResultID}`, (event, result) => args[2](result))
+      ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, (event, result) => args[2](result))
     }
 
-    ipcRenderer.send(constants.RUNTIME_SENDMESSAGE, targetExtensionId, message, this.originResultID)
-    this.incrementOriginResultID()
+    ipcRenderer.send(constants.RUNTIME_SENDMESSAGE, targetExtensionId, message, originResultID)
+    originResultID++
   }
 
   getManifest() {
@@ -128,10 +132,6 @@ class Runtime {
   setUninstallURL(url, callback) {
     if (callback)
       return callback
-  }
-
-  incrementOriginResultID() {
-    this.originResultID = this.originResultID++
   }
 }
 
