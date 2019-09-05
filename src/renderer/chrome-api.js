@@ -87,7 +87,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
     },
 
     create(details, cb) {
-      cb();
+      cb && cb();
     },
 
     query(args, cb) {
@@ -123,6 +123,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
 
   ipcRenderer.on(`${constants.RUNTIME_ONMESSAGE_}${extensionId}`, (event, tabId, message, resultID) => {
     chrome.runtime.onMessage.emit(message, new MessageSender({ tabId, extensionId }), (messageResult) => {
+      // log(`Runtime message result (chrome-api.js) #${resultID}:`, message, messageResult)
       ipcRenderer.send(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, messageResult)
     })
   });
@@ -140,7 +141,7 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   subscribeAndForwardEvents(chrome);
 
   if (!isPackaged) {
-    chrome = loggingProxy(chrome);
+    // chrome = loggingProxy(chrome);
   }
 
   return chrome;

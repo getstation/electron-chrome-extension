@@ -56,7 +56,7 @@ const handler = {
 
     if (['string', 'number'].includes(typeof apis[prop])) {
       const result = apis[prop];
-      log(`${apis.__path}.${prop} `, result);
+      // log(`${apis.__path}.${prop} `, result);
 
       return result;
     }

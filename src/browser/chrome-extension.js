@@ -221,7 +221,7 @@ ipcMain.on(constants.RUNTIME_SENDMESSAGE, function (event, extensionId, message,
 
   page.webContents.sendToAll(`${constants.RUNTIME_ONMESSAGE_}${extensionId}`, event.sender.id, message, resultID)
   ipcMain.once(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, (eventResult, result) => {
-    eventResult.sender.send(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, result)
+    event.sender.send(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, result)
   })
   resultID++
 })
