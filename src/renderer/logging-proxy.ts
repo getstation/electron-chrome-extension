@@ -1,4 +1,4 @@
-import { log } from '../common/utils';
+// import { log } from '../common/utils';
 
 // Proxy for log functions/properties calls in a given context
 /**
