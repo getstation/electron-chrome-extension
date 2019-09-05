@@ -212,16 +212,16 @@ ipcMain.on(constants.I18N_MANIFEST, function (event, extensionId) {
 })
 
 let resultID = 1
-ipcMain.on(constants.RUNTIME_SENDMESSAGE, function (event, extensionId, message, originResultID) {
+ipcMain.on(constants.RUNTIME_SENDMESSAGE, function (contentScriptEvent, extensionId, message, originResultID) {
   const page = backgroundPages[extensionId]
   if (!page) {
     console.error(`Connect to unknown extension ${extensionId}`)
     return
   }
 
-  page.webContents.sendToAll(`${constants.RUNTIME_ONMESSAGE_}${extensionId}`, event.sender.id, message, resultID)
-  ipcMain.once(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, (eventResult, result) => {
-    event.sender.send(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, result)
+  page.webContents.sendToAll(`${constants.RUNTIME_ONMESSAGE_}${extensionId}`, contentScriptEvent.sender.id, message, resultID)
+  ipcMain.once(`${constants.RUNTIME_ONMESSAGE_RESULT_}${resultID}`, (backgroundPageEvent, result) => {
+    contentScriptEvent.sender.send(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, result)
   })
   resultID++
 })

@@ -1,4 +1,4 @@
-// import { log } from '../common/utils';
+import { log } from '../common/utils';
 
 // Proxy for log functions/properties calls in a given context
 /**
@@ -36,7 +36,7 @@ const handler = {
             return new Proxy(callResult, handler);
           }
 
-          // log(`${apis.__path}.${prop} `, ...args, callResult);
+          log(`${apis.__path}.${prop} `, ...args, callResult);
 
           return callResult;
         }
@@ -48,7 +48,7 @@ const handler = {
           return new Proxy(result, handler);
         }
 
-        // log(`${apis.__path}.${prop} `, result);
+        log(`${apis.__path}.${prop} `, result);
 
         return result;
       };
@@ -56,7 +56,7 @@ const handler = {
 
     if (['string', 'number'].includes(typeof apis[prop])) {
       const result = apis[prop];
-      // log(`${apis.__path}.${prop} `, result);
+      log(`${apis.__path}.${prop} `, result);
 
       return result;
     }
