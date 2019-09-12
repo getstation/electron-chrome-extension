@@ -1,4 +1,4 @@
-const { ipcRenderer, remote: { app: { isPackaged } } } = require('electron');
+const { ipcRenderer } = require('electron');
 
 const constants = require('../common/constants');
 const { log } = require('../common/utils');
@@ -139,10 +139,6 @@ exports.injectTo = function (extensionId, isBackgroundPage, context) {
   chrome.runtime.onInstalled.emit({ reason: 'install' });
 
   subscribeAndForwardEvents(chrome);
-
-  if (!isPackaged) {
-    // chrome = loggingProxy(chrome);
-  }
 
   return chrome;
 };
