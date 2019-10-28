@@ -101,7 +101,7 @@ const startBackgroundPages = function (manifest) {
   const contents = webContents.create({
     type: 'backgroundPage',
     partition: 'persist:__chrome_extension',
-    sandbox: true,
+    sandbox: false,
     commandLineSwitches: [
       `--preload=${path.join(__dirname, '../renderer/index.js')}`
     ]
