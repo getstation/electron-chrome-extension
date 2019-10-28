@@ -18,7 +18,7 @@
   "author": "Station <hello@getstation.com>",
   "license": "ISC",
   "peerDependencies": {
-    "electron": ">=6.0.2"
+    "electron": ">=7.0.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",
@@ -27,7 +27,7 @@
     "@types/mocha": "^5.2.5",
     "@types/tmp": "0.0.33",
     "concurrently": "^4.1.0",
-    "electron": "^6.0.2",
+    "electron": "^7.0.0",
     "electron-mocha": "^8.0.1",
     "electron-process-manager": "^0.7.1",
     "mocha": "^5.2.0",

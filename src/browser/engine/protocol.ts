@@ -39,7 +39,7 @@ const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chro
 // Stream callback allow custom headers.
 
 const protocolHandler = async (
-  { url }: Electron.RegisterBufferProtocolRequest,
+  { url }: any,
   callback: Function
 ) => {
   const { hostname, pathname } = parse(url);
@@ -110,7 +110,7 @@ app.on('session-created', (session) => {
     );
   }
 
-  session.protocol.registerStreamProtocol(
+  session.protocol.registerBufferProtocol(
     protocolAsScheme(Protocol.Extension),
     protocolHandler,
     (error: any) => {

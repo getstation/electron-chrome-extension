@@ -95,7 +95,7 @@ Object.keys(contentScripts).forEach(key => {
   if (cs.contentScripts) {
     setupContentScript(cs.extensionId, worldId, function (isolatedWorldWindow) {
       // native window open workaround
-      const { ipcRendererInternal } = require('@electron/internal/renderer/ipc-renderer-internal');
+      const { ipcRendererInternal } = require('../api/ipc-renderer-internal');
 
       const { guestInstanceId, openerId } = process;
 

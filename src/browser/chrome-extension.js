@@ -1,4 +1,4 @@
-const { app, ipcMain, webContents, BrowserWindow, protocol } = require('electron')
+const { app, ipcMain, webContents } = require('electron')
 const { getAllWebContents } = process.electronBinding('web_contents')
 const ChromeAPIHandler = require('./handlers');
 
@@ -22,11 +22,6 @@ const wcAsTab = wc => ({
   title: wc.getTitle(),
   incognito: false,
 })
-
-// TODO(zcbenz): Remove this when we have Object.values().
-const objectValues = function (object) {
-  return Object.keys(object).map(function (key) { return object[key] })
-}
 
 // Mapping between extensionId(hostname) and manifest.
 const manifestMap = {}  // extensionId => manifest
@@ -104,9 +99,10 @@ const startBackgroundPages = function (manifest) {
 
   // ref: https://cs.chromium.org/chromium/src/chrome/browser/background/background_contents_service.cc?l=678
   const contents = webContents.create({
-    isBackgroundPage: true,
+    type: 'backgroundPage',
+    partition: 'persist:__chrome_extension',
+    sandbox: true,
     commandLineSwitches: [
-      '--electron-chrome-extension-background-page',
       `--preload=${path.join(__dirname, '../renderer/index.js')}`
     ]
   });
@@ -129,8 +125,10 @@ const removeBackgroundPages = function (manifest) {
 }
 
 const sendToBackgroundPages = function (...args) {
-  for (const page of objectValues(backgroundPages)) {
-    page.webContents.sendToAll(...args)
+  for (const page of Object.values(backgroundPages)) {
+    if (!page.webContents.isDestroyed()) {
+      page.webContents.sendToAll(...args)
+    }
   }
 }
 
@@ -192,7 +190,7 @@ let nextId = 0
 
 ipcMain.on(constants.RUNTIME_CONNECT, function (event, extensionId, connectInfo, url) {
   const page = backgroundPages[extensionId]
-  if (!page) {
+  if (!page || page.webContents.isDestroyed()) {
     console.error(`Connect to unknown extension ${extensionId}`)
     return
   }
@@ -242,7 +240,59 @@ ipcMain.on(constants.TABS_SEND_MESSAGE, function (event, tabId, extensionId, isB
   resultID++
 })
 
+const getLanguage = () => {
+  return app.getLocale().replace(/-.*$/, '').toLowerCase()
+}
+
+const getMessagesPath = (extensionId) => {
+  const metadata = manifestMap[extensionId]
+  if (!metadata) {
+    throw new Error(`Invalid extensionId: ${extensionId}`)
+  }
+
+  const localesDirectory = path.join(metadata.srcDirectory, '_locales')
+  const language = getLanguage()
+
+  try {
+    const filename = path.join(localesDirectory, language, 'messages.json')
+    fs.accessSync(filename, fs.constants.R_OK)
+    return filename
+  } catch {
+    const defaultLocale = metadata.default_locale || 'en'
+    return path.join(localesDirectory, defaultLocale, 'messages.json')
+  }
+}
+
+const validStorageTypes = new Set(['sync', 'local'])
+
+const getChromeStoragePath = (storageType, extensionId) => {
+  if (!validStorageTypes.has(storageType)) {
+    throw new Error(`Invalid storageType: ${storageType}`)
+  }
+
+  if (!manifestMap[extensionId]) {
+    throw new Error(`Invalid extensionId: ${extensionId}`)
+  }
+
+  return path.join(app.getPath('userData'), `/Chrome Storage/${extensionId}-${storageType}.json`)
+}
+
+const isChromeExtension = function (pageURL) {
+  const { protocol } = url.parse(pageURL)
+  return protocol === 'chrome-extension:'
+}
+
+const assertChromeExtension = function (contents, api) {
+  const pageURL = contents._getURL()
+  if (!isChromeExtension(pageURL)) {
+    console.error(`Blocked ${pageURL} from calling ${api}`)
+    throw new Error(`Blocked ${api}`)
+  }
+}
+
 ipcMain.on(constants.TABS_EXECUTESCRIPT, function (event, requestId, tabId, extensionId, details) {
+  assertChromeExtension(event.sender, 'chrome.tabs.executeScript()')
+
   const contents = webContents.fromId(tabId)
   if (!contents) {
     console.error(`Sending message to unknown tab ${tabId}`)
@@ -290,6 +340,10 @@ ipcMain.on(
 ipcMain.on(constants.RUNTIME_GET_MANIFEST, (event, extensionId) => {
   event.returnValue = manifestMap[extensionId];
 })
+
+exports.getContentScripts = () => {
+  return Object.values(contentScripts)
+}
 
 // Transfer the content scripts to renderer.
 const contentScripts = {}
@@ -385,8 +439,10 @@ const loadDevToolsExtensions = function (win, manifests) {
   extensionInfoArray.forEach((extension) => {
     win.devToolsWebContents._grantOriginAccess(extension.startPage)
   })
-  // ref: https://github.com/electron/electron/pull/17614/files#diff-8d85c651cb0fb8feef2c4694d52da2e3R400
-  win.devToolsWebContents.executeJavaScript(`InspectorFrontendAPI.addExtensions(${JSON.stringify(extensionInfoArray)})`)
+  // ref: https://github.com/electron/electron/blob/cdff1bde22f99f99c2273c2dea3b7a4a3adea09d/lib/browser/chrome-extension.js#L392
+  extensionInfoArray.forEach((extensionInfo) => {
+    win.devToolsWebContents.executeJavaScript(`Extensions.extensionServer._addExtension(${JSON.stringify(extensionInfo)})`)
+  })
 }
 
 app.on('web-contents-created', function (event, webContents) {
@@ -394,7 +450,7 @@ app.on('web-contents-created', function (event, webContents) {
 
   hookWebContentsEvents(webContents)
   webContents.on('devtools-opened', function () {
-    loadDevToolsExtensions(webContents, objectValues(manifestMap))
+    loadDevToolsExtensions(webContents, Object.values(manifestMap))
   })
 })
 
