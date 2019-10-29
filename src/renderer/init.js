@@ -1,6 +1,6 @@
 const url = require('url');
 const constants = require('../common/constants');
-const isBackgroundPage = process.argv.indexOf('--electron-chrome-extension-background-page') !== -1;
+const isBackgroundPage = process.argv.indexOf('--removed-electron-chrome-extension-background-page') !== -1;
 
 // Mixmax detect the navigator user agent for his own desktop app
 // and add a behvior that is not compliant with our mechanism.

@@ -36,6 +36,7 @@
         const webviews = document.querySelectorAll('webview')
 
         for (wv of webviews) {
+          wv.openDevTools()
           wv.addEventListener(
             'focus',
             event => ipcRenderer.send('WEBVIEW_FOCUS', event.target.getWebContents().id),

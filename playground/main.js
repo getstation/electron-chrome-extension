@@ -33,12 +33,14 @@ function createWindow() {
   }));
 
   mainWindow.on('closed', () => mainWindow = null);
+
+  mainWindow.openDevTools()
 }
 
 app.on('ready', async () => {
   createWindow();
 
-  require('electron-process-manager').openProcessManager();
+  // require('electron-process-manager').openProcessManager();
 
   // Mixmax: ocpljaamllnldhepankaeljmeeeghnid
   // Gmelius: dheionainndbbpoacpnopgmnihkcmnkl
@@ -60,7 +62,7 @@ app.on('ready', async () => {
   });
 
   // load Mixmax for the fun
-  await ECx.load('dheionainndbbpoacpnopgmnihkcmnkl');
+  await ECx.load('kbfnbcaeplbcioakkpcpgfkobkghlhen');
 });
 
 ipcMain.on('WEBVIEW_FOCUS', (_, tabId) =>

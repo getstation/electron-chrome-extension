@@ -100,21 +100,26 @@ const startBackgroundPages = function (manifest) {
   // ref: https://cs.chromium.org/chromium/src/chrome/browser/background/background_contents_service.cc?l=678
   const contents = webContents.create({
     type: 'backgroundPage',
-    partition: 'persist:__chrome_extension',
+    // partition: 'persist:__chrome_extension',
     sandbox: false,
     commandLineSwitches: [
-      `--preload=${path.join(__dirname, '../renderer/index.js')}`
+      `--preload=${path.join(__dirname, '../renderer/index.js')}`,
+      '--removed-electron-chrome-extension-background-page'
     ]
   });
 
   backgroundPages[manifest.extensionId] = { html: html, webContents: contents, name: name, src: manifest.srcDirectory }
 
-  contents.loadURL(url.format({
+  const contentsUrl = url.format({
     protocol: constants.EXTENSION_PROTOCOL,
     slashes: true,
     hostname: manifest.extensionId,
     pathname: name
-  }))
+  })
+
+  contents.loadURL(contentsUrl)
+
+  setTimeout(() => contents.openDevTools(), 10000)
 }
 
 const removeBackgroundPages = function (manifest) {
