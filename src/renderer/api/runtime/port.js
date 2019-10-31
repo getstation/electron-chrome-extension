@@ -22,7 +22,7 @@ class Port {
     });
     ipcRenderer.on(`${constants.PORT_POSTMESSAGE_}${portId}`, (event, message) => {
       const sendResponse = function () { console.error('sendResponse is not implemented') };
-      // log(`emit message for port #${portId} ${name}: `, message);
+      log(`emit message for port #${portId} ${name}: `, message);
       this.onMessage.emit(message, this.sender, sendResponse)
     });
   }
