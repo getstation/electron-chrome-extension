@@ -44,7 +44,6 @@ const protocolHandler = async (
   { url }: any,
   callback: Function
 ) => {
-  console.log(url);
   const { hostname, pathname } = parse(url);
   if (!hostname || !pathname) return callback();
 

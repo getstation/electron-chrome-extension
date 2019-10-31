@@ -12,13 +12,12 @@ const matchesPattern = function (pattern) {
   return url.match(regexp)
 }
 
-const setupContentScript = function (extensionId, worldId, callback) {
+const setupContentScript = async function (extensionId, worldId, callback) {
   const chromeAPIs = require('../chrome-api').injectTo(extensionId, false, {})
+  const isolatedWorldWindow = await webFrame.executeJavaScriptInIsolatedWorld(worldId, [{ code: 'window', url: `${extensionId}://ChromeAPI` }]);
+  isolatedWorldWindow.chrome = chromeAPIs;
 
-  webFrame.executeJavaScriptInIsolatedWorld(worldId, [{ code: 'window', url: `${extensionId}://ChromeAPI` }], function (isolatedWorldWindow) {
-    isolatedWorldWindow.chrome = chromeAPIs;
-    callback(isolatedWorldWindow)
-  });
+  callback(isolatedWorldWindow)
 }
 
 // Run the code with chrome API integrated.

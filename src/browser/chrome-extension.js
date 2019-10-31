@@ -118,8 +118,6 @@ const startBackgroundPages = function (manifest) {
   })
 
   contents.loadURL(contentsUrl)
-
-  setTimeout(() => contents.openDevTools(), 10000)
 }
 
 const removeBackgroundPages = function (manifest) {

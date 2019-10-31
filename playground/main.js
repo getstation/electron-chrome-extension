@@ -62,7 +62,7 @@ app.on('ready', async () => {
   });
 
   // load Mixmax for the fun
-  await ECx.load('kbfnbcaeplbcioakkpcpgfkobkghlhen');
+  await ECx.load('ocpljaamllnldhepankaeljmeeeghnid');
 });
 
 ipcMain.on('WEBVIEW_FOCUS', (_, tabId) =>
