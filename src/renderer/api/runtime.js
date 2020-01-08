@@ -125,7 +125,7 @@ class Runtime {
       ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, (event, result) => args[2](result))
     }
 
-    ipcRenderer.send(constants.RUNTIME_SENDMESSAGE, targetExtensionId, message, originResultID)
+    ipcRenderer.send(constants.RUNTIME_SEND_MESSAGE, targetExtensionId, message, originResultID)
     originResultID++
   }
 
@@ -136,6 +136,10 @@ class Runtime {
   setUninstallURL(url, callback) {
     if (callback)
       return callback
+  }
+
+  incrementOriginResultID() {
+    originResultID++
   }
 }
 

@@ -213,7 +213,7 @@ ipcMain.on(constants.I18N_MANIFEST, function (event, extensionId) {
 })
 
 let resultID = 1
-ipcMain.on(constants.RUNTIME_SENDMESSAGE, function (contentScriptEvent, extensionId, message, originResultID) {
+ipcMain.on(constants.RUNTIME_SEND_MESSAGE, function (contentScriptEvent, extensionId, message, originResultID) {
   const page = backgroundPages[extensionId]
   if (!page) {
     console.error(`Connect to unknown extension ${extensionId}`)

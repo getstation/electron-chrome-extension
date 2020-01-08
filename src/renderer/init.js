@@ -36,7 +36,5 @@ if (protocol === `${constants.EXTENSION_PROTOCOL}:`) {
   require('./window-setup')(window, ipcRendererInternal, guestInstanceId, openerId);
   // end workaround
 
-  require('./xhr').default(window);
-
   require('./injectors/content-scripts-injector')
 }
