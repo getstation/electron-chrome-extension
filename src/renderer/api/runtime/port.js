@@ -22,8 +22,8 @@ class Port {
     });
     ipcRenderer.on(`${constants.PORT_POSTMESSAGE_}${portId}`, (event, message) => {
       const sendResponse = function () { console.error('sendResponse is not implemented') };
-      log(`emit message for port #${portId} ${name}: `, message);
-      this.onMessage.emit(message, this.sender, sendResponse)
+      // log(`emit received message for port #${portId} ${name}: `, message);
+      this.onMessage.emit(JSON.parse(message), this.sender, sendResponse)
     });
   }
 
@@ -35,7 +35,8 @@ class Port {
   }
 
   postMessage(message) {
-    ipcRenderer.sendToAll(this.tabId, `${constants.PORT_POSTMESSAGE_}${this.portId}`, message);
+    // log(`postMessage for port #${this.portId} ${this.name}: `, message);
+    ipcRenderer.sendToAll(this.tabId, `${constants.PORT_POSTMESSAGE_}${this.portId}`, JSON.stringify(message));
   }
 
   _onDisconnect() {

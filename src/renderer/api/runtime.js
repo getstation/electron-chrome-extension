@@ -113,7 +113,7 @@ class Runtime {
       // A case of not provide extension-id: (message, responseCallback)
       if (typeof args[1] === 'function') {
         ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, (event, result) => {
-          log(`Runtime message result (runtime.js) #${originResultID}:`, args[0], result)
+          // log(`Runtime message result (runtime.js) #${originResultID}:`, args[0], result)
           return args[1](result);
         })
         message = args[0]
@@ -126,7 +126,7 @@ class Runtime {
     }
 
     ipcRenderer.send(constants.RUNTIME_SEND_MESSAGE, targetExtensionId, message, originResultID)
-    originResultID++
+    this.incrementOriginResultID()
   }
 
   getManifest() {

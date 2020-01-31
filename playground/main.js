@@ -59,8 +59,8 @@ app.on('ready', async () => {
     fetcher: { autoUpdate: true, autoUpdateInterval: 1000000 },
   });
 
-  // load Mixmax for the fun
-  await ECx.load('pmnhcgfcafcnkbengdcanjablaabjplo');
+  // load Grammarly for the fun
+  await ECx.load('kbfnbcaeplbcioakkpcpgfkobkghlhen');
 });
 
 ipcMain.on('WEBVIEW_FOCUS', (_, tabId) =>

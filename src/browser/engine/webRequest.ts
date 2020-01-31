@@ -1,4 +1,4 @@
-import { app } from 'electron';
+import { app, webContents } from 'electron';
 import enhanceWebRequest from 'electron-better-web-request';
 // @ts-ignore
 import recursivelyLowercaseJSONKeys from 'recursive-lowercase-json';
@@ -30,17 +30,123 @@ const stringify = (policies: { [name: string]: string[] }): string =>
     )
     .join(';');
 
+const requestIsXhrOrSubframe = (details: any) => {
+  const { resourcetype } = details;
+
+  const isXhr = resourcetype === 'xhr';
+  const isSubframe = resourcetype === 'subFrame';
+
+  return isXhr || isSubframe;
+};
+
+const requestHasExtensionOrigin = (details: any) => {
+  const { requestHeaders, requestheaders } = details;
+
+  const origin = (requestHeaders && requestHeaders.origin) || (requestheaders && requestheaders.origin);
+
+  if (origin) {
+    return origin.startsWith(Protocol.Extension);
+  }
+
+  return false;
+};
+
+const requestIsFromBackgroundPage = (details: any): boolean => {
+  const { webcontentsid } = details;
+
+  if (webcontentsid) {
+    const wc = webContents.fromId(webcontentsid);
+
+    if (wc) {
+      return wc.getURL().startsWith(Protocol.Extension);
+    }
+
+    return false;
+  }
+
+  return false;
+};
+
+const requestIsOption = (details: any) => {
+  const { method } = details;
+
+  return method === 'OPTIONS';
+};
+
+const requestIsForExtension = (details: any) =>
+  requestHasExtensionOrigin(details) && requestIsXhrOrSubframe(details);
+
+const requestsOrigins = new Map<string, string>();
+
 app.on(
   'session-created',
   (session: Electron.Session) => {
     enhanceWebRequest(session);
 
+    // session.webRequest.onBeforeRequest(
+    //   // @ts-ignore
+    //   (details: any, callback: Function) => {
+    //     console.log('-----' + 'onBeforeRequest');
+    //     console.log(details.url);
+    //     console.log(details);
+
+    //     callback({
+    //       cancel: false,
+    //     });
+    //   }
+    // );
+
+    session.webRequest.onBeforeSendHeaders(
+      // @ts-ignore
+      (details: any, callback: Function) => {
+        const formattedDetails = recursivelyLowercaseJSONKeys(details);
+        const { id, requestheaders } = formattedDetails;
+
+        requestsOrigins.set(id, requestheaders.origin);
+
+        if (!requestIsFromBackgroundPage(formattedDetails) && requestIsForExtension(formattedDetails)
+          && !requestIsOption(formattedDetails)) {
+          return callback({
+            cancel: false,
+            requestHeaders: {
+              ...formattedDetails.requestheaders,
+              origin: ['null'],
+            },
+          });
+        }
+
+        // console.log('-----' + 'onBeforeSendHeaders');
+        // console.log(details.url);
+        // console.log(details);
+
+        callback({
+          cancel: false,
+          requestHeaders: formattedDetails.requestheaders,
+        });
+      },
+      {
+        origin: 'ecx-cors',
+      }
+    );
+
+    // session.webRequest.onSendHeaders(
+    //   // @ts-ignore
+    //   (details: any) => {
+    //     console.log('-----' + 'onSendHeaders');
+    //     console.log(details.url);
+    //     console.log(details);
+    //   }
+    // );
+
     session.webRequest.onHeadersReceived(
       // @ts-ignore
       (details: any, callback: Function) => {
         const formattedDetails = recursivelyLowercaseJSONKeys(details);
-        const { responseheaders } = formattedDetails;
-
+        const { id, responseheaders } = formattedDetails;
+        console.log('-----' + 'onHeadersReceived');
+        console.log(details.url);
+        console.log(details);
+        console.log('-----');
         const headers = new Map<string, string[]>(Object.entries(responseheaders));
 
         // Override Content Security Policy Header
@@ -91,6 +197,28 @@ app.on(
         }
         // End override CSP iframe-src policy
 
+        const accessControlAllowOrigin = responseheaders['access-control-allow-origin'] || [];
+        const allowedOriginIsWildcard = accessControlAllowOrigin.includes('*');
+
+        // Code block for bypass preflight CORS check like Wavebox is doing it
+        // `chrome-extension://` requests doesn't bypass CORS
+        // check like in Chromium
+        //
+        // refs:
+        // https://fetch.spec.whatwg.org/#cors-check
+        // https://cs.chromium.org/chromium/src/extensions/common/cors_util.h?rcl=faf5cf5cb5985875dedd065d852b35a027e50914&l=21
+        // https://github.com/wavebox/waveboxapp/blob/09f791314e1ecc808cbbf919ac65e5f6dda785bd/src/app/src/Extensions/Chrome/CRExtensionRuntime/CRExtensionBackgroundPage.js#L195
+        // todo(hugo): find a better and understandable solution
+        if (requestIsForExtension(formattedDetails)
+          || allowedOriginIsWildcard) {
+          headers.set('access-control-allow-credentials', ['true']);
+          headers.set('access-control-allow-origin', ['*']);
+        } else {
+          headers.set('access-control-allow-credentials', ['true']);
+        }
+
+        requestsOrigins.delete(id);
+
         callback({
           cancel: false,
           responseHeaders: fromEntries(headers),
@@ -100,5 +228,23 @@ app.on(
         origin: 'ecx-cors',
       }
     );
+
+    // session.webRequest.onCompleted(
+    //   // @ts-ignore
+    //   (details: any) => {
+    //     console.log('-----' + 'onCompleted');
+    //     console.log(details.url);
+    //     console.log(details);
+    //   }
+    // );
+
+    // session.webRequest.onErrorOccurred(
+    //   // @ts-ignore
+    //   (details: any) => {
+    //     console.log('-----' + 'onErrorOccurred');
+    //     console.log(details.url);
+    //     console.log(details);
+    //   }
+    // );
   }
 );
