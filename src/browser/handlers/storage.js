@@ -133,16 +133,18 @@ class ChromeStorageAPIHandler {
     constructor(extensionId) {
         this.syncStorageAPIHandler = new ChromeStorageAreaAPIHandler('sync', extensionId);
         this.localStorageAPIHandler = new ChromeStorageAreaAPIHandler('local', extensionId);
+        this.managedStorageAPIHandler = new ChromeStorageAreaAPIHandler('managed', extensionId);
 
         const eventName = `chrome-storage-changed-${extensionId}`;
         this.syncStorageAPIHandler.on('changed', changes =>
             ipcSend(eventName, [changes, 'sync']));
         this.localStorageAPIHandler.on('changed', changes =>
-            ipcSend(eventName, [changes, 'local']));
+            ipcSend(eventName, [changes, 'managed']));
     }
     release() {
         this.syncStorageAPIHandler.release();
         this.localStorageAPIHandler.release();
+        this.managedStorageAPIHandler.release();
     }
 }
 
