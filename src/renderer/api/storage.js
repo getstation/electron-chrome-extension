@@ -33,6 +33,7 @@ module.exports = {
     return {
       sync: new ChromeStorageAreaAPIClient('sync', extensionId),
       local: new ChromeStorageAreaAPIClient('local', extensionId),
+      managed: new ChromeStorageAreaAPIClient('managed', extensionId),
       onChanged: changedEvent,
     };
   }
