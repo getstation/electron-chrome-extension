@@ -1,6 +1,6 @@
 {
   "name": "electron-chrome-extension",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "description": "Chrome Extensions Engine for Electron",
   "main": "index.js",
   "scripts": {
