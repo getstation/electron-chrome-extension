@@ -23,7 +23,7 @@ export default class Cookies extends Handler<Events> {
 
     this.electronCookies.addListener(
       'changed',
-      (_, cookie, cause, removed) => {
+      (_: any, cookie: any, cause: any, removed: any) => {
         const cxCookie = this.electronCookieToCxCookie(cookie);
         const cxCause = ELECTRON_TO_CRX_COOKIE_CHANGE_CAUSE[cause];
 
@@ -41,80 +41,55 @@ export default class Cookies extends Handler<Events> {
   async handleGet(details: { url: string } & Partial<Cookie>): Promise<Cookie | null> {
     const { url, name } = details; // warning(hugo) ignore storeId
 
-    return new Promise((resolve) => {
-      this.electronCookies.get(
-        { url, name },
-        (_error, cookies) => {
-          if (cookies && cookies[0]) {
-            const cookie = cookies[0];
-            resolve(this.electronCookieToCxCookie(cookie));
-          }
+    const cookies = await this.electronCookies.get({ url, name });
 
-          // "This parameter is null if no such cookie was found"
-          // https://developer.chrome.com/extensions/cookies#property-get-callback
-          resolve(null);
-        }
-      );
-    });
+    if (cookies && cookies[0]) {
+      const cookie = cookies[0];
+      return this.electronCookieToCxCookie(cookie);
+    }
+
+    // "This parameter is null if no such cookie was found"
+    // https://developer.chrome.com/extensions/cookies#property-get-callback
+    return null;
   }
 
   async handleGetAll(details: { url: string } & Partial<Cookie>) {
     const { url, name, domain, path, secure, session } = details;
     // warning(hugo) ignore storeId
 
-    return new Promise((resolve) => {
-      this.electronCookies.get(
-        { url, name, domain, path, secure, session },
-        (_error, cookies) => {
-          if (cookies) {
-            resolve(cookies.map(c => this.electronCookieToCxCookie(c)));
-          }
+    const cookies = await this.electronCookies.get(
+      { url, name, domain, path, secure, session });
 
-          resolve([]);
-        }
-      );
-    });
+    if (cookies) {
+      return cookies.map(c => this.electronCookieToCxCookie(c));
+    }
+
+    return [];
   }
 
   async handleSet(details: { url: string } & Partial<Cookie>) {
     const { url, name, value, domain, path, secure, httpOnly, expirationDate } = details; // warning(hugo) ignore sameSite & storeId
 
-    return new Promise((resolve) => {
-      this.electronCookies.set(
-        { url, name, value, domain, path, secure, httpOnly, expirationDate },
-        (error) => {
-          if (error && error !== null) {
-            return resolve(undefined);
-          }
+    await this.electronCookies.set(
+      { url, name, value, domain, path, secure, httpOnly, expirationDate });
 
-          resolve({
-            name,
-            value,
-            domain,
-            path,
-            secure,
-            httpOnly,
-            expirationDate,
-            storeId: null,
-          });
-        }
-      );
-    });
-
+    return {
+      name,
+      value,
+      domain,
+      path,
+      secure,
+      httpOnly,
+      expirationDate,
+      storeId: null,
+    };
   }
 
   async handleRemove(details: { url: string } & Partial<Cookie>) {
     const { url, name } = details; // warning(hugo) ignore storeId
 
-    return new Promise((resolve) => {
-      this.electronCookies.remove(
-        url,
-        name!,
-        () => {
-          resolve({ url, name, storeId: null });
-        }
-      );
-    });
+    await this.electronCookies.remove(url, name!);
+    return { url, name, storeId: null };
   }
 
   handleGetAllCookieStores() { } // warning(hugo) ignore for now

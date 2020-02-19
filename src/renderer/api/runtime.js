@@ -84,7 +84,11 @@ class Runtime {
     let targetExtensionId = this.id
     let connectInfo = { name: '' }
     if (args.length === 1) {
-      connectInfo = args[0]
+      if (typeof args[0] === 'string') {
+        targetExtensionId = args[0]
+      } else {
+        connectInfo = args[0]
+      }
     } else if (args.length === 2) {
       [targetExtensionId, connectInfo] = args
     }
@@ -121,8 +125,8 @@ class Runtime {
       ipcRenderer.once(`${constants.RUNTIME_SENDMESSAGE_RESULT_}${originResultID}`, (event, result) => args[2](result))
     }
 
-    ipcRenderer.send(constants.RUNTIME_SENDMESSAGE, targetExtensionId, message, originResultID)
-    originResultID++
+    ipcRenderer.send(constants.RUNTIME_SEND_MESSAGE, targetExtensionId, message, originResultID)
+    this.incrementOriginResultID()
   }
 
   getManifest() {
@@ -132,6 +136,10 @@ class Runtime {
   setUninstallURL(url, callback) {
     if (callback)
       return callback
+  }
+
+  incrementOriginResultID() {
+    originResultID++
   }
 }
 

@@ -1,6 +1,6 @@
 const url = require('url');
 const constants = require('../common/constants');
-const isBackgroundPage = process.argv.indexOf('--electron-chrome-extension-background-page') !== -1;
+const isBackgroundPage = process.argv.indexOf('--removed-electron-chrome-extension-background-page') !== -1;
 
 // Mixmax detect the navigator user agent for his own desktop app
 // and add a behvior that is not compliant with our mechanism.
@@ -30,13 +30,11 @@ if (protocol === `${constants.EXTENSION_PROTOCOL}:`) {
   })
 } else {
   // native window open workaround
-  const { ipcRendererInternal } = require('@electron/internal/renderer/ipc-renderer-internal');
+  const { ipcRendererInternal } = require('./api/ipc-renderer-internal');
   const { guestInstanceId, openerId } = process;
 
   require('./window-setup')(window, ipcRendererInternal, guestInstanceId, openerId);
   // end workaround
-
-  require('./xhr').default(window);
 
   require('./injectors/content-scripts-injector')
 }

@@ -30,8 +30,10 @@ const asyncReadFile = promisify(readFile);
 const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chrome-extension-resource:; object-src \'self\' blob: filesystem:;';
 
 (protocol as any).registerSchemesAsPrivileged([
-  { scheme: protocolAsScheme(Protocol.Extension),
-    privileges: { standard: true, secure: true, bypassCSP: true } },
+  {
+    scheme: protocolAsScheme(Protocol.Extension),
+    privileges: { standard: true, secure: true, bypassCSP: true },
+  },
 ]);
 
 // The protocol handler load file into Buffers
@@ -39,7 +41,7 @@ const defaultContentSecurityPolicy = 'script-src \'self\' blob: filesystem: chro
 // Stream callback allow custom headers.
 
 const protocolHandler = async (
-  { url }: Electron.RegisterBufferProtocolRequest,
+  { url }: any,
   callback: Function
 ) => {
   const { hostname, pathname } = parse(url);
@@ -112,13 +114,6 @@ app.on('session-created', (session) => {
 
   session.protocol.registerStreamProtocol(
     protocolAsScheme(Protocol.Extension),
-    protocolHandler,
-    (error: any) => {
-      if (error) {
-        console.error(
-          `Unable to register ${Protocol.Extension} protocol: ${error}`
-        );
-      }
-    }
+    protocolHandler
   );
 });

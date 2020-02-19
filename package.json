@@ -1,6 +1,6 @@
 {
   "name": "electron-chrome-extension",
-  "version": "4.0.4",
+  "version": "5.0.0-rc.2",
   "description": "Chrome Extensions Engine for Electron",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "author": "Station <hello@getstation.com>",
   "license": "ISC",
   "peerDependencies": {
-    "electron": ">=6.0.2"
+    "electron": ">=7.0.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",
@@ -27,9 +27,9 @@
     "@types/mocha": "^5.2.5",
     "@types/tmp": "0.0.33",
     "concurrently": "^4.1.0",
-    "electron": "^6.0.2",
+    "electron": "^7.1.10",
     "electron-mocha": "^8.0.1",
-    "electron-process-manager": "^0.7.1",
+    "electron-process-manager": "^1.0.0",
     "mocha": "^5.2.0",
     "ts-mocha": "^2.0.0",
     "tslint": "^5.11.0",

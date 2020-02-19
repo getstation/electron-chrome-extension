@@ -12,13 +12,12 @@ const matchesPattern = function (pattern) {
   return url.match(regexp)
 }
 
-const setupContentScript = function (extensionId, worldId, callback) {
+const setupContentScript = async function (extensionId, worldId, callback) {
   const chromeAPIs = require('../chrome-api').injectTo(extensionId, false, {})
+  const isolatedWorldWindow = await webFrame.executeJavaScriptInIsolatedWorld(worldId, [{ code: 'window', url: `${extensionId}://ChromeAPI` }]);
+  isolatedWorldWindow.chrome = chromeAPIs;
 
-  webFrame.executeJavaScriptInIsolatedWorld(worldId, [{ code: 'window', url: `${extensionId}://ChromeAPI` }], function (isolatedWorldWindow) {
-    isolatedWorldWindow.chrome = chromeAPIs;
-    callback(isolatedWorldWindow)
-  });
+  callback(isolatedWorldWindow)
 }
 
 // Run the code with chrome API integrated.
@@ -95,7 +94,7 @@ Object.keys(contentScripts).forEach(key => {
   if (cs.contentScripts) {
     setupContentScript(cs.extensionId, worldId, function (isolatedWorldWindow) {
       // native window open workaround
-      const { ipcRendererInternal } = require('@electron/internal/renderer/ipc-renderer-internal');
+      const { ipcRendererInternal } = require('../api/ipc-renderer-internal');
 
       const { guestInstanceId, openerId } = process;
 
@@ -104,8 +103,6 @@ Object.keys(contentScripts).forEach(key => {
 
       require('../window-setup')(isolatedWorldWindow, ipcRendererInternal, guestInstanceId, openerId, shouldUseNonNativeWinOpen);
       // end workaround
-
-      require('../xhr').default(isolatedWorldWindow);
 
       for (const script of cs.contentScripts) {
         addContentScript(cs.extensionId, script)

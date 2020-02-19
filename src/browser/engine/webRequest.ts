@@ -40,7 +40,9 @@ const requestIsXhrOrSubframe = (details: any) => {
 };
 
 const requestHasExtensionOrigin = (details: any) => {
-  const { headers: { origin } } = details;
+  const { requestHeaders, requestheaders } = details;
+
+  const origin = (requestHeaders && requestHeaders.origin) || (requestheaders && requestheaders.origin);
 
   if (origin) {
     return origin.startsWith(Protocol.Extension);
@@ -81,37 +83,13 @@ app.on(
   (session: Electron.Session) => {
     enhanceWebRequest(session);
 
-    /**
-     * Capture origin header to override CSP on response received
-     * See comment below for full explanation
-     * Capture in two listeners: onBeforeRequest and onBeforeSendHeaders
-     * since some requests with custom protocol are not catched
-     * in the onBeforeSendHeaders listener but in onBeforeRequest
-     */
-    session.webRequest.onBeforeRequest(
-      // @ts-ignore
-      (details: any, callback: Function) => {
-        const formattedDetails = recursivelyLowercaseJSONKeys(details);
-        const { id, headers: { origin } } = formattedDetails;
-
-        requestsOrigins.set(id, origin);
-
-        callback({
-          cancel: false,
-        });
-      },
-      {
-        origin: 'ecx-cors',
-      }
-    );
-
     session.webRequest.onBeforeSendHeaders(
       // @ts-ignore
       (details: any, callback: Function) => {
         const formattedDetails = recursivelyLowercaseJSONKeys(details);
-        const { id, headers: { origin } } = formattedDetails;
+        const { id, requestheaders } = formattedDetails;
 
-        requestsOrigins.set(id, origin);
+        requestsOrigins.set(id, requestheaders.origin);
 
         if (!requestIsFromBackgroundPage(formattedDetails) && requestIsForExtension(formattedDetails)
           && !requestIsOption(formattedDetails)) {
@@ -205,7 +183,7 @@ app.on(
         if (requestIsForExtension(formattedDetails)
           || allowedOriginIsWildcard) {
           headers.set('access-control-allow-credentials', ['true']);
-          headers.set('access-control-allow-origin', [requestsOrigins.get(id)!]);
+          headers.set('access-control-allow-origin', ['*']);
         } else {
           headers.set('access-control-allow-credentials', ['true']);
         }

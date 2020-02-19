@@ -139,6 +139,8 @@ class ChromeStorageAPIHandler {
         this.syncStorageAPIHandler.on('changed', changes =>
             ipcSend(eventName, [changes, 'sync']));
         this.localStorageAPIHandler.on('changed', changes =>
+            ipcSend(eventName, [changes, 'local']));
+        this.managedStorageAPIHandler.on('changed', changes =>
             ipcSend(eventName, [changes, 'managed']));
     }
     release() {
