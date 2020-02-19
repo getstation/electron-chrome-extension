@@ -83,19 +83,6 @@ app.on(
   (session: Electron.Session) => {
     enhanceWebRequest(session);
 
-    // session.webRequest.onBeforeRequest(
-    //   // @ts-ignore
-    //   (details: any, callback: Function) => {
-    //     console.log('-----' + 'onBeforeRequest');
-    //     console.log(details.url);
-    //     console.log(details);
-
-    //     callback({
-    //       cancel: false,
-    //     });
-    //   }
-    // );
-
     session.webRequest.onBeforeSendHeaders(
       // @ts-ignore
       (details: any, callback: Function) => {
@@ -115,10 +102,6 @@ app.on(
           });
         }
 
-        // console.log('-----' + 'onBeforeSendHeaders');
-        // console.log(details.url);
-        // console.log(details);
-
         callback({
           cancel: false,
           requestHeaders: formattedDetails.requestheaders,
@@ -129,24 +112,12 @@ app.on(
       }
     );
 
-    // session.webRequest.onSendHeaders(
-    //   // @ts-ignore
-    //   (details: any) => {
-    //     console.log('-----' + 'onSendHeaders');
-    //     console.log(details.url);
-    //     console.log(details);
-    //   }
-    // );
-
     session.webRequest.onHeadersReceived(
       // @ts-ignore
       (details: any, callback: Function) => {
         const formattedDetails = recursivelyLowercaseJSONKeys(details);
         const { id, responseheaders } = formattedDetails;
-        console.log('-----' + 'onHeadersReceived');
-        console.log(details.url);
-        console.log(details);
-        console.log('-----');
+
         const headers = new Map<string, string[]>(Object.entries(responseheaders));
 
         // Override Content Security Policy Header
@@ -228,23 +199,5 @@ app.on(
         origin: 'ecx-cors',
       }
     );
-
-    // session.webRequest.onCompleted(
-    //   // @ts-ignore
-    //   (details: any) => {
-    //     console.log('-----' + 'onCompleted');
-    //     console.log(details.url);
-    //     console.log(details);
-    //   }
-    // );
-
-    // session.webRequest.onErrorOccurred(
-    //   // @ts-ignore
-    //   (details: any) => {
-    //     console.log('-----' + 'onErrorOccurred');
-    //     console.log(details.url);
-    //     console.log(details);
-    //   }
-    // );
   }
 );
