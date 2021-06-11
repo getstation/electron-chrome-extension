@@ -27,7 +27,7 @@
     "@types/mocha": "^5.2.5",
     "@types/tmp": "0.0.33",
     "concurrently": "^4.1.0",
-    "electron": "^7.1.10",
+    "electron": "^9.4.0",
     "electron-mocha": "^8.0.1",
     "electron-process-manager": "^1.0.0",
     "mocha": "^5.2.0",
