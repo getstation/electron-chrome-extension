@@ -15,6 +15,10 @@
     "prepublishOnly": "npm run ci && rm -rf ./lib/ && tslint -p . && tsc -p .",
     "playground:reset": "rm -rf playground/.electron-user-data"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getstation/electron-chrome-extension.git"
+  },
   "author": "Station <hello@getstation.com>",
   "license": "ISC",
   "peerDependencies": {
