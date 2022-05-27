@@ -1,5 +1,5 @@
 const { app, ipcMain, webContents } = require('electron')
-const { getAllWebContents } = process.electronBinding('web_contents')
+const { getAllWebContents } = process._linkedBinding('electron_common_web_contents')
 const ChromeAPIHandler = require('./handlers');
 
 const { Buffer } = require('buffer')
